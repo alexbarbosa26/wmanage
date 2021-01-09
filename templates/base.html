@@ -15,16 +15,18 @@
           <a class="navbar-brand" href="#">WManage</a>
 
           <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
-          {% if user.is_authenticated %}
+          
             <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+            {% if user.is_authenticated %}
               <li class="nav-item active">
                 <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="#">Link</a>
               </li>
+            {% endif %}
             </ul>
-          {% endif %}
+          
           
             <ul class="navbar-nav">
                 {% if user.is_authenticated %}
