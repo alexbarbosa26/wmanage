@@ -8,6 +8,7 @@
     {% bootstrap_css %}
     <link rel="stylesheet" type="text/css" href="{% static 'style/signin.css' %}">    
     <link rel="stylesheet" type="text/css" href="{% static 'style/stick-footer.css' %}"> 
+    <link rel="stylesheet" type="text/css" href="{% static 'style/dashboard.css' %}"> 
     <title>{% block title %}{% endblock %}</title>
 </head>
 <body>
@@ -24,21 +25,36 @@
             <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
             {% if user.is_authenticated %}
               <li class="nav-item dropdown active">
-                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Cadastrar</a>
+                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                  <span data-feather="file-plus"></span>
+                  Cadastrar
+                </a>
                 <div class="dropdown-menu">
-                  <a class="dropdown-item" href="#">Ativos</a>
-                  <a class="dropdown-item" href="#">Proventos</a>
+                  <a class="dropdown-item" href="#">
+                    <span data-feather="file"></span>
+                    Ativos
+                  </a>
+                  <a class="dropdown-item" href="#">
+                    <span data-feather="file"></span>
+                    Proventos
+                  </a>
                 </div>
               </li>
               <li class="nav-item dropdown active">
-                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Importar</a>
+                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                  <span data-feather="upload"></span>
+                  Importar
+                </a>
                 <div class="dropdown-menu">
-                  <a class="dropdown-item" href="#">Ativos</a>
-                  <a class="dropdown-item" href="#">Proventos</a>
+                  <a class="dropdown-item" href="#">
+                    <span data-feather="hard-drive"></span>
+                    Ativos
+                  </a>
+                  <a class="dropdown-item" href="#">
+                    <span data-feather="hard-drive"></span>
+                    Proventos
+                  </a>
                 </div>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#">Link</a>
               </li>
             {% endif %}
             </ul>
@@ -46,15 +62,24 @@
           
             <ul class="navbar-nav">
                 {% if user.is_authenticated %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'account_logout' %}">Sair</a>
+                <li class="nav-item active">
+                    <a class="nav-link" href="{% url 'account_logout' %}">
+                      <span data-feather="log-out"></span>
+                      Sair
+                    </a>
                 </li>
                 {% else %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'account_login' %}">Entrar</a>
+                <li class="nav-item active">
+                    <a class="nav-link" href="{% url 'account_login' %}">
+                      <span data-feather="log-in"></span>
+                      Entrar
+                    </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'account_signup' %}">Cadastro</a>
+                <li class="nav-item active">
+                    <a class="nav-link" href="{% url 'account_signup' %}">
+                      <span data-feather="user-plus"></span>
+                      Cadastro
+                    </a>
                 </li>
                 {% endif %}
             </ul>
@@ -76,6 +101,11 @@
         <span class="text-muted">Postado por: Alex Barbosa da Silva</span>
       </div>
     </footer>
+    <!-- Icons -->
+    <script src="https://unpkg.com/feather-icons/dist/feather.min.js"></script>
+    <script>
+      feather.replace()
+    </script>
     {% bootstrap_javascript jquery=True %}
     </body>
 </html>
