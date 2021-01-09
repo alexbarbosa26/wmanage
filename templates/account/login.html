@@ -1,14 +1,14 @@
 {% extends 'base.html' %}
-
+{% load bootstrap4 %}
 {% load crispy_forms_tags %}
 
 {% block title %}Entrar{% endblock %}
 
 {% block content %}
-    <h2>Entrar</h2>
-    <form method="post">
+    <form method="post" class="form-signin">
         {% csrf_token %}
-        {{ form|crispy }}
+        <h1 class="h3 mb-3 font-weight-normal">Entra no sistema</h1>
+        {% bootstrap_form form %}        
         <button class="btn btn-success" type="submit">Entrar</button>
     </form>
 {% endblock %}

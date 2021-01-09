@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 from pathlib import Path
-# import os
+import os
 # import locale
 
 # locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     "crispy_forms",
+    'bootstrap4',
 ]
 
 MIDDLEWARE = [
@@ -145,3 +146,8 @@ AUTHENTICATION_BACKENDS = [
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+STATICFILES_DIRS = [
+     BASE_DIR / 'static',
+]
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
