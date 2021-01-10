@@ -1,24 +1,30 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+    {% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" type="image/png" href="{% static 'favicon.ico' %}"/>  
     {% load static %}
     {% load bootstrap4 %}    
     {% bootstrap_css %}
     <link rel="stylesheet" type="text/css" href="{% static 'style/signin.css' %}">    
     <link rel="stylesheet" type="text/css" href="{% static 'style/stick-footer.css' %}"> 
     <link rel="stylesheet" type="text/css" href="{% static 'style/dashboard.css' %}"> 
+    <link rel="stylesheet" type="text/css" href="{% static 'style/main.css' %}">
     <title>{% block title %}{% endblock %}</title>
 </head>
-<body>
+<body class="bg-light">
   <article>
     <header>
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
           <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
-          <a class="navbar-brand" href="#">WManage</a>
+          <a class="navbar-brand" href="{% url 'pages:home' %}">
+            <span data-feather="package" class="logotipo"></span>
+            WManage
+          </a>
 
           <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
           
@@ -30,7 +36,7 @@
                   Cadastrar
                 </a>
                 <div class="dropdown-menu">
-                  <a class="dropdown-item" href="#">
+                  <a class="dropdown-item" href="{% url 'cadastrar-nota' %}">
                     <span data-feather="file"></span>
                     Ativos
                   </a>
@@ -89,13 +95,14 @@
   </article>
 
     <aside>
-      <main class="container">
-        <div class="container">
+      <main class="container" role="main">
+        <div class="container-fluid">
           {% block content %}
           {% endblock %}
         </div>
       </main>
     </aside>
+
     <footer class="footer">
       <div class="container">
         <span class="text-muted">Postado por: Alex Barbosa da Silva</span>

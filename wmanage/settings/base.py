@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 from pathlib import Path
-import os
+# import os
 # import locale
 
 # locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
@@ -50,6 +50,8 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     "crispy_forms",
     'bootstrap4',
+    'bootstrap_datepicker_plus',
+    'widget_tweaks',
 ]
 
 MIDDLEWARE = [
