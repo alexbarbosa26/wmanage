@@ -68,11 +68,15 @@
                   Importar
                 </a>
                 <div class="dropdown-menu">
-                  <a class="dropdown-item" href="#">
+                  <a class="dropdown-item" href="{% url 'upload-view' %}">
                     <span data-feather="hard-drive"></span>
                     Ativos
                   </a>
-                  <a class="dropdown-item" href="#">
+                  <a class="dropdown-item" href="{% url 'upload-view-cotacao' %}">
+                    <span data-feather="hard-drive"></span>
+                    Cotação
+                  </a>
+                  <a class="dropdown-item" href="{% url 'upload-view-provento' %}">
                     <span data-feather="hard-drive"></span>
                     Proventos
                   </a>
@@ -135,6 +139,7 @@
     <script>
       feather.replace()
     </script>
+    <script src={% static 'js/main.js' %}></script>
     {% bootstrap_javascript jquery=True %}
     </body>
 </html>

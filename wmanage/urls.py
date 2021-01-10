@@ -20,6 +20,7 @@ urlpatterns = [
     # Page Home
     path('', include('pages.urls')),
     path('', include('cadastro.urls')),
+    path('', include('csvs.urls')),
 
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),

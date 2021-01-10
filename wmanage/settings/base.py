@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     # apps
     'cadastro',
     'pages',
+    'csvs',
     # bibliotecas
     'allauth',
     'allauth.account',
