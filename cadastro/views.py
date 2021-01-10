@@ -10,7 +10,7 @@ from bootstrap_datepicker_plus import DatePickerInput
 import locale
 
 #Set Locale
-locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
+locale.setlocale(locale.LC_ALL, '')
 
 def index(request):
     return HttpResponse("Hello, world. You're at the polls index.")
