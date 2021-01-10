@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block title %}WManage{% endblock %}
+
+{% block content %}
+    {% for item in result %}
+        {{ item.ativo }}
+    {% endfor %}
+{% endblock %}
