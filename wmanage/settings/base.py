@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     "crispy_forms",
     'bootstrap4',
+    'bootstrap_datepicker',
     'bootstrap_datepicker_plus',
     'widget_tweaks',
 ]
@@ -163,3 +164,8 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+# Use BOOTSTRAP3 if you are using Bootstrap 3
+BOOTSTRAP4 = {
+    'include_jquery': True,
+}

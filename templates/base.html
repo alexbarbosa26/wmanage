@@ -7,7 +7,9 @@
     <link rel="shortcut icon" type="image/png" href="{% static 'favicon.ico' %}"/>  
     {% load static %}
     {% load bootstrap4 %}    
-    {% bootstrap_css %}
+    {% bootstrap_css %}        
+    {% bootstrap_javascript jquery=True %}
+    {{ form.media }}
     <link rel="stylesheet" type="text/css" href="{% static 'style/signin.css' %}">    
     <link rel="stylesheet" type="text/css" href="{% static 'style/stick-footer.css' %}"> 
     <link rel="stylesheet" type="text/css" href="{% static 'style/dashboard.css' %}"> 
@@ -123,8 +125,20 @@
     <aside>
       <main class="container" role="main">
         <div class="container-fluid">
-          {% block content %}
-          {% endblock %}
+          {% if messages %}
+          {% for message in messages %}
+          <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          {% endfor %}
+        {% endif %}
+        {% block scripts %} 
+        {% endblock scripts %}
+        {% block content %}
+        {% endblock %}
         </div>
       </main>
     </aside>
@@ -140,6 +154,5 @@
       feather.replace()
     </script>
     <script src={% static 'js/main.js' %}></script>
-    {% bootstrap_javascript jquery=True %}
     </body>
 </html>
