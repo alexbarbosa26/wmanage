@@ -5,10 +5,10 @@
 {% block title %}WManager{% endblock %}
 
 {% block content %}
-<h2>Excluir Ativo</h2>
+<h4 class="mt-4">Cadastrar Proventos</h4>
 <form method="post"> 
     {% csrf_token %}
-    <div class="form-row">
+    <div class="form-row mt-3">
         <div class="form-group col-md-3 mb-0">
           {{ form.ativo|attr:"placeholder:EX: MGLU3"|attr:"autofocus"|as_crispy_field }}
         </div>

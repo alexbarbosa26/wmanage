@@ -13,9 +13,9 @@
     <small>Campos Obrigatórios ( * )</small>
   </h4>  
 </section>
-  <form method="post" class="mt-4">
+  <form method="post" class="mt-4" autocomplete="off">
       {% csrf_token %}
-      <div class="form-row forms-container">
+      <div class="form-row forms-container mb-3 rounded">
           <div class="form-group col-md-3 mb-0">
             {{ form.ativo|attr:"placeholder:EX: MGLU3"|attr:"autofocus"|as_crispy_field }}
           </div>
