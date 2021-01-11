@@ -36,6 +36,7 @@ def upload_files_view(request):
                         corretagem= Decimal(row[7]),
                         emolumentos = Decimal(row[8]),
                         tx_liquida_CBLC = Decimal(row[9]),
+                        user = request.user,
                     )
             obj.activated = True
             obj.save()

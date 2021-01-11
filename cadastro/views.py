@@ -1,4 +1,4 @@
-from .models import Ativo, Nota
+from .models import Ativo, Nota, Proventos
 
 from django.shortcuts import render
 from django.http import HttpResponse
@@ -180,3 +180,33 @@ class NotaUpdate(LoginRequiredMixin,SuccessMessageMixin, UpdateView):
           )
 
          return form
+
+class ProventosCreate(LoginRequiredMixin, CreateView):
+    model = Proventos
+    fields = ('ativo','tipo_provento','data','valor')
+    template_name = 'cadastros/form-proventos.html'
+    success_url = reverse_lazy('listar-proventos')
+    success_message = "%(ativo)s registrado com sucesso!"    
+
+    def get_success_message(self, cleaned_data):
+        return self.success_message % dict(
+            cleaned_data,
+            ativo=self.object.ativo,
+        )
+
+    def get_form(self):
+        form = super().get_form()
+        form.instance.user = self.request.user
+        form.fields['data'].widget = DatePickerInput(format='%d/%m/%Y',
+         options={'locale':'pt-br'}
+        )
+        return form
+
+class ProventosList(LoginRequiredMixin,ListView):
+    login_url = reverse_lazy('account_login')
+    model = Proventos
+    template_name = 'listar/proventos.html'
+
+    def get_queryset(self):
+        self.object_list = Proventos.objects.filter(user=self.request.user)
+        return self.object_list

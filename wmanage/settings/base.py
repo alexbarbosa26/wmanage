@@ -51,7 +51,6 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     "crispy_forms",
     'bootstrap4',
-    'bootstrap_datepicker',
     'bootstrap_datepicker_plus',
     'widget_tweaks',
 ]

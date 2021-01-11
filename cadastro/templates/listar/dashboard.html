@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block title %}WManager{% endblock %}
+
+{% block scripts %} 
+<script>
+    $(document).ready(function(){
+        let socket = new WebSocket('ws://localhost:8000/ws/polData/');
+            socket.onopen = function(e){
+        };
+
+        socket.onmessage = function(e){
+            console.log(e.data);
+            var recData=JSON.parse(e.data);
+            dataObjNew=dataObj['data']['datasets'][0]['data'];
+            dataObjNew.shift();
+            dataObjNew.push(recData.value);
+            dataObj['data']['datasets'][0]['data']=dataObjNew;
+            window.myLine.update();
+
+        };
+
+        socket.onclose = function(e){
+            alert('Conexão fechada');
+        };
+
+        var dataObj={
+            type: 'line',
+            data: {
+                labels: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20],
+                datasets: [{
+                    label: 'Real time data',
+                    data: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20],
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                }
+            }
+        }
+        var ctx = document.getElementById('myChart').getContext('2d');
+        window.myLine = new Chart(ctx,dataObj );
+    })
+</script>
+{% endblock scripts %}
+
+{% block content %}
+    <div style="max-width: 900px; max-height: 400px;">
+        <canvas id="myChart" width="900" height="400"></canvas>
+    </div>
+{% endblock %}
+
+

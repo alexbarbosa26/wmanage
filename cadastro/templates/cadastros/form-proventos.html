@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% load crispy_forms_tags %}
+{% block title %}WManager{% endblock %}
+
+{% block content %}
+<h2>Excluir Ativo</h2>
+<form method="post"> 
+    {% csrf_token %}
+    <div class="form-row">
+        <div class="form-group col-md-3 mb-0">
+          {{ form.ativo|attr:"placeholder:EX: MGLU3"|attr:"autofocus"|as_crispy_field }}
+        </div>
+        <div class="form-group col-md-2 mb-0">
+            {{ form.tipo_provento|as_crispy_field }}
+        </div>        
+        <div class="form-group col-md-3 mb-0">                     
+              {{ form.data|attr:"placeholder:dia/mes/ano"|as_crispy_field }}            
+        </div>
+        <div class="form-group col-md-4 mb-0">
+          {{ form.valor|as_crispy_field }}
+        </div>
+      </div>
+    <button class="btn btn-success mt-4 mb-3" type="submit">Cadastrar</button>
+</form>
+{% endblock %}

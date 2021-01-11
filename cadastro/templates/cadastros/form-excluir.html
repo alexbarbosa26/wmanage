@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}WManager{% endblock %}
+
+{% block content %}
+<h2>Excluir Ativo</h2>
+<form method="post"> 
+    <p>
+        Deseja excluir o ativo: <b>{{ object }}?</b>
+    </p>   
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button class="btn btn-danger" type="submit">Excluir</button>
+</form>
+{% endblock %}
