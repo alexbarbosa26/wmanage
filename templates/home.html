@@ -1,109 +1,70 @@
 {% extends 'base.html' %}
-
+{% load static %}
 {% block title %}WManage{% endblock %}
 
 {% block content %}
-    <h2 class="mt-4">Section title</h2>
-          <div class="table-responsive mt-3">
-            <table class="table table-striped table-sm table-bordered table-hover">
-              <thead class="thead-dark"> 
-                <tr>
-                  <th>#</th>
-                  <th>Header</th>
-                  <th>Header</th>
-                  <th>Header</th>
-                  <th>Header</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>1,001</td>
-                  <td>Lorem</td>
-                  <td>ipsum</td>
-                  <td>dolor</td>
-                  <td>sit</td>
-                </tr>
-                <tr>
-                  <td>1,002</td>
-                  <td>amet</td>
-                  <td>consectetur</td>
-                  <td>adipiscing</td>
-                  <td>elit</td>
-                </tr>
-                <tr>
-                  <td>1,003</td>
-                  <td>Integer</td>
-                  <td>nec</td>
-                  <td>odio</td>
-                  <td>Praesent</td>
-                </tr>
-                <tr>
-                  <td>1,003</td>
-                  <td>libero</td>
-                  <td>Sed</td>
-                  <td>cursus</td>
-                  <td>ante</td>
-                </tr>
-                <tr>
-                  <td>1,004</td>
-                  <td>dapibus</td>
-                  <td>diam</td>
-                  <td>Sed</td>
-                  <td>nisi</td>
-                </tr>
-                <tr>
-                  <td>1,005</td>
-                  <td>Nulla</td>
-                  <td>quis</td>
-                  <td>sem</td>
-                  <td>at</td>
-                </tr>
-                <tr>
-                  <td>1,006</td>
-                  <td>nibh</td>
-                  <td>elementum</td>
-                  <td>imperdiet</td>
-                  <td>Duis</td>
-                </tr>
-                <tr>
-                  <td>1,007</td>
-                  <td>sagittis</td>
-                  <td>ipsum</td>
-                  <td>Praesent</td>
-                  <td>mauris</td>
-                </tr>
-                <tr>
-                  <td>1,008</td>
-                  <td>Fusce</td>
-                  <td>nec</td>
-                  <td>tellus</td>
-                  <td>sed</td>
-                </tr>
-                <tr>
-                  <td>1,009</td>
-                  <td>augue</td>
-                  <td>semper</td>
-                  <td>porta</td>
-                  <td>Mauris</td>
-                </tr>
-                <tr>
-                  <td>1,010</td>
-                  <td>massa</td>
-                  <td>Vestibulum</td>
-                  <td>lacinia</td>
-                  <td>arcu</td>
-                </tr>
-                <tr>
-                  <td>1,011</td>
-                  <td>eget</td>
-                  <td>nulla</td>
-                  <td>Class</td>
-                  <td>aptent</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </main>
-      </div>
-    </div>
+<section class="content-header">
+  <h4 class="mt-4">
+    Carteira de Ações
+  </h4>
+  <ol class="breadcrumb">
+    {% if status_fechado_aberto == 'Mercado fechado' %}  
+      <li><i class="fa fa-circle text-danger"></i> {{status_fechado_aberto}} </li>
+    {%else%}
+      <li><i class="fa fa-circle text-success"></i> {{status_fechado_aberto}} </li>
+    {%endif%}
+  </ol>
+</section>
+
+<br>
+{%  include 'status.html' %}
+
+<div class="table-responsive-sm">
+  <table id="paginator" class="table table-hover border border-secondary rounded">
+      <thead class="thead-dark">
+        <tr>
+          <th scope="col">Ativo</th>
+          <th scope="col">Qtde.</th>
+          <th scope="col">V.Compra Total [R$]</th>
+          <th scope="col">Custo [R$]</th>
+          <th scope="col">V.Mercado Unit. [R$]</th>
+          <th scope="col">V.Mercado Total [R$]</th>
+          <th scope="col">Lucro [R$]</th>
+          <th scope="col">Variação Preço</th>
+          <th scope="col">Variação (%)</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for nota in result_c %}
+      <tr>    
+          <th scope="row" class="text-primary">{{nota.ativo}}</th>
+          <td>{{nota.qt}}</td>
+          <td>{{nota.preco_f}}</td>
+          <td>{{nota.custos}}</td>
+          <td>{{nota.preco_m}}</td>
+          <td>{{nota.v_mercado}}</td>
+          {% if nota.lucro > 'R$ 0,00' %}
+            <td><h4><span class="badge badge-success lucro">{{nota.lucro}}</span></h4></td>
+          {% else %}
+            <td><h4><span class="badge badge-danger lucro">{{nota.lucro}}</span></h4></td>
+          {% endif %}
+          {% if nota.variacao_1 > '-0' %}
+            <td><span class='badge badge-danger lucro'>R$ {{nota.variacao_1}}</span></td>
+          {% else %}
+            <td><span class='badge badge-success lucro'>R$ {{nota.variacao_1}}</span></td>
+          {% endif %}
+          {% if nota.variacao_2 > '(-0)' %}
+            <td><span class='text-danger'>{{nota.variacao_2}}</span></td>
+          {% else %}
+            <td><span class='text-success'>{{nota.variacao_2}}</span></td>  
+          {% endif %}
+      </tr>
+      {% empty %}
+        <tr>        
+          <td colspan="11">Nenhum registro encontrado.</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+  </table>
+</div>
 {% endblock %}

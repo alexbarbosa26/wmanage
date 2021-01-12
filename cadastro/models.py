@@ -47,7 +47,7 @@ class Cotacao(models.Model):
     
     
     def __str__(self):
-        return self.acao
+        return self.ativo
 
 # Create models Proventos
 class Proventos(models.Model):

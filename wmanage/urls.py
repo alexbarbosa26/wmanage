@@ -18,7 +18,7 @@ from django.urls import path, include
 
 urlpatterns = [
     # Page Home
-    path('', include('pages.urls')),
+    path('', include('pages.urls', namespace="pages")),
     path('', include('cadastro.urls')),
     path('', include('csvs.urls')),
 

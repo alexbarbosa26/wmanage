@@ -1,0 +1,66 @@
+<div class="row">
+    <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-blue">
+        <div class="inner">
+            <h3>{{ total_investido }}</h3>
+
+            <p></p>
+        </div>
+        <div class="icon">
+            
+        </div>
+        <a href="#" class="small-box-footer"><i class="fa fa-money-bill-wave"></i> Total Investido</a>
+        </div>
+    </div>
+    <!-- ./col -->
+    <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        {% if total_lucro > 'R$ 0,00' %}
+        <div class="small-box bg-green">
+        {% else %}
+        <div class="small-box bg-red">
+        {% endif %}
+        <div class="inner">
+            <h3>{{ total_lucro }}</h3>
+
+            <p></p>
+        </div>
+        <div class="icon">
+            
+        </div>
+        <a href="#" class="small-box-footer" active><i class="fa fa-hand-holding-usd"></i> Lucro</a>
+        </div>
+    </div>
+    <!-- ./col -->
+    <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-yellow">
+        <div class="inner">
+            <h3>{{total_v_mercado}}</h3>
+
+            <p></p>
+        </div>
+        <div class="icon">
+            <i class=""></i>
+        </div>
+            <a href="#" class="small-box-footer"><i class="fa fa-wallet"></i> V.Mercado</a>
+        </div>
+    </div>
+    <!-- ./col -->
+    <div class="col-lg-3 col-xs-6">
+        <!-- small box -->
+        <div class="small-box bg-blue-active">
+        <div class="inner">
+            <h3>{{total_proventos}}</h3>
+
+            <p></p>
+        </div>
+        <div class="icon">
+            <i class="ion ion-pie-graph"></i>
+        </div>
+        <a href="#" class="small-box-footer"><i class="fa fa-hand-holding-usd"></i> Proventos Total</a>
+        </div>
+    </div>
+<!-- ./col -->
+</div>

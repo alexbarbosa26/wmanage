@@ -1,9 +1,8 @@
 from django.urls import path
-
-from . import views
+from cadastro.views import WalletView
 
 app_name = "pages"
 
 urlpatterns = [
-    path("", views.HomePageView.as_view(), name="home"),
+    path('', WalletView.as_view(), name="home"),
 ]

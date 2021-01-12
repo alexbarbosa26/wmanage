@@ -10,6 +10,8 @@
     {% bootstrap_css %}        
     {% bootstrap_javascript jquery=True %}
     {{ form.media }}
+    <script src="{% static 'fontawesome_free/js/all.min.js' %}"></script>
+    <link href="{% static 'fontawesome_free/css/all.min.css' %}" rel="stylesheet" type="text/css">
     <link rel="stylesheet" type="text/css" href="{% static 'style/signin.css' %}">    
     <link rel="stylesheet" type="text/css" href="{% static 'style/stick-footer.css' %}"> 
     <link rel="stylesheet" type="text/css" href="{% static 'style/dashboard.css' %}"> 
@@ -142,7 +144,7 @@
         </div>
       </main>
     </aside>
-
+    <br>
     <footer class="footer">
       <div class="container">
         <span class="text-muted">Desenvolvido por:</span> <a href="#">Alex Barbosa da Silva</a>
