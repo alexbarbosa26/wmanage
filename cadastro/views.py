@@ -15,7 +15,7 @@ from braces.views import  GroupRequiredMixin
 import locale
 
 #Set Locale
-locale.setlocale(locale.LC_ALL, '')
+locale.setlocale(locale.LC_ALL, 'C.UTF-8')
 
 def index(request):
     return HttpResponse("Hello, world. You're at the polls index.")
