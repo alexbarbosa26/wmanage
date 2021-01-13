@@ -14,7 +14,7 @@ def upload_files_view(request):
         form.save()
         form = CsvModelForm()            
         obj = Csv.objects.get(activated=False)
-        with open(obj.file_name.path, 'r') as f:
+        with open(obj.file_name.path, 'r', encoding="latin-1") as f:
             reader = csv.reader(f)
 
             for i, row in enumerate(reader):
