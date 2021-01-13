@@ -52,7 +52,7 @@ def upload_files_view_cotacao(request):
         form_cotacao.save()
         form_cotacao = CsvModelForm()            
         obj = Csv.objects.get(activated=False)
-        with open(obj.file_name.path, 'r') as f:
+        with open(obj.file_name.path, 'r', encoding="latin1") as f:
             reader = csv.reader(f)
 
             for i, row in enumerate(reader):
