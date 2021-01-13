@@ -16,7 +16,7 @@ def upload_files_view(request):
         obj = Csv.objects.get(activated=False)
         with open(obj.file_name.path, 'r', encoding="latin1") as f:
             reader = csv.reader(f)
-            print(reader)
+            
             for i, row in enumerate(reader):
                 if i==0:
                     pass
@@ -84,7 +84,7 @@ def upload_files_view_proventos(request):
         form_provento.save()
         form_provento = CsvModelForm()            
         obj = Csv.objects.get(activated=False)
-        with open(obj.file_name.path, 'r') as f:
+        with open(obj.file_name.path, 'r', encoding="latin1") as f:
             reader = csv.reader(f)
 
             for i, row in enumerate(reader):
