@@ -12,7 +12,7 @@ from django.views.generic import TemplateView
 from django.db.models import Count, Sum
 from bootstrap_datepicker_plus import DatePickerInput
 from braces.views import  GroupRequiredMixin
-import locale
+from . import locale
 
 #Set Locale
 locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
