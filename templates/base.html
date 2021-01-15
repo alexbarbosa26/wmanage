@@ -93,7 +93,7 @@
             <ul class="navbar-nav">
                 {% if user.is_authenticated %}
                 <li class="nav-item active">
-                        <a class="nav-link" >
+                        <a class="nav-link" href="{% url 'profile' user.id %}">
                           <span data-feather="user"></span>
                           {{user.email}}
                         </a>
