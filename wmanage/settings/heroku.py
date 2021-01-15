@@ -20,5 +20,5 @@ DATABASES = {
     'default': env.db(),
 }
 
-EMAIL_HOST_USER = env('EMAIL_HOST_USER ')
+EMAIL_HOST_USER = env('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD') #past the key or password app here
