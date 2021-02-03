@@ -8,7 +8,10 @@
     <form method="post" class="form-signin" autocomplete="off">
         {% csrf_token %}
         <h1 class="h3 mb-3 mt-4 font-weight-normal">Entra no sistema</h1>
-        {% bootstrap_form form %}        
+        {% bootstrap_form form %}
+        <div class="mb-4">
+            <a class="small" href="{% url 'password_reset' %}">Esqueceu sua senha ?</a>
+        </div>        
         <button class="btn btn-success" type="submit">Entrar</button>
     </form>
 {% endblock %}
