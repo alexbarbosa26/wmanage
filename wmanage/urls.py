@@ -29,6 +29,14 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
     path('profile/<int:pk>/', ProfileView.as_view(), name='profile'),
 
+    path(
+        'change-password/',
+        auth_views.PasswordChangeView.as_view(
+            template_name='account/change-password.html',
+            success_url='/password-reset-complete/'
+        ),
+        name='change_password'
+    ),
 
     # Forget Password
     path('password-reset/', auth_views.PasswordResetView.as_view(
@@ -38,16 +46,19 @@ urlpatterns = [
             #  success_url='/accounts/login/'
          ),
          name='password_reset'),
+
     path('password-reset/done/',
          auth_views.PasswordResetDoneView.as_view(
              template_name='password-reset/password_reset_done.html'
          ),
          name='password_reset_done'),
+
     path('password-reset-confirm/<uidb64>/<token>/',
          auth_views.PasswordResetConfirmView.as_view(
              template_name='password-reset/password_reset_confirm.html'
          ),
          name='password_reset_confirm'),
+
     path('password-reset-complete/',
          auth_views.PasswordResetCompleteView.as_view(
              template_name='password-reset/password_reset_complete.html'
