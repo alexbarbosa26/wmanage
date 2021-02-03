@@ -215,7 +215,6 @@ class WalletView(LoginRequiredMixin, TemplateView):
         for compra in result_compra:
             if compra['qt'] != 0:
                 preco_mercado = Cotacao.objects.filter(ativo=compra['ativo']).last()
-                print(preco_mercado)
                 status_fechado_aberto = Cotacao.objects.filter(ativo=compra['ativo']).last()
                 status_fechado_aberto = status_fechado_aberto.status_fechado_aberto
                 ultima_atualizacao = preco_mercado.data_instante
@@ -283,6 +282,27 @@ class ProventosCreate(LoginRequiredMixin, CreateView):
         )
         return form
 
+class ProventosUpdate(LoginRequiredMixin, UpdateView):
+    model = Proventos
+    fields = ('ativo','tipo_provento','data','valor')
+    template_name = 'cadastros/form-proventos.html'
+    success_url = reverse_lazy('listar-proventos')
+    success_message = "Proventos do %(ativo)s atualizado com sucesso!"    
+
+    def get_success_message(self, cleaned_data):
+        return self.success_message % dict(
+            cleaned_data,
+            ativo=self.object.ativo,
+        )
+
+    def get_form(self):
+        form = super().get_form()
+        form.instance.user = self.request.user
+        form.fields['data'].widget = DatePickerInput(format='%d/%m/%Y',
+         options={'locale':'pt-br'}
+        )
+        return form
+
 class ProventosList(LoginRequiredMixin,ListView):
     login_url = reverse_lazy('account_login')
     model = Proventos
@@ -291,3 +311,17 @@ class ProventosList(LoginRequiredMixin,ListView):
     def get_queryset(self):
         self.object_list = Proventos.objects.filter(user=self.request.user)
         return self.object_list
+
+# Delete
+class ProventosDelete(LoginRequiredMixin, DeleteView):
+    login_url = reverse_lazy('account_login')
+    model = Proventos
+    template_name = 'cadastros/form-excluir.html'
+    success_url = reverse_lazy('listar-ordens')
+    success_message = "%(ativo)s deletado com sucesso!"
+
+    def get_success_message(self, cleaned_data):
+        return self.success_message % dict(
+            cleaned_data,
+            ativo=self.object.ativo,
+        )

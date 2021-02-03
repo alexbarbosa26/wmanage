@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import NotaCreate, NotaList, NotaUpdate, NotaDelete, ProventosCreate, ProventosList
+from .views import NotaCreate, NotaList, NotaUpdate, NotaDelete, ProventosCreate, ProventosList, ProventosUpdate, ProventosDelete
 from . import views
 
 urlpatterns = [
@@ -8,8 +8,11 @@ urlpatterns = [
     path('cadastros/proventos/', ProventosCreate.as_view(), name='cadastrar-proventos'),
 
     path('listar/ativos/', NotaList.as_view(), name='listar-ordens'),
-    path('cadastro/listas/proventos/', ProventosList.as_view(), name='listar-proventos'),
+    path('listar/proventos/', ProventosList.as_view(), name='listar-proventos'),
 
     path('editar/ativo/<int:pk>/', NotaUpdate.as_view(), name='editar-nota'),
+    path('editar/proventos/<int:pk>/', ProventosUpdate.as_view(), name='editar-provento'),
+
     path('excluir/nota/<int:pk>/', NotaDelete.as_view(), name='excluir-nota'),
+    path('excluir/provento/<int:pk>/', ProventosDelete.as_view(), name='excluir-provento'),
 ]
