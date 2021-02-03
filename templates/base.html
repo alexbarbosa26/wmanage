@@ -92,12 +92,22 @@
           
             <ul class="navbar-nav">
                 {% if user.is_authenticated %}
-                <li class="nav-item active">
-                        <a class="nav-link" href="{% url 'profile' user.id %}">
-                          <span data-feather="user"></span>
-                          {{user.email}}
-                        </a>
-                    </li>
+                <li class="nav-item dropdown active">
+                    <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                      <span data-feather="user"></span>
+                      {{user.email}}
+                    </a>
+                <div class="dropdown-menu">
+                  <a class="dropdown-item" href="{% url 'profile' user.id %}">
+                    <span data-feather="user"></span>
+                    Perfil
+                  </a>
+                  <a class="dropdown-item" href="{% url 'password_reset' %}">
+                    <span data-feather="key"></span>
+                    Alterar Senha
+                  </a>
+                </div>
+                </li>
                 <li class="nav-item active">
                     <a class="nav-link" href="{% url 'account_logout' %}">
                       <span data-feather="log-out"></span>
