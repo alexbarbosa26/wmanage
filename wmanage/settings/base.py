@@ -178,6 +178,7 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = 'no-reply@wmanage.com'
+EMAIL_CONFIRMATION_PERIOD_DAYS = 7
 
 # LOGGING = {
 #     'version': 1,
