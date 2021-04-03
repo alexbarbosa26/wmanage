@@ -16,6 +16,7 @@
     <link rel="stylesheet" type="text/css" href="{% static 'style/stick-footer.css' %}"> 
     <link rel="stylesheet" type="text/css" href="{% static 'style/dashboard.css' %}"> 
     <link rel="stylesheet" type="text/css" href="{% static 'style/main.css' %}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.bundle.js"></script>
     <title>{% block title %}{% endblock %}</title>
 </head>
 <body class="bg-light">
@@ -83,6 +84,18 @@
                   <a class="dropdown-item" href="{% url 'upload-view-provento' %}">
                     <span data-feather="hard-drive"></span>
                     Proventos
+                  </a>
+                </div>
+              </li>
+              <li class="nav-item dropdown active">
+                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                  <span data-feather="pie-chart"></span>
+                  Gráfico
+                </a>
+                <div class="dropdown-menu">
+                  <a class="dropdown-item" href="{% url 'carteira-chart' %}">
+                    <span data-feather="bar-chart"></span>
+                    Ativos
                   </a>
                 </div>
               </li>
@@ -165,6 +178,6 @@
     <script>
       feather.replace()
     </script>
-    <script src={% static 'js/main.js' %}></script>
+    <script src={% static 'js/main.js' %}></script>    
     </body>
 </html>

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}WManage{% endblock %}
+
+
+{% block content %}
+    <div style="align-items: center">
+        <canvas id="carteiraChart" width="900"></canvas>
+    </div>
+{% endblock %}
+
+{% block scripts %} 
+<script>
+    $(document).ready(function(){
+        names = JSON.parse('{{ names|safe }}');
+        prices = JSON.parse('{{ prices|safe }}');    
+
+        const dataObj={
+            type: 'pie',
+            data: {
+                labels: names,
+                datasets: [{
+                    label: ['a','b'],
+                    data: prices,
+                    backgroundColor: [
+                    'rgba(128, 0, 0)',
+                    'rgba(54, 162, 235)',
+                    'rgba(255, 206, 86)',
+                    'rgba(75, 192, 192)',
+                    'rgba(153, 102, 255)',
+                    'rgba(0, 128, 128)',
+                    'rgba(0, 128, 0)',
+                    'rgba(0, 128, 0)',
+                    ],
+                }]
+            },
+            options: {
+                responsive: true,
+                legend: {
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'Distribuição de Carteira'
+                },
+            }
+        }
+        const ctx = document.getElementById('carteiraChart').getContext('2d');
+        window.myLine = new Chart(ctx,dataObj );
+    })
+</script>
+{% endblock scripts %}

@@ -1,5 +1,5 @@
 from .models import Ativo, Nota, Proventos, Cotacao
-
+import json
 from decimal import Decimal
 from django.shortcuts import render
 from django.http import HttpResponse
@@ -198,7 +198,7 @@ class WalletView(LoginRequiredMixin, TemplateView):
         total_v_mercado = 0
         ultima_atualizacao = []
         status_fechado_aberto = []
-        status_fechado_aberto = '---'
+        status_fechado_aberto = 'Aguardando o cadastro de ações'
         x = 0
         y = 0
         v = 0
@@ -248,7 +248,10 @@ class WalletView(LoginRequiredMixin, TemplateView):
             pro = i.valor + pro
 
         pro_result = locale.currency(pro, grouping=True)
-
+        total_lucro = locale.currency(pro, grouping=True)
+        total_investido = locale.currency(pro, grouping=True)
+        total_v_mercado = locale.currency(pro, grouping=True)
+        
         context = {
             'result_c' : r_result,
             'total_lucro' : total_lucro,
@@ -325,3 +328,64 @@ class ProventosDelete(LoginRequiredMixin, DeleteView):
             cleaned_data,
             ativo=self.object.ativo,
         )
+
+# Função de Gráfico
+class CarteiraChart(LoginRequiredMixin, TemplateView):
+    login_url = reverse_lazy('account_login')  
+    template_name = 'dashboard/carteiraChart.html' 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        r_result = []
+        status_fechado_aberto = []
+        status_fechado_aberto = 'Aguardando o cadastro de ações'
+        x = 0
+        y = 0
+        v = 0
+        result_compra = Nota.objects.values('ativo').annotate(qt=Sum('quantidade'), preco_f=Sum('total_compra'), custos=Sum('total_custo'), preco_m=Sum('preco'), v_mercado=Sum('preco'), lucro=Sum('preco'), variacao_mercado_1=Count('identificador'), variacao_mercado_2=Count('identificador')).filter(tipo='C', user=self.request.user)
+        result_venda = Nota.objects.values('ativo').annotate(qt=Sum('quantidade'), preco_f=Sum('total_compra'), custos=Sum('total_custo')).filter(tipo='V', user=self.request.user)
+            
+        for venda in result_venda:
+            for compra in result_compra:
+                if compra['ativo'] == venda['ativo']:                
+                    compra['qt'] = compra['qt'] - venda['qt']
+                    compra['preco_f'] = abs(compra['preco_f'] - venda['preco_f'])
+                    compra['custos'] = compra['custos'] - venda['custos']
+
+        for compra in result_compra:
+            if compra['qt'] != 0:
+                preco_mercado = Cotacao.objects.filter(ativo=compra['ativo']).last()
+                status_fechado_aberto = Cotacao.objects.filter(ativo=compra['ativo']).last()
+                status_fechado_aberto = status_fechado_aberto.status_fechado_aberto
+                ultima_atualizacao = preco_mercado.data_instante
+                compra['v_mercado'] = locale.currency(Decimal(preco_mercado.fechamento_ajustado.replace(",",".")) * compra['qt'], grouping=True)
+                compra['lucro'] = (Decimal(preco_mercado.fechamento_ajustado.replace(",","."))*compra['qt'])-compra['preco_f']-compra['custos']-compra['custos']*(Decimal(preco_mercado.fechamento_ajustado.replace(",","."))*compra['qt'])/compra['preco_f']
+                
+                v = (Decimal(preco_mercado.fechamento_ajustado.replace(",",".")) * compra['qt']) + v
+                x = compra['lucro'] + x
+                y = compra['preco_f'] + compra['custos'] + y
+
+                compra['lucro'] = locale.currency(compra['lucro'], grouping=True)
+                compra['preco_m'] = locale.currency(Decimal(preco_mercado.fechamento_ajustado.replace(",",".")), grouping=True)
+                compra['preco_f'] = locale.currency(compra['preco_f'], grouping=True)
+                compra['custos'] = locale.currency(compra['custos'], grouping=True)
+                compra['variacao_1'] = preco_mercado.variacao_1
+                compra['variacao_2'] = preco_mercado.variacao_2
+                
+
+                r_result.append(compra)
+                print(r_result)
+            else:
+                pass
+        names = []
+        prices = []
+        for i in r_result:
+            
+            names.append(i['ativo'])
+            prices.append(i['qt'])
+        
+        context = {
+            'names' : json.dumps(names),
+            'prices' : json.dumps(prices)
+        }
+        
+        return context
