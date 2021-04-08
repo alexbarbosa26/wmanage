@@ -3,11 +3,7 @@
 {% block title %}WManage{% endblock %}
 
 
-{% block content %}
-    <div style="align-items: center">
-        <canvas id="carteiraChart" width="900"></canvas>
-    </div>
-{% endblock %}
+
 
 {% block scripts %} 
 <script>
@@ -36,8 +32,14 @@
             },
             options: {
                 responsive: true,
-                legend: {
-                    position: 'top',
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: {
+                            color: 'rgb(255, 99, 132)'
+                        }
+                    }
                 },
                 title: {
                     display: true,
@@ -50,3 +52,7 @@
     })
 </script>
 {% endblock scripts %}
+
+{% block content %}
+    <canvas id="carteiraChart" style="align-items: center; padding-top: 0" height="10" width="50"></canvas>
+{% endblock %}

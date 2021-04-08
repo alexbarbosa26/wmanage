@@ -189,13 +189,14 @@ class WalletView(LoginRequiredMixin, TemplateView):
     template_name = 'home.html'  
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        v_zero = locale.currency(0, grouping=True)
         r_result = []
         total_lucro = []
-        total_lucro = 0
+        total_lucro = v_zero
         total_investido = []
-        total_investido = 0
+        total_investido = v_zero
         total_v_mercado = []
-        total_v_mercado = 0
+        total_v_mercado = v_zero
         ultima_atualizacao = []
         status_fechado_aberto = []
         status_fechado_aberto = 'Aguardando o cadastro de ações'
@@ -237,8 +238,8 @@ class WalletView(LoginRequiredMixin, TemplateView):
                 total_lucro=locale.currency(x, grouping=True)
                 total_investido=locale.currency(y, grouping=True)
                 total_v_mercado = locale.currency(v, grouping=True)
-            else:
-                pass
+            # else:
+            #     pass
 
         pro = 0
         pro_result = []
@@ -248,9 +249,6 @@ class WalletView(LoginRequiredMixin, TemplateView):
             pro = i.valor + pro
 
         pro_result = locale.currency(pro, grouping=True)
-        total_lucro = locale.currency(pro, grouping=True)
-        total_investido = locale.currency(pro, grouping=True)
-        total_v_mercado = locale.currency(pro, grouping=True)
         
         context = {
             'result_c' : r_result,
