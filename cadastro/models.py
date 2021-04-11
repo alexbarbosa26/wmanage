@@ -8,7 +8,7 @@ class Nota(models.Model):
         ('C','COMPRA'),
         ('V','VENDA'),
     )
-    ativo = models.CharField(max_length=50, )
+    ativo = models.CharField(max_length=50)
     quantidade = models.IntegerField()
     preco = models.DecimalField(max_digits=10,decimal_places=2, verbose_name='Preço')
     data = models.DateField()
@@ -26,14 +26,15 @@ class Nota(models.Model):
     data_instante = models.DateTimeField(auto_now=True)
     user = models.ForeignKey(User, on_delete=models.PROTECT, verbose_name="usuário")
 
-    def save(self, *args, **kwargs):        
+    def save(self, *args, **kwargs):
+        self.ativo = self.ativo.upper()        
         self.total_compra = self.preco * self.quantidade
         self.total_custo = self.corretagem + self.emolumentos + self.tx_liquida_CBLC
 
-        super().save(*args,**kwargs)
+        super(Nota, self).save(*args,**kwargs)
         
     def __str__(self):
-        return self.ativo
+        return self.ativo.upper()
 
 # Create models Cotacao
 class Cotacao(models.Model):

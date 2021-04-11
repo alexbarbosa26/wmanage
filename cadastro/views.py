@@ -1,3 +1,4 @@
+from django.forms import widgets
 from .models import Ativo, Nota, Proventos, Cotacao
 import json
 from decimal import Decimal
@@ -21,7 +22,7 @@ def index(request):
     return HttpResponse("Hello, world. You're at the polls index.")
 
 #Create
-class NotaCreate(LoginRequiredMixin,SuccessMessageMixin, CreateView):
+class NotaCreate(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     login_url = reverse_lazy('account_login')
     model = Nota
     fields = (
@@ -371,7 +372,6 @@ class CarteiraChart(LoginRequiredMixin, TemplateView):
                 
 
                 r_result.append(compra)
-                print(r_result)
             else:
                 pass
         names = []
