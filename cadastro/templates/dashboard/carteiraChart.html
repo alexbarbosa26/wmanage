@@ -25,8 +25,15 @@
                     'rgba(75, 192, 192)',
                     'rgba(153, 102, 255)',
                     'rgba(0, 128, 128)',
-                    'rgba(0, 128, 0)',
-                    'rgba(0, 128, 0)',
+                    'rgba(150, 50, 50)',
+                    'rgba(191, 63, 63)',
+                    'rgba(63, 63, 191)',
+                    'rgba(63, 191, 63)',
+                    'rgba(127, 63, 191)',
+                    'rgba(63, 191, 191)',
+                    'rgba(12, 38, 38)',
+                    'rgba(38, 38, 12)',
+                    'rgba(38, 12, 38)',
                     ],
                 }]
             },
@@ -48,7 +55,7 @@
             }
         }
         const ctx = document.getElementById('carteiraChart').getContext('2d');
-        window.myLine = new Chart(ctx,dataObj );
+        window.myLine = new Chart(ctx,dataObj);
     })
 </script>
 {% endblock scripts %}

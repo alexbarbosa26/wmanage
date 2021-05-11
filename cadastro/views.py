@@ -227,6 +227,7 @@ class WalletView(LoginRequiredMixin, TemplateView):
                 x = compra['lucro'] + x
                 y = compra['preco_f'] + compra['custos'] + y
 
+                porcentagem_lucro = round((x/y)*100,2)
                 compra['lucro'] = locale.currency(compra['lucro'], grouping=True)
                 compra['preco_m'] = locale.currency(Decimal(preco_mercado.fechamento_ajustado.replace(",",".")), grouping=True)
                 compra['preco_f'] = locale.currency(compra['preco_f'], grouping=True)
@@ -235,7 +236,7 @@ class WalletView(LoginRequiredMixin, TemplateView):
                 compra['variacao_2'] = preco_mercado.variacao_2
                 
 
-                r_result.append(compra)
+                r_result.append(compra)                
                 total_lucro=locale.currency(x, grouping=True)
                 total_investido=locale.currency(y, grouping=True)
                 total_v_mercado = locale.currency(v, grouping=True)
@@ -259,6 +260,7 @@ class WalletView(LoginRequiredMixin, TemplateView):
             'total_proventos' : pro_result,
             'status_fechado_aberto' : status_fechado_aberto,
             'ultima_atualizacao': ultima_atualizacao,
+            'porcentagem_lucro': porcentagem_lucro,            
         }
         
         return context

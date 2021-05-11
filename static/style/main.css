@@ -14,7 +14,7 @@
   box-shadow: 0 1px 1px rgba(0,0,0,0.1);
 }
 
-.small-box h3, .small-box p {
+.small-box h3, .small-box p, .small-box h5 {
   z-index: 5;
 }
 
@@ -23,7 +23,16 @@
 }
 
 .small-box h3 {
-  font-size: 38px;
+  font-size: 30px;
+  font-weight: bold;
+  margin: 0 0 10px 0;
+  white-space: nowrap;
+  padding: 0;
+  position: relative;
+}
+
+.small-box h5 {
+  font-size: 15px;
   font-weight: bold;
   margin: 0 0 10px 0;
   white-space: nowrap;
