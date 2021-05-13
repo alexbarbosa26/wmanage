@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}WManager{% endblock %}
+{% block title %}WManager Proventos{% endblock %}
 
 {% block content %}
 <h3 class="mt-4">Ordens Registradas</h3>
@@ -9,6 +9,13 @@
     <path fill-rule="evenodd" d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm6.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z"/>
   </svg>
    Registar Proventos
+</a>
+<a href="{% url 'export-proventos-xls' %}" class="btn btn-info mt-3 mb-3">
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-excel" viewBox="0 0 16 16">
+    <path d="M5.884 6.68a.5.5 0 1 0-.768.64L7.349 10l-2.233 2.68a.5.5 0 0 0 .768.64L8 10.781l2.116 2.54a.5.5 0 0 0 .768-.641L8.651 10l2.233-2.68a.5.5 0 0 0-.768-.64L8 9.219l-2.116-2.54z"/>
+    <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z"/>
+  </svg>
+   Exportar
 </a>
 <div class="table-responsive">
 <table id="paginator" class="table table-hover border border-secondary rounded">

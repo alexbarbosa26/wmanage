@@ -17,4 +17,6 @@ urlpatterns = [
     path('excluir/provento/<int:pk>/', ProventosDelete.as_view(), name='excluir-provento'),
 
     path('dashboard/carteira-chart/', CarteiraChart.as_view(), name='carteira-chart'),
+
+    path(r'^export/xls/$', views.export_proventos_xls, name='export-proventos-xls'),
 ]
