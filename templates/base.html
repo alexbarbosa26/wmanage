@@ -66,10 +66,12 @@
                     <span data-feather="file"></span>
                     Proventos
                   </a>
+                  {% if request.user|has_group:"Administrador" %}
                   <a class="dropdown-item" href="{% url 'listar-cotacao' %}">
                     <span data-feather="file"></span>
                     Cotacao
                   </a>
+                  {% endif %}
                 </div>
               </li>
               <li class="nav-item dropdown active">
@@ -82,10 +84,12 @@
                     <span data-feather="hard-drive"></span>
                     Ativos
                   </a>
+                  {% if request.user|has_group:"Administrador" %}
                   <a class="dropdown-item" href="{% url 'upload-view-cotacao' %}">
                     <span data-feather="hard-drive"></span>
                     Cotação
                   </a>
+                  {% endif %}
                   <a class="dropdown-item" href="{% url 'upload-view-provento' %}">
                     <span data-feather="hard-drive"></span>
                     Proventos
