@@ -18,9 +18,6 @@ import locale
 #Set Locale
 locale.setlocale(locale.LC_ALL, 'pt_BR')
 
-def index(request):
-    return HttpResponse("Hello, world. You're at the polls index.")
-
 #Create
 class NotaCreate(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     login_url = reverse_lazy('account_login')
@@ -45,8 +42,10 @@ class NotaCreate(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     success_message = "%(ativo)s registrado com sucesso!"
 
     def form_valid(self, form):
-        ativo_reg = Ativo.objects.values().filter(ativo=form.cleaned_data['ativo'], user=self.request.user)
+        ativo_reg = Ativo.objects.values().filter(ativo__icontains=form.cleaned_data['ativo'], user=self.request.user)
         ativo_reg = list(ativo_reg)
+        cotacao_reg = Cotacao.objects.values().filter(ativo__icontains=form.cleaned_data['ativo'])
+        cotacao_reg = list(cotacao_reg)        
 
         if ativo_reg == [] and form.cleaned_data['tipo'] == 'V':
             context ={
@@ -54,19 +53,30 @@ class NotaCreate(LoginRequiredMixin, SuccessMessageMixin, CreateView):
             }
             return render(self.request, 'error.html', context)
 
-        elif ativo_reg == [] and form.cleaned_data['tipo'] == 'C' and form.cleaned_data['quantidade'] > 0:
+        elif ativo_reg == [] and form.cleaned_data['tipo'] == 'C' and form.cleaned_data['quantidade'] > 0 and cotacao_reg == []:
             Ativo.objects.create(ativo=form.cleaned_data['ativo'],  quantidade=form.cleaned_data['quantidade'], preco_total=form.cleaned_data['quantidade']*form.cleaned_data['preco'], user=self.request.user)
-        
-        elif form.cleaned_data['tipo'] == 'C' and form.cleaned_data['quantidade'] > 0 :
+            Cotacao.objects.create(acao=form.cleaned_data['identificador'], ativo=form.cleaned_data['ativo'])
+
+        elif ativo_reg == [] and form.cleaned_data['tipo'] == 'C' and form.cleaned_data['quantidade'] > 0 and cotacao_reg != []:
+            Ativo.objects.create(ativo=form.cleaned_data['ativo'],  quantidade=form.cleaned_data['quantidade'], preco_total=form.cleaned_data['quantidade']*form.cleaned_data['preco'], user=self.request.user)
+            Cotacao.objects.create(acao=form.cleaned_data['identificador'], ativo=form.cleaned_data['ativo'])        
+
+        elif form.cleaned_data['tipo'] == 'C' and form.cleaned_data['quantidade'] > 0 and cotacao_reg == []:
             ativo_reg[0]['quantidade'] = ativo_reg[0]['quantidade'] + form.cleaned_data['quantidade']
             ativo_reg[0]['preco_total'] = ativo_reg[0]['preco_total'] + (form.cleaned_data['quantidade']*form.cleaned_data['preco'])
             Ativo.objects.filter(ativo=form.cleaned_data['ativo'], user=self.request.user).update(ativo=form.cleaned_data['ativo'], quantidade=ativo_reg[0]['quantidade'], preco_total=ativo_reg[0]['preco_total'], user=self.request.user)
-            
+            Cotacao.objects.create(acao=form.cleaned_data['identificador'], ativo=form.cleaned_data['ativo'])
+
+        elif form.cleaned_data['tipo'] == 'C' and form.cleaned_data['quantidade'] > 0 and cotacao_reg != []:
+            ativo_reg[0]['quantidade'] = ativo_reg[0]['quantidade'] + form.cleaned_data['quantidade']
+            ativo_reg[0]['preco_total'] = ativo_reg[0]['preco_total'] + (form.cleaned_data['quantidade']*form.cleaned_data['preco'])
+            Ativo.objects.filter(ativo=form.cleaned_data['ativo'], user=self.request.user).update(ativo=form.cleaned_data['ativo'], quantidade=ativo_reg[0]['quantidade'], preco_total=ativo_reg[0]['preco_total'], user=self.request.user)
+        
         elif form.cleaned_data['tipo'] == 'V' and form.cleaned_data['quantidade'] <= ativo_reg[0]['quantidade']:
             ativo_reg[0]['quantidade'] = ativo_reg[0]['quantidade'] - form.cleaned_data['quantidade']
             ativo_reg[0]['preco_total'] = ativo_reg[0]['preco_total'] - (form.cleaned_data['quantidade']*form.cleaned_data['preco'])
             Ativo.objects.filter(ativo=form.cleaned_data['ativo'], user=self.request.user).update(ativo=form.cleaned_data['ativo'], quantidade=ativo_reg[0]['quantidade'], preco_total=ativo_reg[0]['preco_total'], user=self.request.user)
-            
+
         else:
             context ={
                 'message':'Não foi possível registrar sua ordem, por favor verifique a quantidade correta e tente novamente'
@@ -389,3 +399,19 @@ class CarteiraChart(LoginRequiredMixin, TemplateView):
         }
         
         return context
+
+
+# List Cotação
+class CotacaoList(LoginRequiredMixin, ListView):
+    login_url = reverse_lazy('account_login')
+    model = Cotacao
+    template_name = 'listar/cotacao.html'
+
+    def get_queryset(self):
+        filter = self.request.GET.get('filter')
+
+        if filter:
+            self.object_list = Cotacao.objects.filter(ativo__icontains=filter)
+        else:
+            self.object_list = Cotacao.objects.all()
+        return self.object_list

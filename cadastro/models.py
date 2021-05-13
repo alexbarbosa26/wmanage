@@ -40,10 +40,10 @@ class Nota(models.Model):
 class Cotacao(models.Model):
     acao = models.CharField(blank=True, max_length=255)
     ativo = models.CharField(blank=True, max_length=255, unique=True)
-    fechamento_ajustado = models.CharField(blank=True, max_length=255)
+    fechamento_ajustado = models.CharField(blank=True, max_length=255, default=0.00)
     variacao_1 = models.CharField(blank=True, max_length=255, default=0.00)
     variacao_2 = models.CharField(blank=True, max_length=255, default=0.00)
-    status_fechado_aberto = models.CharField(blank=True, max_length=255)
+    status_fechado_aberto = models.CharField(blank=True, max_length=255, default='Aguardando Atualizacao')
     data_instante = models.DateTimeField(auto_now_add=True)
     
     

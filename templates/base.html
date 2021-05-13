@@ -16,7 +16,8 @@
     <link rel="stylesheet" type="text/css" href="{% static 'style/stick-footer.css' %}"> 
     <link rel="stylesheet" type="text/css" href="{% static 'style/dashboard.css' %}"> 
     <link rel="stylesheet" type="text/css" href="{% static 'style/main.css' %}">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.bundle.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.bundle.js"></script>   
+    
     <title>{% block title %}{% endblock %}</title>
 </head>
 <body class="bg-light">
@@ -65,6 +66,10 @@
                     <span data-feather="file"></span>
                     Proventos
                   </a>
+                  <a class="dropdown-item" href="{% url 'listar-cotacao' %}">
+                    <span data-feather="file"></span>
+                    Cotacao
+                  </a>
                 </div>
               </li>
               <li class="nav-item dropdown active">
@@ -100,8 +105,7 @@
                 </div>
               </li>
             {% endif %}
-            </ul>
-          
+            </ul>          
           
             <ul class="navbar-nav">
                 {% if user.is_authenticated %}
@@ -179,5 +183,6 @@
       feather.replace()
     </script>
     <script src={% static 'js/main.js' %}></script>    
+    <script src={% static 'js/scripts.js' %}></script> 
     </body>
 </html>
