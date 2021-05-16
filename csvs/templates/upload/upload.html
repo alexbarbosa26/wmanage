@@ -18,6 +18,6 @@
  </form>
 
  {%for obj in objlist%}
-  baixar arquivo CSV de exemplo: <a href="{{obj.file_name}}">{{obj.file_name}}</a>
+  <a href="{{obj.file_name.url}}">baixar arquivo CSV de exemplo</a>
  {% endfor %}
 {% endblock %}
