@@ -9,4 +9,4 @@ class Csv(models.Model):
     activated = models.BooleanField(default=False)
 
     def __str__(self) -> str:
-        return f"File id: {self.id}"
+        return f"File id: {self.id, self.file_name}"

@@ -40,8 +40,9 @@ def upload_files_view(request):
                     )
             obj.activated = True
             obj.save()
+    objlist=Csv.objects.filter(id=20)
                     
-    return render(request,'upload/upload.html',{'form':form})
+    return render(request,'upload/upload.html',{'form':form, 'objlist':objlist})
 
 
 # Create your views cotacão

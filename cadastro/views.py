@@ -400,7 +400,6 @@ class CarteiraChart(LoginRequiredMixin, TemplateView):
         
         return context
 
-
 # List Cotação
 class CotacaoList(LoginRequiredMixin, ListView):
     login_url = reverse_lazy('account_login')
@@ -415,7 +414,6 @@ class CotacaoList(LoginRequiredMixin, ListView):
         else:
             self.object_list = Cotacao.objects.all()
         return self.object_list
-
 
 def export_proventos_xls(request):
     response = HttpResponse(content_type='application/ms-excel')
