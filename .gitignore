@@ -140,4 +140,4 @@ cython_debug/
 .vscode/
 db.sqlite3
 
-*.csv
+#*.csv
