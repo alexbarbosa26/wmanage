@@ -18,5 +18,5 @@ urlpatterns = [
 
     path('dashboard/carteira-chart/', CarteiraChart.as_view(), name='carteira-chart'),
 
-    path(r'^export/xls/$', views.export_proventos_xls, name='export-proventos-xls'),
+    path('export/xls/', views.export_proventos_xls, name='export-proventos-xls'),
 ]

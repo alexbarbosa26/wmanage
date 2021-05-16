@@ -107,7 +107,7 @@ class NotaList(LoginRequiredMixin, ListView):
     template_name = 'listar/ordens.html'
 
     def get_queryset(self):
-        self.object_list = Nota.objects.filter(user=self.request.user)
+        self.object_list = Nota.objects.filter(user=self.request.user).order_by('data')
         return self.object_list
 
 
@@ -323,7 +323,7 @@ class ProventosList(LoginRequiredMixin,ListView):
     template_name = 'listar/proventos.html'
 
     def get_queryset(self):
-        self.object_list = Proventos.objects.filter(user=self.request.user)
+        self.object_list = Proventos.objects.filter(user=self.request.user).order_by('data')
         return self.object_list
 
 # Delete
