@@ -23,8 +23,9 @@ def get_yahoo_cotacao():
         fuso_horario = timezone('America/Sao_Paulo')
         if compra['qt'] != 0:
             url = 'https://br.financas.yahoo.com/quote/'+compra['ativo']+'.SA'
+            headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36 Edg/91.0.864.64'}
             #pegando cotação no yahoo            
-            response = requests.get(url)
+            response = requests.get(url, headers=headers)
             soup = BeautifulSoup(response.text, 'lxml')
             preco_mercado = soup.find_all('div', {'class':'D(ib) Mend(20px)'})[0].find('span').text
             variacao_mercado = soup.find_all('span', {'data-reactid':'33'})[1].text
