@@ -28,7 +28,10 @@ def get_yahoo_cotacao():
             response = requests.get(url, headers=headers)
             soup = BeautifulSoup(response.text, 'lxml')
             preco_mercado = soup.find_all('div', {'class':'D(ib) Mend(20px)'})[0].find('span').text
-            variacao_mercado = soup.find_all('span', {'data-reactid':'33'})[1].text
+            try:
+                variacao_mercado = soup.find_all('span', {'class':'Trsdu(0.3s) Fw(500) Pstart(10px) Fz(24px) C($positiveColor)'})[0].text
+            except IndexError:
+                variacao_mercado = soup.find_all('span', {'class':'Trsdu(0.3s) Fw(500) Pstart(10px) Fz(24px) C($negativeColor)'})[0].text
             mercado_aberto_fechado = soup.find('span', {'data-id':'mk-msg'}).text
             variacao_mercado = variacao_mercado.split(' ')
 
