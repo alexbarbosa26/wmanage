@@ -415,32 +415,34 @@ class CotacaoList(LoginRequiredMixin, ListView):
             self.object_list = Cotacao.objects.all()
         return self.object_list
 
-def export_proventos_xls(request):
-    response = HttpResponse(content_type='application/ms-excel')
-    response['Content-Disposition'] = 'attachment; filename="proventos.xls"'
+class Export_xls:
 
-    wb = xlwt.Workbook(encoding='utf-8')
-    ws = wb.add_sheet('Proventos')
+    def get_context_data(request):
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = 'attachment; filename="proventos.xls"'
 
-    # Sheet header, first row
-    row_num = 0
+        wb = xlwt.Workbook(encoding='utf-8')
+        ws = wb.add_sheet('Proventos')
 
-    font_style = xlwt.XFStyle()
-    font_style.font.bold = True
+        # Sheet header, first row
+        row_num = 0
 
-    columns = ['Ativo', 'Tipo', 'Data', 'Valor', ]
+        font_style = xlwt.XFStyle()
+        font_style.font.bold = True
 
-    for col_num in range(len(columns)):
-        ws.write(row_num, col_num, columns[col_num], font_style)
+        columns = ['Ativo', 'Tipo', 'Data', 'Valor', ]
 
-    # Sheet body, remaining rows
-    font_style = xlwt.XFStyle()
+        for col_num in range(len(columns)):
+            ws.write(row_num, col_num, columns[col_num], font_style)
 
-    rows = Proventos.objects.all().values_list('ativo', 'tipo_provento', 'data', 'valor')
-    for row in rows:
-        row_num += 1
-        for col_num in range(len(row)):
-            ws.write(row_num, col_num, row[col_num], font_style)
+        # Sheet body, remaining rows
+        font_style = xlwt.XFStyle()
 
-    wb.save(response)
-    return response
+        rows = Proventos.objects.all().values_list('ativo', 'tipo_provento', 'data', 'valor').filter(user=request.user)
+        for row in rows:
+            row_num += 1
+            for col_num in range(len(row)):
+                ws.write(row_num, col_num, row[col_num], font_style)
+
+        wb.save(response)
+        return response
