@@ -20,52 +20,56 @@
 <br>
 {%  include 'status.html' %}
 
-<div class="table-responsive-sm">
-  <table id="paginator" class="table table-hover border border-secondary rounded">
-      <thead class="thead-dark">
-        <tr>
-          <th scope="col">Ativo</th>
-          <th scope="col">Qtde.</th>
-          <th scope="col">V.Compra Total [R$]</th>
-          <th scope="col">Custo [R$]</th>
-          <th scope="col">V.Mercado Unit. [R$]</th>
-          <th scope="col">V.Mercado Total [R$]</th>
-          <th scope="col">Lucro [R$]</th>
-          <th scope="col">Variação Preço</th>
-          <th scope="col">Variação (%)</th>
-        </tr>
-      </thead>
-      <tbody>
-      {% for nota in result_c %}
-      <tr>    
-          <th scope="row" class="text-primary">{{nota.ativo}}</th>
-          <td>{{nota.qt}}</td>
-          <td>{{nota.preco_f}}</td>
-          <td>{{nota.custos}}</td>
-          <td>{{nota.preco_m}}</td>
-          <td>{{nota.v_mercado}}</td>
-          {% if nota.lucro > 'R$ 0,00' %}
-            <td><h4><span class="badge badge-success lucro">{{nota.lucro}}</span></h4></td>
-          {% else %}
-            <td><h4><span class="badge badge-danger lucro">{{nota.lucro}}</span></h4></td>
-          {% endif %}
-          {% if nota.variacao_1 > '-0' %}
-            <td><span class='badge badge-danger lucro'>R$ {{nota.variacao_1}}</span></td>
-          {% else %}
-            <td><span class='badge badge-success lucro'>R$ {{nota.variacao_1}}</span></td>
-          {% endif %}
-          {% if nota.variacao_2 > '(-0)' %}
-            <td><span class='text-danger'>{{nota.variacao_2}}</span></td>
-          {% else %}
-            <td><span class='text-success'>{{nota.variacao_2}}</span></td>  
-          {% endif %}
-      </tr>
-      {% empty %}
-        <tr>        
-          <td colspan="11">Nenhum registro encontrado.</td>
-        </tr>
-      {% endfor %}
-      </tbody>
-  </table>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">
+      <table id="paginator" class="table table-hover border border-secondary rounded" cellspacing="0" style="width:100%">
+          <thead class="thead-dark">
+            <tr>
+              <th scope="col">Ativo</th>
+              <th scope="col">Qtde.</th>
+              <th scope="col">V.Compra Total [R$]</th>
+              <th scope="col">Custo [R$]</th>
+              <th scope="col">V.Mercado Unit. [R$]</th>
+              <th scope="col">V.Mercado Total [R$]</th>
+              <th scope="col">Lucro [R$]</th>
+              <th scope="col">Variação Preço</th>
+              <th scope="col">Variação (%)</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for nota in result_c %}
+          <tr>    
+              <th scope="row" class="text-primary">{{nota.ativo}}</th>
+              <td>{{nota.qt}}</td>
+              <td>{{nota.preco_f}}</td>
+              <td>{{nota.custos}}</td>
+              <td>{{nota.preco_m}}</td>
+              <td>{{nota.v_mercado}}</td>
+              {% if nota.lucro > 'R$ 0,00' %}
+                <td><h4><span class="badge badge-success lucro">{{nota.lucro}}</span></h4></td>
+              {% else %}
+                <td><h4><span class="badge badge-danger lucro">{{nota.lucro}}</span></h4></td>
+              {% endif %}
+              {% if nota.variacao_1 > '-0' %}
+                <td><span class='badge badge-danger lucro'>R$ {{nota.variacao_1}}</span></td>
+              {% else %}
+                <td><span class='badge badge-success lucro'>R$ {{nota.variacao_1}}</span></td>
+              {% endif %}
+              {% if nota.variacao_2 > '(-0)' %}
+                <td><span class='text-danger'>{{nota.variacao_2}}</span></td>
+              {% else %}
+                <td><span class='text-success'>{{nota.variacao_2}}</span></td>  
+              {% endif %}
+          </tr>
+          {% empty %}
+            <tr>        
+              <td colspan="11">Nenhum registro encontrado.</td>
+            </tr>
+          {% endfor %}
+          </tbody>
+      </table>
+    </div>
+  </div>  
 </div>
 {% endblock %}
