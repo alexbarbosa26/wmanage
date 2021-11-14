@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+    <meta name="monetization" content="$ilp.uphold.com/4qaL8d2i2hw2">
     {% load static %}
     {% load user_tags %}
     <meta charset="UTF-8">
@@ -23,7 +24,13 @@
     <link rel="stylesheet" type="text/css" href="{% static 'style/responsive.bootstrap4.min.css' %}">
     <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.11.3/datatables.min.js"></script> 
     <script src="{% static 'js/dataTables.responsive.min.js' %}"></script>
-    
+    <script>
+      if (document.monetization) {
+        document.monetization.addEventListener('monetizationstart', () => {
+          document.getElementById('exclusive').classList.remove('hidden')
+        })
+      }
+    </script>
     <title>{% block title %}{% endblock %}</title>
 </head>
 <body class="bg-light">
@@ -159,8 +166,7 @@
           </div>
         </nav>
     </header>
-  </article>
-
+  </article>  
     <aside>
       <main class="container" role="main">
         <div class="container-fluid">
@@ -186,6 +192,7 @@
       <div class="container">
         <span class="text-muted">Desenvolvido por:</span> <a href="#">Alex Barbosa da Silva</a>
       </div>
+      <div id="exclusive" class="hidden">Here's some exclusive content!</div>
     </footer>
     <!-- Icons -->
     <script src="https://unpkg.com/feather-icons/dist/feather.min.js"></script>
