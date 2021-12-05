@@ -24,7 +24,10 @@
     <link rel="stylesheet" type="text/css" href="{% static 'style/responsive.bootstrap4.min.css' %}">
     <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.11.3/datatables.min.js"></script> 
     <script src="{% static 'js/dataTables.responsive.min.js' %}"></script>
-    <script>
+    <script src="{% static 'js/start-stop.js' %}"></script>
+    <script src="{% static 'js/wm-previewer.js' %}"></script>
+
+    {% comment %} <script>
       if (document.monetization) {
         document.monetization.addEventListener('monetizationstart', () => {
           document.getElementById('exclusive').classList.remove('hidden')
@@ -52,7 +55,7 @@
 
       document.monetization.addEventListener('monetizationprogress', progressEventHandler)
 
-    </script>
+    </script> {% endcomment %}
     <title>{% block title %}{% endblock %}</title>
 </head>
 <body class="bg-light">
@@ -214,7 +217,12 @@
       <div class="container">
         <span class="text-muted">Desenvolvido por:</span> <a href="#">Alex Barbosa da Silva</a>
       </div>
-      <div id="exclusive" class="hidden">Here's some exclusive content!</div>
+      <div id="loading">
+        Current Monetization State: <span id="state"></span>
+      </div>
+
+      <button id="stop-button">Stop Monetization</button>
+      <button id="start-button" disabled>Start Monetization</button>
     </footer>
     <!-- Icons -->
     <script src="https://unpkg.com/feather-icons/dist/feather.min.js"></script>
