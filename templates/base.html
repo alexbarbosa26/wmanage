@@ -32,6 +32,28 @@
           document.getElementById('exclusive').classList.remove('hidden')
         })
       }
+
+      function startEventHandler (event) {
+        console.log(event)
+      }
+      document.monetization.addEventListener('monetizationstart', startEventHandler)
+
+      function pendingEventHandler (event) {
+        console.log(event)
+      }
+      document.monetization.addEventListener('monetizationpending', pendingEventHandler)
+
+      function stopEventHandler (event) {
+        console.log(event)
+      }
+      document.monetization.addEventListener('monetizationstop', stopEventHandler)
+      
+      function progressEventHandler (event) {
+        console.log(event)
+      }
+
+      document.monetization.addEventListener('monetizationprogress', progressEventHandler)
+
     </script>
     <title>{% block title %}{% endblock %}</title>
 </head>
