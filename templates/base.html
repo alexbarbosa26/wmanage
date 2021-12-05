@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta name="monetization" content="$ilp.uphold.com/4qaL8d2i2hw2">
-    <meta name="monetization" content="$ilp.uphold.com/EBL9DqmpREjq">
+    {% comment %} <meta name="monetization" content="$ilp.uphold.com/EBL9DqmpREjq"> {% endcomment %}
     
     {% load static %}
     {% load user_tags %}
@@ -47,7 +47,7 @@
         console.log(event)
       }
       document.monetization.addEventListener('monetizationstop', stopEventHandler)
-      
+
       function progressEventHandler (event) {
         console.log(event)
       }
