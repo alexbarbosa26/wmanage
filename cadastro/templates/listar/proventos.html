@@ -36,7 +36,7 @@
         <tr>    
             <th scope="row">{{provento.ativo}}</th>
             <td>{{provento.tipo_provento}}</td>
-            <td>{{provento.data|date:'d/m/y'}}</td>
+            <td>{{provento.data|date:'d/m/Y'}}</td>
             <td>R$ {{provento.valor}}</td>
             <td>
                 <a href="{% url 'editar-provento' provento.pk %}" class="btn btn-warning btn-sm" title="Editar">              
