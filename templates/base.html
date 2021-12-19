@@ -10,7 +10,6 @@
     <meta name="theme-color" content="black">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <meta name="format-detection" content="telephone=no">
     <link rel="shortcut icon" type="image/png" href="{% static 'favicon.ico' %}"/>  
     {% load static %}
     {% load bootstrap4 %}    
@@ -31,36 +30,6 @@
     <script src="{% static 'js/dataTables.responsive.min.js' %}"></script>
     <script type="application/javascript" src="{% static 'js/start-stop.js' %}"></script>
     <script src="{% static 'js/wm-previewer.js' %}"></script>
-
-    {% comment %} <script>
-      if (document.monetization) {
-        document.monetization.addEventListener('monetizationstart', () => {
-          document.getElementById('exclusive').classList.remove('hidden')
-        })
-      }
-
-      function startEventHandler (event) {
-        console.log(event)
-      }
-      document.monetization.addEventListener('monetizationstart', startEventHandler)
-
-      function pendingEventHandler (event) {
-        console.log(event)
-      }
-      document.monetization.addEventListener('monetizationpending', pendingEventHandler)
-
-      function stopEventHandler (event) {
-        console.log(event)
-      }
-      document.monetization.addEventListener('monetizationstop', stopEventHandler)
-
-      function progressEventHandler (event) {
-        console.log(event)
-      }
-
-      document.monetization.addEventListener('monetizationprogress', progressEventHandler)
-
-    </script> {% endcomment %}
     <title>{% block title %}{% endblock %}</title>
 </head>
 <body class="bg-light">
