@@ -1,21 +1,23 @@
+{% load static %}
+{% load bootstrap4 %} 
+{% load user_tags %}
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta name="monetization" content="$ilp.uphold.com/2xjkJJQpKFd4">    
-    {% load static %}
-    {% load user_tags %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="black">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <link rel="shortcut icon" type="image/png" href="{% static 'favicon.ico' %}"/>  
-    {% load static %}
-    {% load bootstrap4 %}    
+    <link rel="icon" sizes="192x192" href="{% static 'favicon.ico' %}">
+    <link rel="shortcut icon" type="image/png" href="{% static 'favicon.ico' %}"/>      
+       
     {% bootstrap_css %}        
     {% bootstrap_javascript jquery=True %}
     {{ form.media }}
+
     <script src="{% static 'fontawesome_free/js/all.min.js' %}"></script>
     <link href="{% static 'fontawesome_free/css/all.min.css' %}" rel="stylesheet" type="text/css">
     <link rel="stylesheet" type="text/css" href="{% static 'style/signin.css' %}">    
@@ -138,6 +140,10 @@
                   <a class="dropdown-item" href="{% url 'change_password' %}">
                     <span data-feather="key"></span>
                     Alterar Senha
+                  </a>
+                  <a class="dropdown-item" href="{% url 'two_factor:profile' %}">
+                    <span data-feather="lock"></span>
+                    Habilitar 2FA
                   </a>
                 </div>
                 </li>

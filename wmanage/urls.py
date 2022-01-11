@@ -17,15 +17,29 @@ from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
 from pages.views import ProfileView
+from two_factor.urls import urlpatterns as tf_urls
+from django_otp.admin import OTPAdminSite
+from django.contrib.auth.models import User
+from django_otp.plugins.otp_totp.models import TOTPDevice
+from django_otp.plugins.otp_totp.admin import TOTPDeviceAdmin
+
+class OTPAdmin(OTPAdminSite):
+    pass
+
+
+admin_site = OTPAdmin(name='OTPAdmin')
+admin_site.register(User)
+admin_site.register(TOTPDevice, TOTPDeviceAdmin)
 
 urlpatterns = [
     # Page Home
     path('', include('pages.urls', namespace="pages")),
     path('', include('cadastro.urls')),
     path('', include('csvs.urls')),
+    path('', include(tf_urls)),
 
-    path('admin/', admin.site.urls),
-    path('accounts/', include('allauth.urls')),
+    path('admin/', admin.site.urls),    
+    path('account/', include('allauth.urls')),
     path('profile/<int:pk>/', ProfileView.as_view(), name='profile'),
 
     path(
