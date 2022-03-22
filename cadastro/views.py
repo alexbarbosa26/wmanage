@@ -261,12 +261,15 @@ class WalletView(LoginRequiredMixin, TemplateView):
             pro = i.valor + pro
 
         pro_result = locale.currency(pro, grouping=True)
+
+        total_v_mercado_extra = locale.currency(v + pro, grouping=True)
         
         context = {
             'result_c' : r_result,
             'total_lucro' : total_lucro,
             'total_investido' : total_investido,
             'total_v_mercado' : total_v_mercado,
+            'total_v_mercado_extra': total_v_mercado_extra,
             'total_proventos' : pro_result,
             'status_fechado_aberto' : status_fechado_aberto,
             'ultima_atualizacao': ultima_atualizacao,
