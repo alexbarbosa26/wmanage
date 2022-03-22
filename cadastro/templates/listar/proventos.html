@@ -4,6 +4,25 @@
 
 {% block content %}
 <h3 class="mt-4">Ordens Registradas</h3>
+
+<form method="get" class="mt-4" autocomplete="off" id="filter-form">
+  {% csrf_token %}
+  <div class="form-row forms-container mb-3 rounded">
+    <div class="form-group col-md-2 mb-0">
+      <label>Data Inicial</label>
+      <input class="form-control" type="date" id="data_inicial" name="data_inicial" placeholder="dd/mm/aaaa" value="{{ request.GET.data_inicial }}">
+    </div>
+    <div class="form-group col-md-2 mb-0">
+      <label>Data Final</label>
+      <input class="form-control" type="date" id="data_final" name="data_final" placeholder="dd/mm/aaaa" value="{{ request.GET.data_final }}">
+    </div>
+    <div class="form-group col-md-2 mb-0">
+      <label></label>
+      <button id="filter-btn" class="btn btn-info form-control mt-1 mb-4" type="submit">Filtrar</button>
+    </div>
+  </div>
+</form>
+
 <a href="{% url 'cadastrar-proventos' %}" class="btn btn-info mt-3 mb-3">
   <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-plus-square-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
     <path fill-rule="evenodd" d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm6.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z"/>

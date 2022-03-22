@@ -323,7 +323,13 @@ class ProventosList(LoginRequiredMixin,ListView):
     template_name = 'listar/proventos.html'
 
     def get_queryset(self):
-        self.object_list = Proventos.objects.filter(user=self.request.user).order_by('data')
+        data_inicial = self.request.GET.get('data_inicial')
+        data_final = self.request.GET.get('data_final')
+
+        if data_inicial or data_final:
+            self.object_list = Proventos.objects.filter(data__range=(data_inicial, data_final), user=self.request.user).order_by('data')
+        else:
+            self.object_list = Proventos.objects.filter(user=self.request.user).order_by('data')
         return self.object_list
 
 # Delete
@@ -414,6 +420,7 @@ class CotacaoList(LoginRequiredMixin, ListView):
         else:
             self.object_list = Cotacao.objects.all()
         return self.object_list
+
 
 class Export_xls:
 
