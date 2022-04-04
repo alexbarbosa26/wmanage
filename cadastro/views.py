@@ -14,6 +14,8 @@ from braces.views import  GroupRequiredMixin
 import xlwt
 from django.http import HttpResponse
 import locale
+import requests
+from bs4 import BeautifulSoup
 
 #Set Locale
 locale.setlocale(locale.LC_ALL, 'pt_BR')
@@ -195,9 +197,28 @@ class NotaUpdate(LoginRequiredMixin,SuccessMessageMixin, UpdateView):
 
          return form
 
+def b3_cotacao():
+        dados=[]
+        url = 'https://br.finance.yahoo.com/quote/^BVSP'
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36 Edg/91.0.864.64'}
+        #pegando cotação no yahoo            
+        response = requests.get(url, headers=headers)
+        soup = BeautifulSoup(response.text, 'lxml')
+
+        b3_nome = soup.find_all('h3', {'class':'Maw(160px)'})[0].find('a').text
+        b3_indice = soup.find_all('h3', {'class':'Maw(160px)'})[0].find('fin-streamer').text
+        b3_porcentagem = soup.find_all('h3', {'class':'Maw(160px)'})[0].find('div').text
+
+        dados.append(b3_nome)
+        dados.append(b3_indice)
+        dados.append(b3_porcentagem)
+    
+        return dados
+
 class WalletView(LoginRequiredMixin, TemplateView):
     login_url = reverse_lazy('account_login')  
-    template_name = 'home.html'  
+    template_name = 'home.html'
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         v_zero = locale.currency(0, grouping=True)
@@ -263,6 +284,8 @@ class WalletView(LoginRequiredMixin, TemplateView):
         pro_result = locale.currency(pro, grouping=True)
 
         total_v_mercado_extra = locale.currency(v + pro, grouping=True)
+
+        b3 = b3_cotacao()
         
         context = {
             'result_c' : r_result,
@@ -273,7 +296,10 @@ class WalletView(LoginRequiredMixin, TemplateView):
             'total_proventos' : pro_result,
             'status_fechado_aberto' : status_fechado_aberto,
             'ultima_atualizacao': ultima_atualizacao,
-            'porcentagem_lucro': porcentagem_lucro,            
+            'porcentagem_lucro': porcentagem_lucro,
+            'b3_nome':b3[0],
+            'b3_indice':b3[1],
+            'b3_porcentagem':b3[2],
         }
         
         return context

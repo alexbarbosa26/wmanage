@@ -8,13 +8,20 @@
     Carteira de Ações
   <small>Control panel</small>
   </h4>
+  <br>
   <ol class="breadcrumb">
-    {% if status_fechado_aberto == 'Mercado fechado' %}  
-      <li><i class="fa fa-circle text-danger"></i> {{status_fechado_aberto}} </li>
-    {%else%}
-      <li><i class="fa fa-circle text-success"></i> {{status_fechado_aberto}} </li>
-    {%endif%}
+      <li><i> </i</li>
   </ol>
+  <ol class="breadcrumb">
+  {% if status_fechado_aberto == 'Mercado fechado' %}  
+    <li><i class="fa fa-circle text-danger"></i>  {{status_fechado_aberto}}&ensp;</li>
+  {%else%}
+    <li><i class="fa fa-circle text-success"></i> {{status_fechado_aberto}}&ensp;</li>
+  {%endif%}
+    <li><i>{{b3_nome}} =>&ensp;</i></li>
+    <li><i> {{b3_indice}}&ensp;</i></li>
+    <li><i> {{b3_porcentagem}}</i></li>
+</ol>
 </section>
 
 <br>
