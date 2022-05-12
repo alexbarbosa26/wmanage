@@ -231,7 +231,7 @@ class WalletView(LoginRequiredMixin, TemplateView):
         total_v_mercado = v_zero
         ultima_atualizacao = []
         status_fechado_aberto = []
-        porcentagem_lucro = 0
+        porcentagem_lucro = 0.0
         status_fechado_aberto = 'Aguardando o cadastro de ações'
         x = 0
         y = 0
@@ -265,15 +265,12 @@ class WalletView(LoginRequiredMixin, TemplateView):
                 compra['preco_f'] = locale.currency(compra['preco_f'], grouping=True)
                 compra['custos'] = locale.currency(compra['custos'], grouping=True)
                 compra['variacao_1'] = preco_mercado.variacao_1
-                compra['variacao_2'] = preco_mercado.variacao_2
-                
+                compra['variacao_2'] = preco_mercado.variacao_2                
 
                 r_result.append(compra)                
                 total_lucro=locale.currency(x, grouping=True)
                 total_investido=locale.currency(y, grouping=True)
-                total_v_mercado = locale.currency(v, grouping=True)
-            # else:
-            #     pass
+                total_v_mercado = locale.currency(v, grouping=True)            
 
         pro = 0
         pro_result = []
@@ -302,7 +299,7 @@ class WalletView(LoginRequiredMixin, TemplateView):
             'porcentagem_lucro': porcentagem_lucro,
             'b3_nome':b3[0],
             'b3_indice':b3[1],
-            'b3_porcentagem':b3[2],
+            'b3_porcentagem':b3[2]
         }
         
         return context
@@ -405,7 +402,6 @@ class CarteiraChart(LoginRequiredMixin, TemplateView):
                 preco_mercado = Cotacao.objects.filter(ativo=compra['ativo']).last()
                 status_fechado_aberto = Cotacao.objects.filter(ativo=compra['ativo']).last()
                 status_fechado_aberto = status_fechado_aberto.status_fechado_aberto
-                ultima_atualizacao = preco_mercado.data_instante
                 compra['v_mercado'] = locale.currency(Decimal(preco_mercado.fechamento_ajustado.replace(",",".")) * compra['qt'], grouping=True)
                 compra['lucro'] = (Decimal(preco_mercado.fechamento_ajustado.replace(",","."))*compra['qt'])-compra['preco_f']-compra['custos']-compra['custos']*(Decimal(preco_mercado.fechamento_ajustado.replace(",","."))*compra['qt'])/compra['preco_f']
                 
