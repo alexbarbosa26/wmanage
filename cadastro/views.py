@@ -231,6 +231,7 @@ class WalletView(LoginRequiredMixin, TemplateView):
         total_v_mercado = v_zero
         ultima_atualizacao = []
         status_fechado_aberto = []
+        porcentagem_lucro = 0
         status_fechado_aberto = 'Aguardando o cadastro de ações'
         x = 0
         y = 0
@@ -284,9 +285,11 @@ class WalletView(LoginRequiredMixin, TemplateView):
         pro_result = locale.currency(pro, grouping=True)
 
         total_v_mercado_extra = locale.currency(v + pro, grouping=True)
-
-        b3 = b3_cotacao()
-        
+        try:
+            b3 = b3_cotacao()
+        except requests.exceptions.SSLError:
+            b3 = ['IBOV','N/A','N/A']
+            
         context = {
             'result_c' : r_result,
             'total_lucro' : total_lucro,
