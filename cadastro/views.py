@@ -466,8 +466,7 @@ def Dashboard(request):
     fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide',title={'font_size':22,'xanchor':'center','x':0.5})
     chart = fig.to_html()
     context = {'chart': chart, 'form': DateForm()}
-    return render(request, 'dashboard/chart.html', context)
-    
+    return render(request, 'dashboard/chart.html', context)    
 
 # List Cotação
 class CotacaoList(LoginRequiredMixin, ListView):
