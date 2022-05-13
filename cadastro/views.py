@@ -1,3 +1,7 @@
+from cgitb import text
+from multiprocessing import context
+
+from cadastro.forms import DateForm
 from .models import Ativo, Nota, Proventos, Cotacao
 import json
 from decimal import Decimal
@@ -16,6 +20,7 @@ from django.http import HttpResponse
 import locale
 import requests
 from bs4 import BeautifulSoup
+import plotly.express as px
 
 #Set Locale
 locale.setlocale(locale.LC_ALL, 'pt_BR')
@@ -433,6 +438,35 @@ class CarteiraChart(LoginRequiredMixin, TemplateView):
         }
         
         return context
+
+# Grafico de proventos
+def Dashboard(request):
+    data_inicio = request.GET.get('data_inicio')
+    data_fim = request.GET.get('data_fim')
+
+    proventos = Proventos.objects.all()    
+    
+    if data_inicio:
+        proventos = proventos.filter(data__gte=data_inicio)
+    if data_fim:
+        proventos = proventos.filter(data__lte=data_fim)
+    
+    proventos = proventos.filter(user=request.user).values('ativo').annotate(valor_total=Sum('valor')).order_by('-valor_total')
+
+    fig = px.bar(proventos,
+        x = 'ativo',
+        y = 'valor_total',
+        text_auto=True,
+        title="Soma de proventos por ativo",
+        labels={'x':'Ativos','y':'Valor'},
+    )
+
+    fig.update_traces(texttemplate='R$ %{y:.4s}',textfont_size=12, textangle=0, textposition="outside", cliponaxis=False)
+    fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide',title={'font_size':22,'xanchor':'center','x':0.5})
+    chart = fig.to_html()
+    context = {'chart': chart, 'form': DateForm()}
+    return render(request, 'dashboard/chart.html', context)
+    
 
 # List Cotação
 class CotacaoList(LoginRequiredMixin, ListView):
