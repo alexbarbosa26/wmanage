@@ -214,7 +214,7 @@ def b3_cotacao():
         dados.append(b3_porcentagem)
     
         return dados
-
+# Classe para mostrar os calculos da tela Home.html
 class WalletView(LoginRequiredMixin, TemplateView):
     login_url = reverse_lazy('account_login')  
     template_name = 'home.html'
