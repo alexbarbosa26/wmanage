@@ -287,6 +287,7 @@ class WalletView(LoginRequiredMixin, TemplateView):
         pro_result = locale.currency(pro, grouping=True)
 
         total_v_mercado_extra = locale.currency(v + pro, grouping=True)
+        # Tratando erro em caso de erro do certificado digital
         try:
             b3 = b3_cotacao()
         except requests.exceptions.SSLError:
