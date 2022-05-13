@@ -3,8 +3,7 @@
 {% load user_tags %}
 <!DOCTYPE html>
 <html lang="pt-br">
-<head>
-    <meta name="monetization" content="$ilp.uphold.com/2xjkJJQpKFd4">    
+<head>  
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="mobile-web-app-capable" content="yes">
@@ -120,6 +119,10 @@
                     <span data-feather="bar-chart"></span>
                     Ativos
                   </a>
+                  <a class="dropdown-item" href="{% url 'proventos-chart' %}">
+                    <span data-feather="bar-chart"></span>
+                    Proventos
+                  </a>
                 </div>
               </li>
             {% endif %}
@@ -196,9 +199,6 @@
     <footer class="footer">
       <div class="container">
         <span class="text-muted">Desenvolvido por:</span> <a href="#">Alex Barbosa da Silva</a>
-      </div>
-      <div id="loading">
-        State: <span id="state"></span>
       </div>
     </footer>
     <!-- Icons -->
