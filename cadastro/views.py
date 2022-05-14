@@ -444,15 +444,11 @@ class CarteiraChart(LoginRequiredMixin, TemplateView):
 def Dashboard(request):
     data_inicio = request.GET.get('data_inicio')
     data_fim = request.GET.get('data_fim')
-
-    proventos = Proventos.objects.select_related().filter(user=request.user) 
     
-    if data_inicio:
-        proventos = proventos.filter(data__gte=data_inicio)
-    if data_fim:
-        proventos = proventos.filter(data__lte=data_fim)
-    
-    proventos = proventos.values('ativo').annotate(valor_total=Sum('valor')).order_by('-valor_total')
+    if data_inicio or data_fim:
+        proventos = Proventos.objects.select_related('user').filter(data__range=(data_inicio,data_fim), user=request.user).values('ativo').annotate(valor_total=Sum('valor')).order_by('-valor_total')
+    else:    
+        proventos = Proventos.objects.select_related('user').filter(user=request.user).values('ativo').annotate(valor_total=Sum('valor')).order_by('-valor_total')
 
     fig = px.bar(proventos,
         x = 'ativo',
