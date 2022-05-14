@@ -445,7 +445,7 @@ def Dashboard(request):
     data_inicio = request.GET.get('data_inicio')
     data_fim = request.GET.get('data_fim')
 
-    proventos = Proventos.objects.filter(user=request.user) 
+    proventos = Proventos.objects.select_related().filter(user=request.user) 
     
     if data_inicio:
         proventos = proventos.filter(data__gte=data_inicio)
