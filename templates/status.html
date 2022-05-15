@@ -41,7 +41,11 @@
         <div class="icon">
             <i class="fa fa-hand-holding-usd"></i>
         </div>
-        <a href="#" class="small-box-footer" active><i class="fa fa-hand-holding-usd"></i> Lucro</a>        
+        {% if total_lucro > 'R$ 0,00' %}
+        <a href="#" class="small-box-footer" active><i class="fa fa-hand-holding-usd"></i> Lucro</a>
+        {% else %}
+        <a href="#" class="small-box-footer" active><i class="fa fa-hand-holding-usd"></i> Perda</a>
+        {% endif %}       
         </div>
     </div>    
     <!-- ./col -->
