@@ -444,14 +444,21 @@ class CarteiraChart(LoginRequiredMixin, TemplateView):
 def Dashboard(request):
     data_inicio = request.GET.get('data_inicio')
     data_fim = request.GET.get('data_fim')
+    total_proventos=0
     
     if data_inicio or data_fim:
         proventos = Proventos.objects.select_related('user').filter(data__range=(data_inicio,data_fim), user=request.user).values('ativo').annotate(valor_total=Sum('valor')).order_by('-valor_total')        
+        for p in proventos:
+            total_proventos += p['valor_total']
     else:    
         proventos = Proventos.objects.select_related('user').filter(user=request.user).values('ativo').annotate(valor_total=Sum('valor')).order_by('-valor_total')
+        for p in proventos:
+            total_proventos += p['valor_total']
 
     if not proventos:
             proventos = [{'ativo':'Nenhum','valor_total':0}]
+
+    total_proventos = locale.currency(total_proventos, grouping=True)
 
     fig = px.bar(proventos,
         x = 'ativo',
@@ -464,7 +471,7 @@ def Dashboard(request):
     fig.update_traces(texttemplate='R$ %{y:,.2f}',textfont_size=12, textangle=0, textposition="outside", cliponaxis=False)
     fig.update_layout(yaxis_tickprefix = 'R$ ', yaxis_tickformat = ',.2f',uniformtext_minsize=8, uniformtext_mode='hide',title={'font_size':22,'xanchor':'center','x':0.5})
     chart = fig.to_html()
-    context = {'chart': chart, 'form': DateForm()}
+    context = {'chart': chart, 'form': DateForm(), 'total_proventos':total_proventos}
     return render(request, 'dashboard/chart.html', context)    
 
 # List Cotação
