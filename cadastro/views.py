@@ -446,9 +446,12 @@ def Dashboard(request):
     data_fim = request.GET.get('data_fim')
     
     if data_inicio or data_fim:
-        proventos = Proventos.objects.select_related('user').filter(data__range=(data_inicio,data_fim), user=request.user).values('ativo').annotate(valor_total=Sum('valor')).order_by('-valor_total')
+        proventos = Proventos.objects.select_related('user').filter(data__range=(data_inicio,data_fim), user=request.user).values('ativo').annotate(valor_total=Sum('valor')).order_by('-valor_total')        
     else:    
         proventos = Proventos.objects.select_related('user').filter(user=request.user).values('ativo').annotate(valor_total=Sum('valor')).order_by('-valor_total')
+
+    if not proventos:
+            proventos = [{'ativo':'Nenhum','valor_total':0}]
 
     fig = px.bar(proventos,
         x = 'ativo',
