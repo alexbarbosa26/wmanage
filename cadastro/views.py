@@ -461,8 +461,8 @@ def Dashboard(request):
         labels={'x':'Ativos','y':'Valor'},
     )
 
-    fig.update_traces(texttemplate='R$ %{y:.3s}',textfont_size=12, textangle=0, textposition="outside", cliponaxis=False)
-    fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide',title={'font_size':22,'xanchor':'center','x':0.5})
+    fig.update_traces(texttemplate='R$ %{y:,.2f}',textfont_size=12, textangle=0, textposition="outside", cliponaxis=False)
+    fig.update_layout(yaxis_tickprefix = 'R$ ', yaxis_tickformat = ',.2f',uniformtext_minsize=8, uniformtext_mode='hide',title={'font_size':22,'xanchor':'center','x':0.5})
     chart = fig.to_html()
     context = {'chart': chart, 'form': DateForm()}
     return render(request, 'dashboard/chart.html', context)    
