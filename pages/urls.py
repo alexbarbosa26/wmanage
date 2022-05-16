@@ -1,5 +1,5 @@
 from django.urls import path
-from cadastro.views import WalletView
+from core.views import WalletView
 from .views import ProfileView
 
 app_name = "pages"

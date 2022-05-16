@@ -34,7 +34,7 @@ admin_site.register(TOTPDevice, TOTPDeviceAdmin)
 urlpatterns = [
     # Page Home
     path('', include('pages.urls', namespace="pages")),
-    path('', include('cadastro.urls')),
+    path('', include('core.urls')),
     path('', include('csvs.urls')),
     path('', include(tf_urls)),
 

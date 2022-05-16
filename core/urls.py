@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import CotacaoList, Dashboard, NotaCreate, NotaList, NotaUpdate, NotaDelete, ProventosCreate, ProventosList, ProventosUpdate, ProventosDelete, CarteiraChart, Export_xls
+from .views import CotacaoList, NotaCreate, NotaList, NotaUpdate, NotaDelete, ProventosCreate, ProventosList, ProventosUpdate, ProventosDelete, CarteiraChart, Export_xls
 from . import views
 
 urlpatterns = [

@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import render
 from .forms import CsvModelForm
 from .models import Csv
-from cadastro.models import Nota, Cotacao, Proventos
+from core.models import Nota, Cotacao, Proventos
 import csv
 
 # Create your views here.

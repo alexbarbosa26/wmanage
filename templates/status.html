@@ -31,20 +31,24 @@
         <!-- small box -->
         {% if total_lucro > 'R$ 0,00' %}
         <div class="small-box bg-green">
+        <div class="icon">
+            <i class="fa fa-hand-holding-usd"></i>
+        </div>
         {% else %}
         <div class="small-box bg-red">
+        <div class="icon">
+            <i class="fa fa-thumbs-down"></i>
+        </div>
         {% endif %}
         <div class="inner">        
             <h3>{{ total_lucro }}</h3>
             <p>( {{ porcentagem_lucro }}% )</p>
         </div>
-        <div class="icon">
-            <i class="fa fa-hand-holding-usd"></i>
-        </div>
+        
         {% if total_lucro > 'R$ 0,00' %}
         <a href="#" class="small-box-footer" active><i class="fa fa-hand-holding-usd"></i> Lucro</a>
         {% else %}
-        <a href="#" class="small-box-footer" active><i class="fa fa-hand-holding-usd"></i> Perda</a>
+        <a href="#" class="small-box-footer" active><i class="fa fa-thumbs-down"></i> Perda</a>
         {% endif %}       
         </div>
     </div>    

@@ -1,7 +1,7 @@
 from django.apps import AppConfig
 
-class CadastroConfig(AppConfig):
-    name = 'cadastro'
+class CoreConfig(AppConfig):
+    name = 'core'
 
     def ready(self):        
         from . import updater
