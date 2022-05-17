@@ -19,10 +19,10 @@ import requests
 from bs4 import BeautifulSoup
 import plotly.express as px
 
-#Set Locale
+# Set Locale
 locale.setlocale(locale.LC_ALL, 'pt_BR')
 
-#Create
+# Create
 class NotaCreate(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     login_url = reverse_lazy('account_login')
     model = Nota
@@ -306,7 +306,7 @@ class WalletView(LoginRequiredMixin, TemplateView):
         }
         
         return context
-
+# Cadastrar proventos
 class ProventosCreate(LoginRequiredMixin, CreateView):
     model = Proventos
     fields = ('ativo','tipo_provento','data','valor')
@@ -327,7 +327,7 @@ class ProventosCreate(LoginRequiredMixin, CreateView):
          options={'locale':'pt-br'}
         )
         return form
-
+# Atualizar proventod
 class ProventosUpdate(LoginRequiredMixin, UpdateView):
     model = Proventos
     fields = ('ativo','tipo_provento','data','valor')
@@ -348,7 +348,7 @@ class ProventosUpdate(LoginRequiredMixin, UpdateView):
          options={'locale':'pt-br'}
         )
         return form
-
+# Listar proventos
 class ProventosList(LoginRequiredMixin,ListView):
     login_url = reverse_lazy('account_login')
     model = Proventos
@@ -364,7 +364,7 @@ class ProventosList(LoginRequiredMixin,ListView):
             self.object_list = Proventos.objects.filter(user=self.request.user).order_by('data')
         return self.object_list
 
-# Delete
+# Delete proventos
 class ProventosDelete(LoginRequiredMixin, DeleteView):
     login_url = reverse_lazy('account_login')
     model = Proventos
