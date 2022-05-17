@@ -5,6 +5,7 @@ from django.db.models import Sum
 from datetime import datetime
 from pytz import timezone
 
+# cotação do yahoo
 def get_yahoo_cotacao():
    
     result_compra = Nota.objects.values('ativo').annotate(qt=Sum('quantidade'), preco_f=Sum('total_compra'), custos=Sum('total_custo'), preco_m=Sum('preco'), v_mercado=Sum('preco'), lucro=Sum('preco')).filter(tipo='C')
