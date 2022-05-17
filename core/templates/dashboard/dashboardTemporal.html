@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block title %}WManage{% endblock %}
+
+{% block content %}
+<h3 class="mt-4">Análise de Série Temporal - {{ativo}}</h3>
+
+<form method="GET" id="filter-form">
+    <div class="form-row mt-5">
+        <div class="form-group col-md-2 mb-0">
+            <label>Data Inicial</label>
+            <input class="form-control" type="date" id="data_inicio" name="data_inicio" placeholder="dd/mm/aaaa" value="{{ request.GET.data_inicio }}">
+          </div>
+          <div class="form-group col-md-2 mb-0">
+            <label>Data Final</label>
+            <input class="form-control" type="date" id="data_fim" name="data_fim" placeholder="dd/mm/aaaa" value="{{ request.GET.data_fim }}">
+          </div>
+        <div class="form-group col-md-1 mb-0">
+            <label></label>
+            <button id="filter-btn" class="btn btn-info form-control mt-2 mb-3" type="submit"><span class="info-box-icon bg-info"><i class="fa fa-search"></i></span></button>
+        </div>        
+    </div>
+</form>
+<nav>
+    <div class="nav nav-tabs" id="nav-tab" role="tablist">
+        <a class="nav-link active" id="nav-series-tab" data-toggle="tab" href="#nav-series" role="tab" aria-controls="nav-series" aria-selected="false">Time Series</a>
+        <a class="nav-link" id="nav-candle-tab" data-toggle="tab" href="#nav-candle" role="tab" aria-controls="nav-candle" aria-selected="true">Candlestick</a>        
+    </div>
+</nav>
+<div class="tab-content" id="nav-tabContent">
+    <div class="tab-pane fade show active" id="nav-series" role="tabpanel" aria-labelledby="nav-series-tab">
+        {{chart_2|safe}}
+    </div>
+    <div class="tab-pane fade" id="nav-candle" role="tabpanel" aria-labelledby="nav-candle-tab">
+        {{chart|safe}}
+    </div>    
+</div>
+      
+{% endblock content %}

@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import CotacaoList, NotaCreate, NotaList, NotaUpdate, NotaDelete, ProventosCreate, ProventosList, ProventosUpdate, ProventosDelete, CarteiraChart, Export_xls
+from .views import CotacaoList, DashboardTemporal, NotaCreate, NotaList, NotaUpdate, NotaDelete, ProventosCreate, ProventosList, ProventosUpdate, ProventosDelete, CarteiraChart, Export_xls
 from . import views
 
 urlpatterns = [
@@ -18,6 +18,7 @@ urlpatterns = [
 
     path('dashboard/carteira-chart/', CarteiraChart.as_view(), name='carteira-chart'),
     path('dashboard/proventos-chart/', views.Dashboard, name='proventos-chart'),
+    path('dashboard/temporal-chart/<str:ativo>', DashboardTemporal.as_view(), name='temporal-chart'),
 
     path('export/xls/', Export_xls.get_context_data, name='export-proventos-xls'),
 ]

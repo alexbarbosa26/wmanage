@@ -47,7 +47,7 @@
           <tbody>
           {% for nota in result_c %}
           <tr>    
-              <th scope="row" class="text-primary">{{nota.ativo}}</th>
+              <th scope="row" class="text-primary"><a href="{% url 'temporal-chart' nota.ativo %}">{{nota.ativo}}</a></th>
               <td>{{nota.qt}}</td>
               <td>{{nota.preco_f}}</td>
               <td>{{nota.custos}}</td>

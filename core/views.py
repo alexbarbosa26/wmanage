@@ -1,3 +1,4 @@
+from datetime import datetime
 from core.forms import DateForm
 from .models import Ativo, Nota, Proventos, Cotacao
 import json
@@ -18,6 +19,9 @@ import locale
 import requests
 from bs4 import BeautifulSoup
 import plotly.express as px
+import yfinance as yf
+import plotly.graph_objects as go
+import pandas as pd
 
 # Set Locale
 locale.setlocale(locale.LC_ALL, 'pt_BR')
@@ -327,6 +331,7 @@ class ProventosCreate(LoginRequiredMixin, CreateView):
          options={'locale':'pt-br'}
         )
         return form
+
 # Atualizar proventod
 class ProventosUpdate(LoginRequiredMixin, UpdateView):
     model = Proventos
@@ -470,6 +475,36 @@ def Dashboard(request):
     chart = fig.to_html()
     context = {'chart': chart, 'form': DateForm(), 'total_proventos':total_proventos}
     return render(request, 'dashboard/chart.html', context)    
+
+# Dashboard Temporal
+class DashboardTemporal(LoginRequiredMixin, TemplateView):
+    login_url = reverse_lazy('account_login')  
+    template_name = 'dashboard/dashboardTemporal.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        ano = str(datetime.today().year)
+        data_inicio = self.request.GET.get('data_inicio')
+        data_fim = self.request.GET.get('data_fim')
+
+        if data_inicio or data_fim:
+            df = yf.download(context['ativo']+'.SA', start=data_inicio, end=data_fim, rounding=True)
+        else:
+            df = yf.download(context['ativo']+'.SA', start=ano+'-01-01', end=ano+'-12-31', rounding=True)
+
+        fig = go.Figure(data=[go.Candlestick(x=df.index,
+                open=df['Open'],
+                high=df['High'],
+                low=df['Low'],
+                close=df['Adj Close'])])
+        fig.update_layout(xaxis_rangeslider_visible=False)
+        chart = fig.to_html()
+
+        fig = go.Figure([go.Scatter(x=df.index, y=df['Adj Close'])])
+        chart_2 = fig.to_html()
+
+        context = {'chart':chart, 'chart_2':chart_2, 'form':DateForm(), 'ativo':context['ativo']}
+        return context
 
 # List Cotação
 class CotacaoList(LoginRequiredMixin, ListView):

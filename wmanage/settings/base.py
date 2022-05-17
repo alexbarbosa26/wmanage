@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     # apps
-    'core',
+    'core.apps.CoreConfig',
     'pages',
     'csvs',
     # bibliotecas

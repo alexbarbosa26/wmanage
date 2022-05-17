@@ -29,7 +29,12 @@
     <!-- ./col -->
     <div class="col-lg-3 col-xs-6">
         <!-- small box -->
-        {% if total_lucro > 'R$ 0,00' %}
+        {% if total_lucro == 'R$ 0,00' %}
+        <div class="small-box bg-grey">
+        <div class="icon">
+            <i class="fas fa-hourglass"></i>
+        </div>
+        {% elif total_lucro > 'R$ 0,00' %}
         <div class="small-box bg-green">
         <div class="icon">
             <i class="fa fa-hand-holding-usd"></i>
@@ -45,7 +50,9 @@
             <p>( {{ porcentagem_lucro }}% )</p>
         </div>
         
-        {% if total_lucro > 'R$ 0,00' %}
+        {% if total_lucro == 'R$ 0,00' %}
+        <a href="#" class="small-box-footer" active><i class="fas fa-hourglass"></i> Lucro ou Perda</a>
+        {% elif total_lucro > 'R$ 0,00'%}
         <a href="#" class="small-box-footer" active><i class="fa fa-hand-holding-usd"></i> Lucro</a>
         {% else %}
         <a href="#" class="small-box-footer" active><i class="fa fa-thumbs-down"></i> Perda</a>
