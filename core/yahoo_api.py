@@ -39,7 +39,7 @@ def get_yahoo_cotacao():
                 variacao_mercado = []
                 variacao_mercado.append(soup.find_all('fin-streamer', {'class':'Fw(500) Pstart(8px) Fz(24px)'})[0].text)
                 variacao_mercado.append(soup.find_all('fin-streamer', {'class':'Fw(500) Pstart(8px) Fz(24px)'})[1].text)
-                mercado_aberto_fechado = soup.find('span', {'data-id':'mk-msg'}).text
+            mercado_aberto_fechado = soup.find('span', {'data-id':'mk-msg'}).text
             # variacao_mercado = variacao_mercado.split(' ')
 
             Cotacao.objects.filter(ativo=compra['ativo']).update(ativo=compra['ativo'], fechamento_ajustado = preco_mercado, variacao_1 = variacao_mercado[0], variacao_2 = variacao_mercado[1], status_fechado_aberto = mercado_aberto_fechado, data_instante = data_e_hora_atuais.astimezone(fuso_horario))
