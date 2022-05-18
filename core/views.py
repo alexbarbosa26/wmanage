@@ -61,21 +61,21 @@ class NotaCreate(LoginRequiredMixin, SuccessMessageMixin, CreateView):
             }
             return render(self.request, 'error.html', context)
 
-        elif ativo_reg == [] and form.cleaned_data['tipo'] == 'C' and form.cleaned_data['quantidade'] > 0 and cotacao_reg == []:
+        elif ativo_reg == [] and form.cleaned_data['tipo'] == 'C' and form.cleaned_data['quantidade'] > 0 and not cotacao_reg:
             Ativo.objects.create(ativo=form.cleaned_data['ativo'],  quantidade=form.cleaned_data['quantidade'], preco_total=form.cleaned_data['quantidade']*form.cleaned_data['preco'], user=self.request.user)
             Cotacao.objects.create(acao=form.cleaned_data['identificador'], ativo=form.cleaned_data['ativo'])
 
-        elif ativo_reg == [] and form.cleaned_data['tipo'] == 'C' and form.cleaned_data['quantidade'] > 0 and cotacao_reg != []:
+        elif ativo_reg == [] and form.cleaned_data['tipo'] == 'C' and form.cleaned_data['quantidade'] > 0 and cotacao_reg:
             Ativo.objects.create(ativo=form.cleaned_data['ativo'],  quantidade=form.cleaned_data['quantidade'], preco_total=form.cleaned_data['quantidade']*form.cleaned_data['preco'], user=self.request.user)
             Cotacao.objects.create(acao=form.cleaned_data['identificador'], ativo=form.cleaned_data['ativo'])        
 
-        elif form.cleaned_data['tipo'] == 'C' and form.cleaned_data['quantidade'] > 0 and cotacao_reg == []:
+        elif form.cleaned_data['tipo'] == 'C' and form.cleaned_data['quantidade'] > 0 and not cotacao_reg:
             ativo_reg[0]['quantidade'] = ativo_reg[0]['quantidade'] + form.cleaned_data['quantidade']
             ativo_reg[0]['preco_total'] = ativo_reg[0]['preco_total'] + (form.cleaned_data['quantidade']*form.cleaned_data['preco'])
             Ativo.objects.filter(ativo=form.cleaned_data['ativo'], user=self.request.user).update(ativo=form.cleaned_data['ativo'], quantidade=ativo_reg[0]['quantidade'], preco_total=ativo_reg[0]['preco_total'], user=self.request.user)
             Cotacao.objects.create(acao=form.cleaned_data['identificador'], ativo=form.cleaned_data['ativo'])
 
-        elif form.cleaned_data['tipo'] == 'C' and form.cleaned_data['quantidade'] > 0 and cotacao_reg != []:
+        elif form.cleaned_data['tipo'] == 'C' and form.cleaned_data['quantidade'] > 0 and cotacao_reg:
             ativo_reg[0]['quantidade'] = ativo_reg[0]['quantidade'] + form.cleaned_data['quantidade']
             ativo_reg[0]['preco_total'] = ativo_reg[0]['preco_total'] + (form.cleaned_data['quantidade']*form.cleaned_data['preco'])
             Ativo.objects.filter(ativo=form.cleaned_data['ativo'], user=self.request.user).update(ativo=form.cleaned_data['ativo'], quantidade=ativo_reg[0]['quantidade'], preco_total=ativo_reg[0]['preco_total'], user=self.request.user)
