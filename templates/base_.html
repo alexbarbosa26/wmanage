@@ -25,7 +25,7 @@
     <link rel="stylesheet" type="text/css" href="{% static 'style/signin.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'style/main.css' %}">
     <!-- Theme style -->
-    <link rel="stylesheet" type="text/css" href="{% static 'dist/css/adminlte.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'style/adminlte.min.css' %}">
     <!-- DataTables -->  
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.11.3/datatables.min.css"/> 
     <link rel="stylesheet" type="text/css" href="{% static 'style/responsive.bootstrap4.min.css' %}">
@@ -38,7 +38,7 @@
   {% if user.is_authenticated %}
   <!-- Preloader -->
   <div class="preloader flex-column justify-content-center align-items-center">
-    <img class="animation__shake" src="{% static 'dist/img/AdminLTELogo.png' %}" alt="WManage" height="60" width="60">
+    <img class="animation__shake" src="{% static 'img/AdminLTELogo.png' %}" alt="WManage" height="60" width="60">
   </div>
   {% endif %}
   
@@ -102,7 +102,7 @@
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
     <a href="{% url 'pages:home' %}" class="brand-link">
-      <img src="{% static 'dist/img/AdminLTELogo.png' %}" alt="WManage" class="brand-image img-circle elevation-3" style="opacity: .8">
+      <img src="{% static 'img/AdminLTELogo.png' %}" alt="WManage" class="brand-image img-circle elevation-3" style="opacity: .8">
       <span class="brand-text font-weight-light">WManage</span>
     </a>
     {% if user.is_authenticated %}
@@ -111,7 +111,7 @@
       <!-- Sidebar user panel (optional) -->
       <div class="user-panel mt-3 pb-3 mb-3 d-flex">
         <div class="image">
-          <img src="{% static 'dist/img/user2-160x160.jpg' %}" class="img-circle elevation-2" alt="User Image">
+          <img src="{% static 'img/default-user.png' %}" class="img-circle elevation-2" alt="User Image">
         </div>
         <div class="info">
           <a href="#" class="d-block">{{user.username}}</a>
@@ -306,9 +306,7 @@
 
 </div>
 <!-- AdminLTE App -->
-<script src="{% static 'dist/js/adminlte.js' %}"></script>
-<!-- AdminLTE dashboard demo (This is only for demo purposes) -->
-<script src="{% static 'dist/js/pages/dashboard.js' %}"></script>
+<script src="{% static 'js/adminlte.js' %}"></script>
 <script src={% static 'js/main.js' %}></script>    
 <script src={% static 'js/scripts.js' %}></script> 
 <script src="{% static 'js/doubleSubmit.js' %}"></script>
