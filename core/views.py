@@ -1,4 +1,5 @@
 from datetime import datetime
+from turtle import title
 from core.forms import DateForm
 from .models import Ativo, Nota, Proventos, Cotacao
 import json
@@ -389,15 +390,21 @@ class CarteiraChart(LoginRequiredMixin, TemplateView):
     template_name = 'dashboard/carteiraChart.html' 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        data_inicio = self.request.GET.get('data_inicio')
+        data_fim = self.request.GET.get('data_fim')
         r_result = []
         status_fechado_aberto = []
         status_fechado_aberto = 'Aguardando o cadastro de ações'
         x = 0
         y = 0
         v = 0
-        result_compra = Nota.objects.values('ativo').annotate(qt=Sum('quantidade'), preco_f=Sum('total_compra'), custos=Sum('total_custo'), preco_m=Sum('preco'), v_mercado=Sum('preco'), lucro=Sum('preco'), variacao_mercado_1=Count('identificador'), variacao_mercado_2=Count('identificador')).filter(tipo='C', user=self.request.user)
-        result_venda = Nota.objects.values('ativo').annotate(qt=Sum('quantidade'), preco_f=Sum('total_compra'), custos=Sum('total_custo')).filter(tipo='V', user=self.request.user)
-            
+        if data_inicio or data_fim:
+            result_compra = Nota.objects.values('ativo').annotate(qt=Sum('quantidade'), preco_f=Sum('total_compra'), custos=Sum('total_custo'), preco_m=Sum('preco'), v_mercado=Sum('preco'), lucro=Sum('preco'), variacao_mercado_1=Count('identificador'), variacao_mercado_2=Count('identificador')).filter(data__range=(data_inicio, data_fim),tipo='C', user=self.request.user)
+            result_venda = Nota.objects.values('ativo').annotate(qt=Sum('quantidade'), preco_f=Sum('total_compra'), custos=Sum('total_custo')).filter(data__range=(data_inicio, data_fim),tipo='V', user=self.request.user)
+        else:
+            result_compra = Nota.objects.values('ativo').annotate(qt=Sum('quantidade'), preco_f=Sum('total_compra'), custos=Sum('total_custo'), preco_m=Sum('preco'), v_mercado=Sum('preco'), lucro=Sum('preco'), variacao_mercado_1=Count('identificador'), variacao_mercado_2=Count('identificador')).filter(tipo='C', user=self.request.user)
+            result_venda = Nota.objects.values('ativo').annotate(qt=Sum('quantidade'), preco_f=Sum('total_compra'), custos=Sum('total_custo')).filter(tipo='V', user=self.request.user)
+                
         for venda in result_venda:
             for compra in result_compra:
                 if compra['ativo'] == venda['ativo']:                
@@ -428,17 +435,24 @@ class CarteiraChart(LoginRequiredMixin, TemplateView):
                 r_result.append(compra)
             else:
                 pass
-        names = []
-        prices = []
+        quantidade = 0
         for i in r_result:
-            
-            names.append(i['ativo'])
-            prices.append(i['qt'])
-        
+            quantidade += int(i['qt'])
+
+        valor_acumulado = quantidade
+        if not r_result:
+            r_result = [{'ativo':'Nenhum','qt':0}]
+
+        fig = px.pie(r_result, values='qt', names='ativo', title='Distribuição da Carteira')
+        chart = fig.to_html()
+
         context = {
-            'names' : json.dumps(names),
-            'prices' : json.dumps(prices)
+            'chart' : chart,
+            'valor_acumulado':valor_acumulado,
+            'form':DateForm()
         }
+
+        
         
         return context
 
