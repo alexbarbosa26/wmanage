@@ -48,7 +48,9 @@
                 class="btn btn-secondary btn-block">{% trans "Use Backup Token" %}</button>
       </p>
     {% endif %}
-
+    <div class="mb-4">
+      <a class="small" href="{% url 'password_reset' %}">Esqueceu sua senha ?</a>
+    </div>   
     {% include "two_factor/_wizard_actions.html" %}
   </form>
 {% endblock %}
