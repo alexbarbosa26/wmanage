@@ -1,8 +1,6 @@
 from datetime import datetime
-from turtle import title
 from core.forms import DateForm
 from .models import Ativo, Nota, Proventos, Cotacao
-import json
 from decimal import Decimal
 from django.shortcuts import render
 from django.urls import reverse_lazy
