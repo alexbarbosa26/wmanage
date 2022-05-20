@@ -5,7 +5,7 @@
 {% block content %}
 <form method="post" class="form-signin" autocomplete="off">
   {% csrf_token %}
-  <h1 class="h3 mb-3 mt-4 font-weight-normal">{% block title %}<img src="{% static 'img/logo_w1.png' %}" alt="WManage" height="60" width="60">{% trans "Entrar no Sistema" %}{% endblock %}</h1>
+  <h1 class="h3 mb-3 mt-4 font-weight-normal"><img src="{% static 'img/logo_w1.png' %}" alt="WManage" height="60" width="60">{% block title %}{% trans "Entrar no Sistema" %}{% endblock %}</h1>
 
   {% if wizard.steps.current == 'auth' %}
     <p>{% blocktrans %}Enter your credentials.{% endblocktrans %}</p>
