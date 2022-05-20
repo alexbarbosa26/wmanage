@@ -439,7 +439,7 @@ class CarteiraChart(LoginRequiredMixin, TemplateView):
 
         valor_acumulado = quantidade
         if not r_result:
-            r_result = [{'ativo':'Nenhum','qt':0}]
+            r_result = [{'ativo':'N/A','qt':0}]
 
         fig = px.pie(r_result, values='qt', names='ativo', title='Distribuição da Carteira')
         chart = fig.to_html()
@@ -565,3 +565,6 @@ class Export_xls:
 
         wb.save(response)
         return response
+
+def error_500(request):
+    return render(request, '500.html')

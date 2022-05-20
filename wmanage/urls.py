@@ -16,6 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
+from django.conf.urls import handler500
 from pages.views import ProfileView
 from two_factor.urls import urlpatterns as tf_urls
 from django_otp.admin import OTPAdminSite
@@ -78,3 +79,4 @@ urlpatterns = [
          ),
          name='password_reset_complete'),
 ]
+handler500='core.views.error_500'
