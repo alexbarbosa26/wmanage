@@ -39,7 +39,7 @@
   <!-- Preloader -->
   <div class="preloader flex-column justify-content-center align-items-center">
     <img class="animation__shake" src="{% static 'img/logo_w1.png' %}" alt="WManage" height="60" width="60">
-    <img src="{% static 'img/loading.gif' %}" alt="loading">
+    <img src="{% static 'img/loading.gif' %}" alt="loading" height="120">
   </div>
   {% endif %}
   
@@ -101,12 +101,13 @@
 
   <!-- Main Sidebar Container -->
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
+    {% if user.is_authenticated %}
     <!-- Brand Logo -->
     <a href="{% url 'pages:home' %}" class="brand-link">
       <img src="{% static 'img/logo_w2.png' %}" alt="WManage" class="brand-image img-circle elevation-3" style="opacity: .8">
       <span class="brand-text font-weight-light">WManage</span>
     </a>
-    {% if user.is_authenticated %}
+    
     <!-- Sidebar -->
     <div class="sidebar">
       <!-- Sidebar user panel (optional) -->
