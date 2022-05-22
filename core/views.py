@@ -20,7 +20,6 @@ from bs4 import BeautifulSoup
 import plotly.express as px
 import yfinance as yf
 import plotly.graph_objects as go
-import pandas as pd
 
 # Set Locale
 locale.setlocale(locale.LC_ALL, 'pt_BR')
@@ -158,6 +157,8 @@ class NotaUpdate(LoginRequiredMixin,SuccessMessageMixin, UpdateView):
     success_message = "%(ativo)s atualizado com sucesso!"
 
     def form_valid(self, form):
+        Ativo.objects.filter(id=self.object.id, user=self.request.user).update(ativo=form.cleaned_data['ativo'])
+
         qtd_antigo = Nota.objects.values('quantidade','total_compra').filter(id=self.object.id, user=self.request.user)
         qtd_antigo = list(qtd_antigo)
         
