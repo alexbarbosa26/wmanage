@@ -1,4 +1,5 @@
 from datetime import datetime
+import json
 from core.forms import DateForm
 from .models import Ativo, Nota, Proventos, Cotacao
 from decimal import Decimal
@@ -577,9 +578,7 @@ class Dash_Carteira_X_Bolsa(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         ativos = Ativo.objects.filter(user=self.request.user)
-        print(ativos)
         acoes = [a.ativo for a in ativos]
-        qtd = [q.quantidade for q in ativos]
         inicio = '2022-01-01'
         fim = '2022-12-31'
 
@@ -589,9 +588,36 @@ class Dash_Carteira_X_Bolsa(LoginRequiredMixin, TemplateView):
         
         df = precos/precos.iloc[0]
         
-        fig = px.line(df, x=df.index, y=df.columns,title='custom tick labels')
-        chart_2 = fig.to_html()
-        context = {'chart':chart_2}
+        fig = px.line(df, x=df.index, y=df.columns,title='Desempenho dos Ativos')
+        fig.update_xaxes(dtick="M1",tickformat="%b\n%Y",ticklabelmode="period")
+        chart = fig.to_html()
+
+        carteira = {str(dado.ativo):dado.quantidade for dado in ativos}
+        carteira_df = pd.Series(data=carteira, index=list(carteira.keys()))
+        # sum(carteira.values())
+        primeiro = precos.iloc[0]
+        qtd_acoes = carteira_df/primeiro
+        PL = precos*qtd_acoes
+        PL['PL Total'] = PL.iloc[:].sum(axis = 1)
+
+        fig = px.line(PL, x=PL.index, y=PL.columns,title='Posição diaria de cada ativo')
+        fig.update_xaxes(dtick="M1",tickformat="%b\n%Y",ticklabelmode="period")
+        chart_PL = fig.to_html()
+
+        ibov = yf.download('^BVSP', start = inicio, end = fim)
+        ibov.rename(columns = {'Adj Close': 'IBOV'}, inplace = True)
+        ibov = ibov.drop(ibov.columns[[0,1,2,3,5]], axis = 1)
+        ibov.index = pd.to_datetime(ibov.index)
+        PL.index = pd.to_datetime(PL.index)
+        novo_df = pd.merge(ibov, PL, how = 'inner', on = 'Date')
+        PL_normalizado = novo_df/novo_df.iloc[0]
+        PL_normalizado = PL_normalizado[['IBOV','PL Total']]
+
+        fig = px.line(PL_normalizado, x=PL_normalizado.index, y=PL_normalizado.columns,title='Carteira Vs Ibovespa')
+        fig.update_xaxes(dtick="M1",tickformat="%b\n%Y",ticklabelmode="period")
+        chart_IBOV_PL = fig.to_html()
+
+        context = {'chart':chart, 'chart_PL':chart_PL, 'chart_IBOV_PL':chart_IBOV_PL}
         
         return context
 
