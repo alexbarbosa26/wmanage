@@ -447,11 +447,13 @@ class CarteiraChart(LoginRequiredMixin, TemplateView):
 
         fig = px.pie(r_result, values='qt', names='ativo', title='Distribuição da Carteira')
         chart = fig.to_html()
-
+        form = DateForm()
+        if self.request.GET:
+            form = DateForm(self.request.GET)
         context = {
             'chart' : chart,
             'valor_acumulado':valor_acumulado,
-            'form':DateForm()
+            'form':form
         }
 
         
@@ -489,7 +491,11 @@ def Dashboard(request):
     fig.update_traces(texttemplate='R$ %{y:,.2f}',textfont_size=12, textangle=0, textposition="outside", cliponaxis=False)
     fig.update_layout(yaxis_tickprefix = 'R$ ', yaxis_tickformat = ',.2f',uniformtext_minsize=8, uniformtext_mode='hide',title={'font_size':22,'xanchor':'center','x':0.5})
     chart = fig.to_html()
-    context = {'chart': chart, 'form': DateForm(), 'total_proventos':total_proventos}
+    form = DateForm()
+    if request.GET:
+        form = DateForm(request.GET)
+    
+    context = {'chart': chart, 'form': form, 'total_proventos':total_proventos}
     return render(request, 'dashboard/chart.html', context)    
 
 # Dashboard Temporal
@@ -518,8 +524,10 @@ class DashboardTemporal(LoginRequiredMixin, TemplateView):
 
         fig = go.Figure([go.Scatter(x=df.index, y=df['Adj Close'])])
         chart_2 = fig.to_html()
-
-        context = {'chart':chart, 'chart_2':chart_2, 'form':DateForm(), 'ativo':context['ativo']}
+        form = DateForm()
+        if self.request.GET:
+            form = DateForm(self.request.GET)
+        context = {'chart':chart, 'chart_2':chart_2, 'form':form, 'ativo':context['ativo']}
         return context
 
 # List Cotação
@@ -577,47 +585,76 @@ class Dash_Carteira_X_Bolsa(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        ativos = Ativo.objects.filter(user=self.request.user)
+        ano = str(datetime.today().year)
+        ano_passado = int(ano)-1
+        ano_passado = str(ano_passado)
+        # 
+        inicio = self.request.GET.get('data_inicio')
+        fim = self.request.GET.get('data_fim')
+        # Consultado a relação de ativos do usuario maior que 0
+        ativos = Ativo.objects.filter(user=self.request.user, quantidade__gt=0)
         acoes = [a.ativo for a in ativos]
-        inicio = '2022-01-01'
-        fim = '2022-12-31'
 
+        # buscando as informações via Yahoo Fincance
         precos = pd.DataFrame()
-        for i in acoes:
-            precos[i] = yf.download(i+'.SA', start = inicio, end = fim)['Adj Close']        
-        
+        if inicio or fim:            
+            for i in acoes:
+                precos[i] = yf.download(i+'.SA', start = inicio, end = fim)['Adj Close']
+        else:            
+            for i in acoes:
+                precos[i] = yf.download(i+'.SA', start = ano_passado+'-01-01', end = ano+'-12-31')['Adj Close']    
+
+        # Vamos normalizar o preço dos ativos para visualizar seus desempenhos
         df = precos/precos.iloc[0]
-        
+        # Apresentando as informações no gráfico 
         fig = px.line(df, x=df.index, y=df.columns,title='Desempenho dos Ativos')
         fig.update_xaxes(dtick="M1",tickformat="%b\n%Y",ticklabelmode="period")
         chart = fig.to_html()
 
+        # Criando um dicionário com as alocações que vamos fazer para cada ativo na nossa carteira
         carteira = {str(dado.ativo):dado.quantidade for dado in ativos}
-        carteira_df = pd.Series(data=carteira, index=list(carteira.keys()))
-        # sum(carteira.values())
+        carteira_df = pd.Series(data=carteira, index=list(carteira.keys()))        
+        # Obtendo preços dos ativos no primeiro dia do investimento
         primeiro = precos.iloc[0]
+        # Quantidade de papéis comprados de cada ativo
         qtd_acoes = carteira_df/primeiro
+        # Criando um dataframe que contém a posição diária de cada ativo
         PL = precos*qtd_acoes
+        # Criando uma coluna que contém a posição consolidada da nossa carteira diariamente
         PL['PL Total'] = PL.iloc[:].sum(axis = 1)
 
-        fig = px.line(PL, x=PL.index, y=PL.columns,title='Posição diaria de cada ativo')
+        # Apresentando as informações no gráfico 
+        fig = px.line(PL, x=PL.index, y=PL.columns,title='Posição diária de cada ativo')
         fig.update_xaxes(dtick="M1",tickformat="%b\n%Y",ticklabelmode="period")
         chart_PL = fig.to_html()
 
-        ibov = yf.download('^BVSP', start = inicio, end = fim)
+        # Obtendo dados do IBOV para comparar com a nossa carteira
+        if inicio or fim:
+            ibov = yf.download('^BVSP', start = inicio, end = fim)
+        else:
+            ibov = yf.download('^BVSP', start = ano_passado+'-01-01', end = ano+'-12-31')
+        # Renomeando a coluna com o nome IBOV
         ibov.rename(columns = {'Adj Close': 'IBOV'}, inplace = True)
+        # Limpando as demais colunas
         ibov = ibov.drop(ibov.columns[[0,1,2,3,5]], axis = 1)
+        # Verificando se o índice dos dataframes está no formato 'data'
         ibov.index = pd.to_datetime(ibov.index)
         PL.index = pd.to_datetime(PL.index)
+        # Juntando tudo num dataframe só
         novo_df = pd.merge(ibov, PL, how = 'inner', on = 'Date')
+        # Normalizando esse novo dataframe que contém o IBOV, todos os ativos e o PL da nossa carteira
         PL_normalizado = novo_df/novo_df.iloc[0]
+        # Filtrando as colunas IBOV e PL Total
         PL_normalizado = PL_normalizado[['IBOV','PL Total']]
 
+        # Apresentando as informações no gráfico
         fig = px.line(PL_normalizado, x=PL_normalizado.index, y=PL_normalizado.columns,title='Carteira Vs Ibovespa')
-        fig.update_xaxes(dtick="M1",tickformat="%b\n%Y",ticklabelmode="period")
+        fig.update_xaxes(dtick="M1", tickformat="%b\n%Y", ticklabelmode="period")
         chart_IBOV_PL = fig.to_html()
-
-        context = {'chart':chart, 'chart_PL':chart_PL, 'chart_IBOV_PL':chart_IBOV_PL}
+        form = DateForm()
+        if self.request.GET:
+            form = DateForm(self.request.GET)
+        context = {'chart':chart, 'chart_PL':chart_PL, 'chart_IBOV_PL':chart_IBOV_PL, 'form':form}
         
         return context
 
