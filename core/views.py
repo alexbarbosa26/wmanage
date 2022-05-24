@@ -57,7 +57,7 @@ class NotaCreate(LoginRequiredMixin, SuccessMessageMixin, CreateView):
         cotacao_reg = list(cotacao_reg)        
 
         # Se ativo for null e a tentativa for uma venda
-        if ativo_reg == [] and form.cleaned_data['tipo'] == 'V':
+        if not ativo_reg and form.cleaned_data['tipo'] == 'V':
             context ={
                 'message':'Não foi possível registrar sua ordem, por favor verifique a quantidade correta informada.'
             }
@@ -81,14 +81,14 @@ class NotaCreate(LoginRequiredMixin, SuccessMessageMixin, CreateView):
             ativo_reg[0]['preco_total'] = ativo_reg[0]['preco_total'] + (form.cleaned_data['quantidade']*form.cleaned_data['preco'])
             Ativo.objects.filter(ativo=form.cleaned_data['ativo'], user=self.request.user).update(ativo=form.cleaned_data['ativo'], quantidade=ativo_reg[0]['quantidade'], preco_total=ativo_reg[0]['preco_total'], user=self.request.user)
         
-        elif form.cleaned_data['tipo'] == 'V' and form.cleaned_data['quantidade'] <= ativo_reg[0]['quantidade']:
+        elif form.cleaned_data['tipo'] == 'V' and form.cleaned_data['quantidade'] <= ativo_reg[0]['quantidade'] and form.cleaned_data['quantidade'] > 0:
             ativo_reg[0]['quantidade'] = ativo_reg[0]['quantidade'] - form.cleaned_data['quantidade']
             ativo_reg[0]['preco_total'] = ativo_reg[0]['preco_total'] - (form.cleaned_data['quantidade']*form.cleaned_data['preco'])
             Ativo.objects.filter(ativo=form.cleaned_data['ativo'], user=self.request.user).update(ativo=form.cleaned_data['ativo'], quantidade=ativo_reg[0]['quantidade'], preco_total=ativo_reg[0]['preco_total'], user=self.request.user)
 
         else:
             context ={
-                'message':'Não foi possível registrar sua ordem, por favor verifique a quantidade correta e tente novamente'
+                'message':'Ordem não registrada, pois a quantidade informada não é compatível com a quantidade que você possui em carteira.'
             }
             return render(self.request, 'error.html', context)
 
