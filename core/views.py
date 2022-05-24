@@ -20,6 +20,8 @@ from bs4 import BeautifulSoup
 import plotly.express as px
 import yfinance as yf
 import plotly.graph_objects as go
+import pandas as pd
+import numpy as np
 
 # Set Locale
 locale.setlocale(locale.LC_ALL, 'pt_BR')
@@ -53,19 +55,19 @@ class NotaCreate(LoginRequiredMixin, SuccessMessageMixin, CreateView):
         cotacao_reg = Cotacao.objects.values().filter(ativo__icontains=form.cleaned_data['ativo'])
         cotacao_reg = list(cotacao_reg)        
 
+        # Se ativo for null e a tentativa for uma venda
         if ativo_reg == [] and form.cleaned_data['tipo'] == 'V':
             context ={
                 'message':'Não foi possível registrar sua ordem, por favor verifique a quantidade correta informada.'
             }
             return render(self.request, 'error.html', context)
-
-        elif ativo_reg == [] and form.cleaned_data['tipo'] == 'C' and form.cleaned_data['quantidade'] > 0 and not cotacao_reg:
+        # Se o ativo for null e tipo=compra, quantidade maior que 0 cotação for null
+        elif not ativo_reg and form.cleaned_data['tipo'] == 'C' and form.cleaned_data['quantidade'] > 0 and not cotacao_reg:
             Ativo.objects.create(ativo=form.cleaned_data['ativo'],  quantidade=form.cleaned_data['quantidade'], preco_total=form.cleaned_data['quantidade']*form.cleaned_data['preco'], user=self.request.user)
             Cotacao.objects.create(acao=form.cleaned_data['identificador'], ativo=form.cleaned_data['ativo'])
 
-        elif ativo_reg == [] and form.cleaned_data['tipo'] == 'C' and form.cleaned_data['quantidade'] > 0 and cotacao_reg:
-            Ativo.objects.create(ativo=form.cleaned_data['ativo'],  quantidade=form.cleaned_data['quantidade'], preco_total=form.cleaned_data['quantidade']*form.cleaned_data['preco'], user=self.request.user)
-            Cotacao.objects.create(acao=form.cleaned_data['identificador'], ativo=form.cleaned_data['ativo'])        
+        elif not ativo_reg and form.cleaned_data['tipo'] == 'C' and form.cleaned_data['quantidade'] > 0 and cotacao_reg:
+            Ativo.objects.create(ativo=form.cleaned_data['ativo'],  quantidade=form.cleaned_data['quantidade'], preco_total=form.cleaned_data['quantidade']*form.cleaned_data['preco'], user=self.request.user)      
 
         elif form.cleaned_data['tipo'] == 'C' and form.cleaned_data['quantidade'] > 0 and not cotacao_reg:
             ativo_reg[0]['quantidade'] = ativo_reg[0]['quantidade'] + form.cleaned_data['quantidade']
@@ -567,5 +569,35 @@ class Export_xls:
         wb.save(response)
         return response
 
+# Dashboard Carteira vs Bolsa
+class Dash_Carteira_X_Bolsa(LoginRequiredMixin, TemplateView):
+    login_url = reverse_lazy('account_login')  
+    template_name = 'dashboard/dash_carteira_x_bolsa.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        ativos = Ativo.objects.filter(user=self.request.user)
+        print(ativos)
+        acoes = [a.ativo for a in ativos]
+        qtd = [q.quantidade for q in ativos]
+        inicio = '2022-01-01'
+        fim = '2022-12-31'
+
+        precos = pd.DataFrame()
+        for i in acoes:
+            precos[i] = yf.download(i+'.SA', start = inicio, end = fim)['Adj Close']        
+        
+        df = precos/precos.iloc[0]
+        
+        fig = px.line(df, x=df.index, y=df.columns,title='custom tick labels')
+        chart_2 = fig.to_html()
+        context = {'chart':chart_2}
+        
+        return context
+
+# Renderezação de erros
 def error_500(request):
     return render(request, '500.html')
+
+def error_404(request,exception):
+    return render(request, '404.html')

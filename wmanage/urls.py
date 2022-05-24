@@ -80,3 +80,4 @@ urlpatterns = [
          name='password_reset_complete'),
 ]
 handler500='core.views.error_500'
+handler404='core.views.error_404'
