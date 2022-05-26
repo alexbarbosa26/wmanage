@@ -84,3 +84,17 @@ class Ativo(models.Model):
 def get_absolute_url(self):
     from django.urls import reverse
     return reverse("cadastrar-nota")
+
+class Desdobramento(models.Model):
+    ativo = models.ForeignKey(Ativo, on_delete=models.CASCADE)
+    data = models.DateField()
+    a_cada = models.IntegerField()
+    desdobra_se = models.IntegerField(verbose_name='Desdobra-se em')
+    user = models.ForeignKey(User, on_delete=models.PROTECT, verbose_name='Usuário')
+    data_instante = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        return super().save(*args, **kwargs)
+    
+    def __str__(self) -> str:
+        return super().__str__()

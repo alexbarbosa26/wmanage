@@ -1,7 +1,6 @@
 from datetime import datetime
-import json
-from core.forms import DateForm
-from .models import Ativo, Nota, Proventos, Cotacao
+from core.forms import DateForm, DesdobramentoForm
+from .models import Ativo, Desdobramento, Nota, Proventos, Cotacao
 from decimal import Decimal
 from django.shortcuts import render
 from django.urls import reverse_lazy
@@ -22,7 +21,6 @@ import plotly.express as px
 import yfinance as yf
 import plotly.graph_objects as go
 import pandas as pd
-import numpy as np
 
 # Set Locale
 locale.setlocale(locale.LC_ALL, 'pt_BR')
@@ -657,6 +655,33 @@ class Dash_Carteira_X_Bolsa(LoginRequiredMixin, TemplateView):
         context = {'chart':chart, 'chart_PL':chart_PL, 'chart_IBOV_PL':chart_IBOV_PL, 'form':form}
         
         return context
+
+class DesdobramentoCreate(LoginRequiredMixin,CreateView):
+    model=Desdobramento
+    template_name='cadastros/desdobramento.html'
+    success_url = reverse_lazy('cadastrar-desdobramentos')
+
+    # def get_form_kwargs(self):
+    #     """ Passes the request object to the form class.
+    #      This is necessary to only display members that belong to a given user"""
+
+    #     kwargs = super(DesdobramentoCreate, self).get_form_kwargs()
+    #     kwargs['request'] = self.request
+    #     return kwargs
+    def form_valid(self, form):
+        return super().form_valid(form)
+
+    def get_form(self):
+        if self.request.method == 'GET':
+            form = DesdobramentoForm(self.request.user or None)
+            form.instance.user = self.request.user
+            form.fields['data'].widget = DatePickerInput(format='%d/%m/%Y', options={'locale':'pt-br'})
+        else:
+            form = DesdobramentoForm(self.request.user, self.request.POST or None)
+            form.instance.user = self.request.user
+            print('CHEGOU AQUI')
+
+        return form
 
 # Renderezação de erros
 def error_500(request):

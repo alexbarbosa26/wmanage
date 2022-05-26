@@ -1,10 +1,11 @@
 from django.urls import path
-from .views import CotacaoList, Dash_Carteira_X_Bolsa, DashboardTemporal, NotaCreate, NotaList, NotaUpdate, NotaDelete, ProventosCreate, ProventosList, ProventosUpdate, ProventosDelete, CarteiraChart, Export_xls
+from .views import CotacaoList, Dash_Carteira_X_Bolsa, DashboardTemporal, DesdobramentoCreate, NotaCreate, NotaList, NotaUpdate, NotaDelete, ProventosCreate, ProventosList, ProventosUpdate, ProventosDelete, CarteiraChart, Export_xls
 from . import views
 
 urlpatterns = [
     path('cadastrar/ativos/', NotaCreate.as_view(), name='cadastrar-nota'),
     path('cadastrar/proventos/', ProventosCreate.as_view(), name='cadastrar-proventos'),
+    path('cadastrar/desdobramentos/', DesdobramentoCreate.as_view(), name='cadastrar-desdobramento'),
 
     path('listar/ativos/', NotaList.as_view(), name='listar-ordens'),
     path('listar/proventos/', ProventosList.as_view(), name='listar-proventos'),
