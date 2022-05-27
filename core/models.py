@@ -94,7 +94,7 @@ class Desdobramento(models.Model):
     data_instante = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
-        return super().save(*args, **kwargs)
+        return super(Desdobramento, self).save(*args, **kwargs)
     
     def __str__(self) -> str:
         return super().__str__()

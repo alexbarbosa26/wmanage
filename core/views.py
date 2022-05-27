@@ -13,7 +13,7 @@ from django.db.models import Count, Sum
 from bootstrap_datepicker_plus import DatePickerInput
 from braces.views import  GroupRequiredMixin
 import xlwt
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 import locale
 import requests
 from bs4 import BeautifulSoup
@@ -114,7 +114,7 @@ class NotaList(LoginRequiredMixin, ListView):
     template_name = 'listar/ordens.html'
 
     def get_queryset(self):
-        self.object_list = Nota.objects.filter(user=self.request.user).order_by('data')
+        self.object_list = Nota.objects.filter(user=self.request.user).order_by('-data')
         return self.object_list
 
 
@@ -656,32 +656,35 @@ class Dash_Carteira_X_Bolsa(LoginRequiredMixin, TemplateView):
         
         return context
 
-class DesdobramentoCreate(LoginRequiredMixin,CreateView):
-    model=Desdobramento
-    template_name='cadastros/desdobramento.html'
-    success_url = reverse_lazy('cadastrar-desdobramentos')
+class DesdobramentoCreate(LoginRequiredMixin, SuccessMessageMixin, CreateView):
+    model = Desdobramento
+    form_class = DesdobramentoForm
+    template_name = 'cadastros/desdobramento.html'
+    success_url = reverse_lazy('cadastrar-desdobramento')
+    success_message = "%(ativo)s registrado com sucesso!"
 
-    # def get_form_kwargs(self):
-    #     """ Passes the request object to the form class.
-    #      This is necessary to only display members that belong to a given user"""
-
-    #     kwargs = super(DesdobramentoCreate, self).get_form_kwargs()
-    #     kwargs['request'] = self.request
-    #     return kwargs
     def form_valid(self, form):
-        return super().form_valid(form)
+        if form.cleaned_data['a_cada'] <= 0 or form.cleaned_data['desdobra_se']<=0:
+            context ={
+                'message':'A quantidade não pode ser igual ou menor que 0. Por favor tente novamente.'
+            }
+            return render(self.request, 'error.html', context)
+        self.object = form.save(commit=False)
+        self.object.user = self.request.user
+        self.object.save()
 
-    def get_form(self):
-        if self.request.method == 'GET':
-            form = DesdobramentoForm(self.request.user or None)
-            form.instance.user = self.request.user
-            form.fields['data'].widget = DatePickerInput(format='%d/%m/%Y', options={'locale':'pt-br'})
-        else:
-            form = DesdobramentoForm(self.request.user, self.request.POST or None)
-            form.instance.user = self.request.user
-            print('CHEGOU AQUI')
+        return HttpResponseRedirect(self.get_success_url())
 
-        return form
+    def get_form_kwargs(self, *args, **kwargs):
+        kwargs = super(DesdobramentoCreate, self).get_form_kwargs(*args, **kwargs)        
+        kwargs['user'] = self.request.user
+        return kwargs
+
+    def get_success_message(self, cleaned_data):
+        return self.success_message % dict(
+            cleaned_data,
+            ativo=self.object.ativo,
+        )
 
 # Renderezação de erros
 def error_500(request):
