@@ -3,7 +3,7 @@ from core.models import Ativo, Desdobramento
 from django.forms.widgets import Select
 from bootstrap_datepicker_plus import DatePickerInput
 
-class DateForm(forms.ModelForm):
+class DateForm(forms.Form):
     data_inicio = forms.DateField(widget=forms.DateInput(attrs={'type':'date'}))
     data_fim = forms.DateField(widget=forms.DateInput(attrs={'type':'date'}))
 
