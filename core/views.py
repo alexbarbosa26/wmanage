@@ -655,13 +655,13 @@ class Dash_Carteira_X_Bolsa(LoginRequiredMixin, TemplateView):
         context = {'chart':chart, 'chart_PL':chart_PL, 'chart_IBOV_PL':chart_IBOV_PL, 'form':form}
         
         return context
-
+# Cadastrado de Desdobramento
 class DesdobramentoCreate(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     model = Desdobramento
     form_class = DesdobramentoForm
     template_name = 'cadastros/desdobramento.html'
     success_url = reverse_lazy('cadastrar-desdobramento')
-    success_message = "%(ativo)s registrado com sucesso!"
+    success_message = "Desdobramento registrado com sucesso!"
 
     def form_valid(self, form):
         if form.cleaned_data['a_cada'] <= 0 or form.cleaned_data['desdobra_se']<=0:
@@ -669,22 +669,22 @@ class DesdobramentoCreate(LoginRequiredMixin, SuccessMessageMixin, CreateView):
                 'message':'A quantidade não pode ser igual ou menor que 0. Por favor tente novamente.'
             }
             return render(self.request, 'error.html', context)
+        else:
+            ativo = Ativo.objects.filter(user=self.request.user, quantidade__gt=0, ativo=form.cleaned_data['ativo'])
+            nota = Nota.objects.filter(user=self.request.user, quantidade__gt=0, ativo=form.cleaned_data['ativo'], tipo='C')
+            print(ativo, nota)
+            pass
+
         self.object = form.save(commit=False)
         self.object.user = self.request.user
         self.object.save()
 
-        return HttpResponseRedirect(self.get_success_url())
+        return super().form_valid(form)
 
     def get_form_kwargs(self, *args, **kwargs):
         kwargs = super(DesdobramentoCreate, self).get_form_kwargs(*args, **kwargs)        
         kwargs['user'] = self.request.user
         return kwargs
-
-    def get_success_message(self, cleaned_data):
-        return self.success_message % dict(
-            cleaned_data,
-            ativo=self.object.ativo,
-        )
 
 # Renderezação de erros
 def error_500(request):

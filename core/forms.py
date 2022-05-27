@@ -17,5 +17,5 @@ class DesdobramentoForm(forms.ModelForm):
         super(DesdobramentoForm, self).__init__(*args, **kwargs)
         self.fields['ativo'].queryset = Ativo.objects.filter(user=self.user, quantidade__gt=0)
 
-    ativo = forms.ModelChoiceField(queryset=None, widget=Select(attrs={'data-live-search': 'true', 'Class':'selectpicker border rounded'}))
+    ativo = forms.ModelChoiceField(queryset=None, widget=Select(attrs={'data-live-search': 'true', 'Class':'selectpicker border rounded', 'autofocus':''}))
     data = forms.DateField(widget=DatePickerInput(format='%d/%m/%Y',options={'locale':'pt-br'}, attrs={'placeholder':'DD/MM/AAAA'}))
