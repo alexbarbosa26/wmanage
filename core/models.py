@@ -97,4 +97,4 @@ class Desdobramento(models.Model):
         return super(Desdobramento, self).save(*args, **kwargs)
     
     def __str__(self) -> str:
-        return super().__str__()
+        return self.ativo.ativo

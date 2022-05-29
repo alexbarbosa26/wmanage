@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import CotacaoList, Dash_Carteira_X_Bolsa, DashboardTemporal, DesdobramentoCreate, NotaCreate, NotaList, NotaUpdate, NotaDelete, ProventosCreate, ProventosList, ProventosUpdate, ProventosDelete, CarteiraChart, Export_xls
+from .views import CotacaoList, Dash_Carteira_X_Bolsa, DashboardTemporal, DesdobramentoCreate, DesdobramentoDelete, DesdobramentoList, NotaCreate, NotaList, NotaUpdate, NotaDelete, ProventosCreate, ProventosList, ProventosUpdate, ProventosDelete, CarteiraChart, Export_xls
 from . import views
 
 urlpatterns = [
@@ -10,12 +10,14 @@ urlpatterns = [
     path('listar/ativos/', NotaList.as_view(), name='listar-ordens'),
     path('listar/proventos/', ProventosList.as_view(), name='listar-proventos'),
     path('listar/base/cotacao/', CotacaoList.as_view(), name='listar-cotacao'),
+    path('listar/desdobramentos/', DesdobramentoList.as_view(), name='listar-desdobramento'),
 
     path('editar/ativo/<int:pk>/', NotaUpdate.as_view(), name='editar-nota'),
     path('editar/proventos/<int:pk>/', ProventosUpdate.as_view(), name='editar-provento'),
 
     path('excluir/nota/<int:pk>/', NotaDelete.as_view(), name='excluir-nota'),
     path('excluir/provento/<int:pk>/', ProventosDelete.as_view(), name='excluir-provento'),
+    path('excluir/desdobramento/<int:pk>/', DesdobramentoDelete.as_view(), name='excluir-desdobramento'),
 
     path('dashboard/carteira-chart/', CarteiraChart.as_view(), name='carteira-chart'),
     path('dashboard/proventos-chart/', views.Dashboard, name='proventos-chart'),

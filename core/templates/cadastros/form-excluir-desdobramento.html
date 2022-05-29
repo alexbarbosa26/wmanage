@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}WManager Excluir{% endblock %}
+
+{% block content %}
+<h4 class="mt-4">Excluir e desfazer desdobramento </h4>
+<form method="post"> 
+    <p>
+        Deseja excluir e desfazer o desdobramento para o ativo: <b>{{ object }}?</b>
+    </p>   
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button class="btn btn-danger" type="submit">Excluir</button>
+</form>
+{% endblock %}

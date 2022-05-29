@@ -1,4 +1,5 @@
 from datetime import datetime
+from math import floor
 from core.forms import DateForm, DesdobramentoForm
 from .models import Ativo, Desdobramento, Nota, Proventos, Cotacao
 from decimal import Decimal
@@ -670,10 +671,32 @@ class DesdobramentoCreate(LoginRequiredMixin, SuccessMessageMixin, CreateView):
             }
             return render(self.request, 'error.html', context)
         else:
+            a_cada = form.cleaned_data['a_cada']
+            desdobra_se = form.cleaned_data['desdobra_se']
             ativo = Ativo.objects.filter(user=self.request.user, quantidade__gt=0, ativo=form.cleaned_data['ativo'])
-            nota = Nota.objects.filter(user=self.request.user, quantidade__gt=0, ativo=form.cleaned_data['ativo'], tipo='C')
-            print(ativo, nota)
-            pass
+            nota = Nota.objects.filter(user=self.request.user, quantidade__gt=0, ativo=form.cleaned_data['ativo'], data__lte=form.cleaned_data['data'])
+            qtd_ajustada_ativo=0
+            qtd_ajustada_ativo_venda = 0
+            qtd_nota_c = 0
+            qtd_nota_v = 0
+            ativo = list(ativo)
+            ativo = ativo[0].quantidade
+
+            for i in nota:
+                qtd_ajustada = int((i.quantidade / a_cada)*desdobra_se)
+                preco_ajustado = i.total_compra / qtd_ajustada       
+                Nota.objects.filter(user=self.request.user, id=i.id).update(quantidade=qtd_ajustada, preco=preco_ajustado)
+                if i.tipo == 'C':
+                    qtd_nota_c +=i.quantidade
+                    qtd_ajustada_ativo += qtd_ajustada
+                else:
+                    qtd_nota_v +=i.quantidade
+                    qtd_ajustada_ativo_venda += qtd_ajustada
+                qtd_ajustada_ativo = (qtd_ajustada_ativo-qtd_ajustada_ativo_venda)
+
+            # calculando a diferença de quantidade da nota e do ativo e somando com o desdobramento 
+            qtd_ajustada_ativo = qtd_ajustada_ativo+(ativo -(qtd_nota_c-qtd_nota_v))
+            Ativo.objects.filter(user=self.request.user).update(quantidade=qtd_ajustada_ativo)
 
         self.object = form.save(commit=False)
         self.object.user = self.request.user
@@ -685,6 +708,65 @@ class DesdobramentoCreate(LoginRequiredMixin, SuccessMessageMixin, CreateView):
         kwargs = super(DesdobramentoCreate, self).get_form_kwargs(*args, **kwargs)        
         kwargs['user'] = self.request.user
         return kwargs
+
+# Lista de desdobramento do usuario
+class DesdobramentoList(LoginRequiredMixin, ListView):
+    login_url = reverse_lazy('account_login')
+    model = Desdobramento
+    template_name = 'listar/desdobramento.html'
+
+    def get_queryset(self):
+        self.object_list = Desdobramento.objects.filter(user=self.request.user).order_by('-data')
+        return self.object_list
+
+class DesdobramentoDelete(LoginRequiredMixin, DeleteView):
+    login_url = reverse_lazy('account_login')
+    model = Desdobramento
+    template_name = 'cadastros/form-excluir-desdobramento.html'
+    success_url = reverse_lazy('listar-desdobramento')
+    success_message = "O desdobramento do %(ativo)s foi desfeito e excluído com sucesso!"
+
+    def delete(self, *args, **kwargs):  
+        desdobramento = Desdobramento.objects.filter(user=self.request.user, id=kwargs['pk'])
+        desdobramento = list(desdobramento) 
+        ativo_d = desdobramento[0].ativo
+        a_cada = desdobramento[0].a_cada
+        desdobra_se = desdobramento[0].desdobra_se
+        data = desdobramento[0].data
+
+        # consultando os ativos e as notas  
+        ativo = Ativo.objects.filter(user=self.request.user, quantidade__gt=0, ativo=ativo_d)
+        nota = Nota.objects.filter(user=self.request.user, quantidade__gt=0, ativo=ativo_d, data__lte=data)        
+        qtd_ajustada_ativo=0
+        qtd_ajustada_ativo_venda = 0
+        qtd_nota_c = 0
+        qtd_nota_v = 0
+        ativo = list(ativo)
+        ativo = ativo[0].quantidade
+        # Desfazendo o desdobramento das notas registradas
+        for i in nota:
+            qtd_ajustada = int((i.quantidade/desdobra_se)*a_cada)
+            preco_ajustado = i.total_compra / qtd_ajustada
+            Nota.objects.filter(user=self.request.user, id=i.id, data__lte=data).update(quantidade=qtd_ajustada, preco=preco_ajustado)            
+            if i.tipo == 'C':
+                qtd_nota_c +=i.quantidade
+                qtd_ajustada_ativo += qtd_ajustada
+            else:
+                qtd_nota_v +=i.quantidade
+                qtd_ajustada_ativo_venda += qtd_ajustada
+            qtd_ajustada_ativo = (qtd_ajustada_ativo-qtd_ajustada_ativo_venda)
+            
+        # calculando a diferença de quantidade da nota e do ativo e somando com o desdobramento 
+        qtd_ajustada_ativo = qtd_ajustada_ativo+(ativo -(qtd_nota_c-qtd_nota_v))
+        Ativo.objects.filter(user=self.request.user).update(quantidade=qtd_ajustada_ativo)
+
+        return super(DesdobramentoDelete, self).delete(*args, **kwargs)
+
+    def get_success_message(self, cleaned_data):
+        return self.success_message % dict(
+            cleaned_data,
+            ativo=self.object.ativo,
+        )
 
 # Renderezação de erros
 def error_500(request):
