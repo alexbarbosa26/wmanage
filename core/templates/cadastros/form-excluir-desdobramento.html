@@ -5,6 +5,8 @@
 {% block content %}
 <h4 class="mt-4">Excluir e desfazer desdobramento </h4>
 <form method="post"> 
+    <p>Atenção todos os desdobramentos do ativo <b>{{ object }}</b> serão desfeitos de <b>{{ object.data }}</b> pra trás.</p>
+    <p>Ativos lançados após essa data não sofrerão nenhuma alteração.</p>
     <p>
         Deseja excluir e desfazer o desdobramento para o ativo: <b>{{ object }}?</b>
     </p>   

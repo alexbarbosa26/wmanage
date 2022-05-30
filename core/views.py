@@ -127,6 +127,23 @@ class NotaDelete(GroupRequiredMixin, LoginRequiredMixin, DeleteView):
     template_name = 'cadastros/form-excluir.html'
     success_url = reverse_lazy('listar-ordens')
     success_message = "%(ativo)s deletado com sucesso!"
+    
+    def delete(self, request, *args, **kwargs):
+        nota = Nota.objects.filter(user=self.request.user, id=kwargs['pk'])
+        ativo = Ativo.objects.filter(user=self.request.user, ativo=nota[0].ativo)
+
+        ativo = list(ativo)
+        nota = list(nota)
+        if nota[0].tipo == 'C':
+            qtd_ajustada = ativo[0].quantidade - nota[0].quantidade
+            preco_ajustado = ativo[0].preco_total - nota[0].total_compra
+        else:
+            qtd_ajustada = ativo[0].quantidade + nota[0].quantidade
+            preco_ajustado = ativo[0].preco_total + nota[0].total_compra
+
+        Ativo.objects.filter(user=self.request.user, ativo=nota[0].ativo).update(quantidade=qtd_ajustada, preco_total=preco_ajustado)
+
+        return super(NotaDelete, self).delete(request, *args, **kwargs)
 
     def get_success_message(self, cleaned_data):
         return self.success_message % dict(
@@ -167,13 +184,13 @@ class NotaUpdate(LoginRequiredMixin,SuccessMessageMixin, UpdateView):
         ativo_reg = Ativo.objects.values().filter(ativo=form.cleaned_data['ativo'], user=self.request.user)
         ativo_reg = list(ativo_reg)
 
-        if ativo_reg[0]['quantidade'] == 0:
+        if ativo_reg[0]['quantidade'] <= 0:
             context ={
                 'message':'Seu saldo é 0 por favor lance uma nota de compra.'
             }
             return render(self.request, 'error.html', context)
 
-        elif ativo_reg == [] and form.cleaned_data['tipo'] == 'V' and form.cleaned_data['quantidade'] < 0:
+        elif not ativo_reg and form.cleaned_data['tipo'] == 'V' and form.cleaned_data['quantidade'] < 0:
             context ={
                 'message':'Não foi possível atualizar sua ordem, por favor verifique a quantidade informada.'
             }
@@ -724,7 +741,7 @@ class DesdobramentoDelete(LoginRequiredMixin, DeleteView):
     model = Desdobramento
     template_name = 'cadastros/form-excluir-desdobramento.html'
     success_url = reverse_lazy('listar-desdobramento')
-    success_message = "O desdobramento do %(ativo)s foi desfeito e excluído com sucesso!"
+    success_message = "%(ativo)s foi desfeito e excluído com sucesso!"
 
     def delete(self, *args, **kwargs):  
         desdobramento = Desdobramento.objects.filter(user=self.request.user, id=kwargs['pk'])
@@ -745,19 +762,19 @@ class DesdobramentoDelete(LoginRequiredMixin, DeleteView):
         ativo = ativo[0].quantidade
         # Desfazendo o desdobramento das notas registradas
         for i in nota:
-            qtd_ajustada = int((i.quantidade/desdobra_se)*a_cada)
+            qtd_ajustada = int((i.quantidade / desdobra_se)*a_cada)
             preco_ajustado = i.total_compra / qtd_ajustada
             Nota.objects.filter(user=self.request.user, id=i.id, data__lte=data).update(quantidade=qtd_ajustada, preco=preco_ajustado)            
             if i.tipo == 'C':
-                qtd_nota_c +=i.quantidade
+                qtd_nota_c += i.quantidade
                 qtd_ajustada_ativo += qtd_ajustada
             else:
-                qtd_nota_v +=i.quantidade
+                qtd_nota_v += i.quantidade
                 qtd_ajustada_ativo_venda += qtd_ajustada
-            qtd_ajustada_ativo = (qtd_ajustada_ativo-qtd_ajustada_ativo_venda)
+            qtd_ajustada_ativo = (qtd_ajustada_ativo - qtd_ajustada_ativo_venda)
             
         # calculando a diferença de quantidade da nota e do ativo e somando com o desdobramento 
-        qtd_ajustada_ativo = qtd_ajustada_ativo+(ativo -(qtd_nota_c-qtd_nota_v))
+        qtd_ajustada_ativo = qtd_ajustada_ativo + (ativo - (qtd_nota_c - qtd_nota_v))
         Ativo.objects.filter(user=self.request.user).update(quantidade=qtd_ajustada_ativo)
 
         return super(DesdobramentoDelete, self).delete(*args, **kwargs)
