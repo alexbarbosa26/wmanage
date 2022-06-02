@@ -1,7 +1,7 @@
 from datetime import datetime
 from math import floor
-from core.forms import DateForm, DesdobramentoForm
-from .models import Ativo, Desdobramento, Nota, Proventos, Cotacao
+from core.forms import BonificacaoForm, DateForm, DesdobramentoForm
+from .models import Ativo, Bonificacao, Desdobramento, Nota, Proventos, Cotacao
 from decimal import Decimal
 from django.shortcuts import render
 from django.urls import reverse_lazy
@@ -784,6 +784,44 @@ class DesdobramentoDelete(LoginRequiredMixin, DeleteView):
             cleaned_data,
             ativo=self.object.ativo,
         )
+
+class BonificacaoCreate(LoginRequiredMixin, SuccessMessageMixin, CreateView):
+    model = Bonificacao
+    form_class: BonificacaoForm
+    login_url = reverse_lazy('account_login')
+    template_name = 'cadastros/form-bonificacao.html'
+    success_url = reverse_lazy('cadastrar-bonificacao')
+    success_message = "Bonificação do %(ativo)s lançada com sucesso!"
+
+    def form_valid(self, form):
+        if form.cleaned_data['a_cada'] <= 0 or form.cleaned_data['recebo_bonus_de'] <= 0 or form.cleaned_data['custo_atrubuido'] <= 0:
+            context ={
+                'message':'A quantidade não pode ser menor ou igual a 0. Por favor tente novamente.'
+            }
+            return render(self.request, 'error.html', context)
+        else:
+            ativo_bonificado = form.cleaned_data['ativo']
+            data = form.cleaned_data['data']
+            a_cada = form.cleaned_data['a_cada']
+            recebo_bonus_de = form.cleaned_data['recebo_bonus_de']
+            custo_atribuido = form.cleaned_data['custo_atribuido']
+            ativo = Ativo.objects.filter(user=self.request.user, quantidade__gt=0, ativo=form.cleaned_data['ativo'])
+            qtd_ajustada = 0
+            Nota.objects.create(ativo=ativo_bonificado, quantidade=qtd_ajustada, preco=custo_atribuido, data=data, tipo='B')
+
+
+        self.object = form.save(commit=False)
+        self.object.user = self.request.user
+        self.object.save()
+
+        return super().form_valid(form)
+
+    def get_form_kwargs(self, *args, **kwargs):
+        kwargs = super(DesdobramentoCreate, self).get_form_kwargs(*args, **kwargs)        
+        kwargs['user'] = self.request.user
+        return kwargs
+
+    pass
 
 # Renderezação de erros
 def error_500(request):

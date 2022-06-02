@@ -1,5 +1,5 @@
 from django import forms
-from core.models import Ativo, Desdobramento
+from core.models import Ativo, Bonificacao, Desdobramento
 from django.forms.widgets import Select
 from bootstrap_datepicker_plus import DatePickerInput
 
@@ -19,3 +19,18 @@ class DesdobramentoForm(forms.ModelForm):
 
     ativo = forms.ModelChoiceField(queryset=None, widget=Select(attrs={'data-live-search': 'true', 'Class':'selectpicker border rounded', 'autofocus':''}))
     data = forms.DateField(widget=DatePickerInput(format='%d/%m/%Y',options={'locale':'pt-br'}, attrs={'placeholder':'DD/MM/AAAA'}))
+
+class BonificacaoForm(forms.ModelForm):
+    class Meta:
+        model = Bonificacao
+        exclude = ('user',)
+
+    def __ini__(self, *args, **kwargs):
+        self.user = kwargs.pop('user')
+        super(BonificacaoForm, self).__init__(*args, **kwargs)
+        self.fields['ativo'].queryset  = Ativo.objects.filter(user=self.user, quantidade__gt=0)
+
+    ativo = forms.ModelChoiceField(queryset=None, widget=Select(attrs={'data-live-search': 'true', 'Class':'selectpicker border rounded', 'autofocus':''}))
+    data = forms.DateField(widget=DatePickerInput(format='%d/%m/%Y',options={'locale':'pt-br'}, attrs={'placeholder':'DD/MM/AAAA'}))
+    
+            
