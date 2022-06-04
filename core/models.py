@@ -112,5 +112,5 @@ class Bonificacao(models.Model):
         return super(Bonificacao, self).save(*args, **kwargs)
 
     def __str__(self) -> str:
-        return super(self.ativo.ativo).__str__()
+        return self.ativo.ativo
     

@@ -36,7 +36,7 @@
     <script src="{% static 'js/bootstrap-select.min.js' %}"></script>
     <title>{% block title %}{% endblock %}</title>
 </head>
-<body class="hold-transition sidebar-mini layout-footer-fixed">
+<body class="hold-transition sidebar-mini sidebar-collapse layout-footer-fixed">
 <div class="wrapper">
   {% if user.is_authenticated %}
   <!-- Preloader -->
@@ -195,6 +195,12 @@
                 </a>
               </li>
               <li class="nav-item">
+                <a href="{% url 'cadastrar-bonificacao' %}" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Bonificação</p>
+                </a>
+              </li>
+              <li class="nav-item">
                 <a href="{% url 'cadastrar-desdobramento' %}" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Desdobramentos</p>
@@ -221,6 +227,12 @@
                 <a href="{% url 'listar-ordens' %}" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Ativos</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{% url 'listar-bonificacao' %}" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Bonificação</p>
                 </a>
               </li>
               <li class="nav-item">

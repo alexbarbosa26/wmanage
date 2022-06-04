@@ -1,5 +1,4 @@
 from datetime import datetime
-from math import floor
 from core.forms import BonificacaoForm, DateForm, DesdobramentoForm
 from .models import Ativo, Bonificacao, Desdobramento, Nota, Proventos, Cotacao
 from decimal import Decimal
@@ -14,7 +13,7 @@ from django.db.models import Count, Sum
 from bootstrap_datepicker_plus import DatePickerInput
 from braces.views import  GroupRequiredMixin
 import xlwt
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse
 import locale
 import requests
 from bs4 import BeautifulSoup
@@ -55,39 +54,39 @@ class NotaCreate(LoginRequiredMixin, SuccessMessageMixin, CreateView):
         cotacao_reg = Cotacao.objects.values().filter(ativo__icontains=form.cleaned_data['ativo'])
         cotacao_reg = list(cotacao_reg)        
 
-        # Se ativo for null e a tentativa for uma venda
-        if not ativo_reg and form.cleaned_data['tipo'] == 'V':
+        # Se o ativo for null e a tentativa for uma venda
+        if not ativo_reg and form.cleaned_data['tipo'] == 'V' and form.cleaned_data['preco']> 0:
             context ={
                 'message':'Não foi possível registrar sua ordem, por favor verifique a quantidade correta informada.'
             }
             return render(self.request, 'error.html', context)
-        # Se o ativo for null e tipo=compra, quantidade maior que 0 cotação for null
-        elif not ativo_reg and form.cleaned_data['tipo'] == 'C' and form.cleaned_data['quantidade'] > 0 and not cotacao_reg:
+        # Se não existir cotação e ativo e a quantidade e preço maior que 0 para a  compra será então cadastre ativo e cotação
+        elif not ativo_reg and form.cleaned_data['tipo'] == 'C' and form.cleaned_data['quantidade'] > 0 and not cotacao_reg and form.cleaned_data['preco'] > 0:
             Ativo.objects.create(ativo=form.cleaned_data['ativo'],  quantidade=form.cleaned_data['quantidade'], preco_total=form.cleaned_data['quantidade']*form.cleaned_data['preco'], user=self.request.user)
             Cotacao.objects.create(acao=form.cleaned_data['identificador'], ativo=form.cleaned_data['ativo'])
-
-        elif not ativo_reg and form.cleaned_data['tipo'] == 'C' and form.cleaned_data['quantidade'] > 0 and cotacao_reg:
+        # se não existir ativo, mas tem cotação na compra e preço maior que 0 então cadastre apenas ativo
+        elif not ativo_reg and form.cleaned_data['tipo'] == 'C' and form.cleaned_data['quantidade'] > 0 and cotacao_reg and form.cleaned_data['preco'] > 0:
             Ativo.objects.create(ativo=form.cleaned_data['ativo'],  quantidade=form.cleaned_data['quantidade'], preco_total=form.cleaned_data['quantidade']*form.cleaned_data['preco'], user=self.request.user)      
-
-        elif form.cleaned_data['tipo'] == 'C' and form.cleaned_data['quantidade'] > 0 and not cotacao_reg:
+        # Se não existir cotação na compra e a quantidade e preço maior que 0 então some a quantidade e preço com o existente depois cadastre noa tivo e tambem a cotação
+        elif form.cleaned_data['tipo'] == 'C' and form.cleaned_data['quantidade'] > 0 and not cotacao_reg and form.cleaned_data['preco'] > 0:
             ativo_reg[0]['quantidade'] = ativo_reg[0]['quantidade'] + form.cleaned_data['quantidade']
             ativo_reg[0]['preco_total'] = ativo_reg[0]['preco_total'] + (form.cleaned_data['quantidade']*form.cleaned_data['preco'])
             Ativo.objects.filter(ativo=form.cleaned_data['ativo'], user=self.request.user).update(ativo=form.cleaned_data['ativo'], quantidade=ativo_reg[0]['quantidade'], preco_total=ativo_reg[0]['preco_total'], user=self.request.user)
             Cotacao.objects.create(acao=form.cleaned_data['identificador'], ativo=form.cleaned_data['ativo'])
-
-        elif form.cleaned_data['tipo'] == 'C' and form.cleaned_data['quantidade'] > 0 and cotacao_reg:
+        # Se existir cotação na compra e a quantidade e preço maior que 0 então some a quantidade e preço com o existente depois cadastre o ativo
+        elif form.cleaned_data['tipo'] == 'C' and form.cleaned_data['quantidade'] > 0 and cotacao_reg and form.cleaned_data['preco'] > 0:
             ativo_reg[0]['quantidade'] = ativo_reg[0]['quantidade'] + form.cleaned_data['quantidade']
             ativo_reg[0]['preco_total'] = ativo_reg[0]['preco_total'] + (form.cleaned_data['quantidade']*form.cleaned_data['preco'])
             Ativo.objects.filter(ativo=form.cleaned_data['ativo'], user=self.request.user).update(ativo=form.cleaned_data['ativo'], quantidade=ativo_reg[0]['quantidade'], preco_total=ativo_reg[0]['preco_total'], user=self.request.user)
-        
-        elif form.cleaned_data['tipo'] == 'V' and form.cleaned_data['quantidade'] <= ativo_reg[0]['quantidade'] and form.cleaned_data['quantidade'] > 0:
+        # Se a venda for menor do que a existente e preço maior que 0 então some a quantidade e preço existente depois cadastre o ativo
+        elif form.cleaned_data['tipo'] == 'V' and form.cleaned_data['quantidade'] <= ativo_reg[0]['quantidade'] and form.cleaned_data['quantidade'] > 0 and form.cleaned_data['preco'] > 0:
             ativo_reg[0]['quantidade'] = ativo_reg[0]['quantidade'] - form.cleaned_data['quantidade']
             ativo_reg[0]['preco_total'] = ativo_reg[0]['preco_total'] - (form.cleaned_data['quantidade']*form.cleaned_data['preco'])
             Ativo.objects.filter(ativo=form.cleaned_data['ativo'], user=self.request.user).update(ativo=form.cleaned_data['ativo'], quantidade=ativo_reg[0]['quantidade'], preco_total=ativo_reg[0]['preco_total'], user=self.request.user)
 
         else:
             context ={
-                'message':'Ordem não registrada, pois a quantidade informada não é compatível com a quantidade que você possui em carteira.'
+                'message':'Ordem não registrada, pois a quantidade informada ou o preço não é compatível com o que você possui em carteira.'
             }
             return render(self.request, 'error.html', context)
 
@@ -134,7 +133,7 @@ class NotaDelete(GroupRequiredMixin, LoginRequiredMixin, DeleteView):
 
         ativo = list(ativo)
         nota = list(nota)
-        if nota[0].tipo == 'C':
+        if nota[0].tipo == 'C' or nota[0].tipo == 'B':
             qtd_ajustada = ativo[0].quantidade - nota[0].quantidade
             preco_ajustado = ativo[0].preco_total - nota[0].total_compra
         else:
@@ -261,7 +260,7 @@ class WalletView(LoginRequiredMixin, TemplateView):
         x = 0
         y = 0
         v = 0
-        result_compra = Nota.objects.values('ativo').annotate(qt=Sum('quantidade'), preco_f=Sum('total_compra'), custos=Sum('total_custo'), preco_m=Sum('preco'), v_mercado=Sum('preco'), lucro=Sum('preco'), variacao_mercado_1=Count('identificador'), variacao_mercado_2=Count('identificador')).filter(tipo='C', user=self.request.user)
+        result_compra = Nota.objects.values('ativo').annotate(qt=Sum('quantidade'), preco_f=Sum('total_compra'), custos=Sum('total_custo'), preco_m=Sum('preco'), v_mercado=Sum('preco'), lucro=Sum('preco'), variacao_mercado_1=Count('identificador'), variacao_mercado_2=Count('identificador')).filter(tipo__in=['C','B'], user=self.request.user)
         result_venda = Nota.objects.values('ativo').annotate(qt=Sum('quantidade'), preco_f=Sum('total_compra'), custos=Sum('total_custo')).filter(tipo='V', user=self.request.user)
             
         for venda in result_venda:
@@ -417,10 +416,10 @@ class CarteiraChart(LoginRequiredMixin, TemplateView):
         y = 0
         v = 0
         if data_inicio or data_fim:
-            result_compra = Nota.objects.values('ativo').annotate(qt=Sum('quantidade'), preco_f=Sum('total_compra'), custos=Sum('total_custo'), preco_m=Sum('preco'), v_mercado=Sum('preco'), lucro=Sum('preco'), variacao_mercado_1=Count('identificador'), variacao_mercado_2=Count('identificador')).filter(data__range=(data_inicio, data_fim),tipo='C', user=self.request.user)
+            result_compra = Nota.objects.values('ativo').annotate(qt=Sum('quantidade'), preco_f=Sum('total_compra'), custos=Sum('total_custo'), preco_m=Sum('preco'), v_mercado=Sum('preco'), lucro=Sum('preco'), variacao_mercado_1=Count('identificador'), variacao_mercado_2=Count('identificador')).filter(data__range=(data_inicio, data_fim),tipo__in=['C','B'], user=self.request.user)
             result_venda = Nota.objects.values('ativo').annotate(qt=Sum('quantidade'), preco_f=Sum('total_compra'), custos=Sum('total_custo')).filter(data__range=(data_inicio, data_fim),tipo='V', user=self.request.user)
         else:
-            result_compra = Nota.objects.values('ativo').annotate(qt=Sum('quantidade'), preco_f=Sum('total_compra'), custos=Sum('total_custo'), preco_m=Sum('preco'), v_mercado=Sum('preco'), lucro=Sum('preco'), variacao_mercado_1=Count('identificador'), variacao_mercado_2=Count('identificador')).filter(tipo='C', user=self.request.user)
+            result_compra = Nota.objects.values('ativo').annotate(qt=Sum('quantidade'), preco_f=Sum('total_compra'), custos=Sum('total_custo'), preco_m=Sum('preco'), v_mercado=Sum('preco'), lucro=Sum('preco'), variacao_mercado_1=Count('identificador'), variacao_mercado_2=Count('identificador')).filter(tipo__in=['C','B'], user=self.request.user)
             result_venda = Nota.objects.values('ativo').annotate(qt=Sum('quantidade'), preco_f=Sum('total_compra'), custos=Sum('total_custo')).filter(tipo='V', user=self.request.user)
                 
         for venda in result_venda:
@@ -787,14 +786,14 @@ class DesdobramentoDelete(LoginRequiredMixin, DeleteView):
 
 class BonificacaoCreate(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     model = Bonificacao
-    form_class: BonificacaoForm
+    form_class= BonificacaoForm
     login_url = reverse_lazy('account_login')
-    template_name = 'cadastros/form-bonificacao.html'
+    template_name = 'cadastros/bonificacao.html'
     success_url = reverse_lazy('cadastrar-bonificacao')
     success_message = "Bonificação do %(ativo)s lançada com sucesso!"
 
     def form_valid(self, form):
-        if form.cleaned_data['a_cada'] <= 0 or form.cleaned_data['recebo_bonus_de'] <= 0 or form.cleaned_data['custo_atrubuido'] <= 0:
+        if form.cleaned_data['a_cada'] <= 0 or form.cleaned_data['recebo_bonus_de'] <= 0 or form.cleaned_data['custo_atribuido'] <= 0:
             context ={
                 'message':'A quantidade não pode ser menor ou igual a 0. Por favor tente novamente.'
             }
@@ -805,10 +804,39 @@ class BonificacaoCreate(LoginRequiredMixin, SuccessMessageMixin, CreateView):
             a_cada = form.cleaned_data['a_cada']
             recebo_bonus_de = form.cleaned_data['recebo_bonus_de']
             custo_atribuido = form.cleaned_data['custo_atribuido']
+            
             ativo = Ativo.objects.filter(user=self.request.user, quantidade__gt=0, ativo=form.cleaned_data['ativo'])
+            nota = Nota.objects.filter(user=self.request.user, quantidade__gt=0, ativo=form.cleaned_data['ativo'], data__lte=data)
             qtd_ajustada = 0
-            Nota.objects.create(ativo=ativo_bonificado, quantidade=qtd_ajustada, preco=custo_atribuido, data=data, tipo='B')
+            qtd_total_ativo = 0
+            total_compra = 0
+            qtd_nota_c = 0
+            qtd_nota_v = 0
+            preco_total_ajustado = 0
+            
+            for i in nota:
+                if i.tipo == 'C' or i.tipo == 'B':
+                    qtd_nota_c += i.quantidade
+                else:
+                    qtd_nota_v += i.quantidade
 
+            qtd_ajustada = qtd_nota_c - qtd_nota_v
+
+            for i in ativo:
+                qtd_ajustada = int((qtd_ajustada/a_cada)*recebo_bonus_de)
+                qtd_total_ativo = i.quantidade + qtd_ajustada
+
+                total_compra = Decimal(form.cleaned_data['custo_atribuido'] * qtd_ajustada)
+                preco_total_ajustado = i.preco_total + total_compra
+
+            if qtd_ajustada <= 0 or qtd_total_ativo <= 0 or total_compra <= 0 or preco_total_ajustado <= 0:
+                context ={
+                'message':'A quantidade não pode ser menor ou igual a 0. Por favor tente novamente.'
+                }
+                return render(self.request, 'error.html', context)
+            else:
+                ativo.update(quantidade=qtd_total_ativo, preco_total=preco_total_ajustado)    
+                nota.create(ativo=ativo_bonificado.ativo, quantidade=qtd_ajustada, preco=custo_atribuido, data=data, tipo='B', total_compra=total_compra, identificador=ativo_bonificado.ativo+' BONIFICAÇÃO', corretagem=0.0, emolumentos=0.0, tx_liquida_CBLC =0.0, user=self.request.user)
 
         self.object = form.save(commit=False)
         self.object.user = self.request.user
@@ -817,11 +845,58 @@ class BonificacaoCreate(LoginRequiredMixin, SuccessMessageMixin, CreateView):
         return super().form_valid(form)
 
     def get_form_kwargs(self, *args, **kwargs):
-        kwargs = super(DesdobramentoCreate, self).get_form_kwargs(*args, **kwargs)        
+        kwargs = super(BonificacaoCreate, self).get_form_kwargs(*args, **kwargs)        
         kwargs['user'] = self.request.user
         return kwargs
 
-    pass
+# Lista de bonificação do usuario
+class BonificacaoList(LoginRequiredMixin, ListView):
+    login_url = reverse_lazy('account_login')
+    model = Bonificacao
+    template_name = 'listar/bonificacao.html'
+
+    def get_queryset(self):
+        self.object_list = Bonificacao.objects.filter(user=self.request.user).order_by('-data')
+        return self.object_list
+        
+# Apagar a bonificação e o que foi lançado em notas e ativo
+class BonificacaoDelete(LoginRequiredMixin, DeleteView):
+    login_url = reverse_lazy('account_login')
+    model = Bonificacao
+    template_name = 'cadastros/form-excluir-bonificacao.html'
+    success_url = reverse_lazy('listar-bonificacao')
+    success_message = "%(ativo)s foi desfeito e excluído com sucesso!"
+
+    def delete(self, *args, **kwargs):  
+        # consultando a bonificação que será excluida os ativos e as notas 
+        bonificacao = Bonificacao.objects.filter(user=self.request.user, id=kwargs['pk'])
+        bonificacao = list(bonificacao) 
+        ativo_b = bonificacao[0].ativo
+        data = bonificacao[0].data
+         
+        ativo = Ativo.objects.filter(user=self.request.user, quantidade__gt=0, ativo=ativo_b)
+        nota = Nota.objects.filter(user=self.request.user, quantidade__gt=0, ativo=ativo_b, data=data, tipo='B')
+
+        qtd_ajustada_ativo=0
+        preco_ajustado_ativo = 0
+        
+        # Desfazendo a bonificação das notas registradas
+        for i, j in zip(ativo, nota):
+            qtd_ajustada_ativo = i.quantidade-j.quantidade
+            preco_ajustado_ativo = i.preco_total - j.total_compra
+        #  se os valores forem menores ou igual a 0 renderiza para pagina de erro   
+        if qtd_ajustada_ativo <= 0 and preco_ajustado_ativo <= 0:
+            context ={
+            'message':'A quantidade não pode ser menor ou igual a 0. Por favor tente novamente.'
+            }
+            return render(self.request, 'error.html', context)
+        else:
+            # apagando a bonificação lançada nas notas
+            nota.delete()
+            # alterando as quantidades e o preco do ativo
+            Ativo.objects.filter(user=self.request.user, ativo=ativo_b).update(quantidade=qtd_ajustada_ativo, preco_total=preco_ajustado_ativo)
+
+        return super(BonificacaoDelete, self).delete(*args, **kwargs)
 
 # Renderezação de erros
 def error_500(request):

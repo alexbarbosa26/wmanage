@@ -25,7 +25,7 @@ class BonificacaoForm(forms.ModelForm):
         model = Bonificacao
         exclude = ('user',)
 
-    def __ini__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user')
         super(BonificacaoForm, self).__init__(*args, **kwargs)
         self.fields['ativo'].queryset  = Ativo.objects.filter(user=self.user, quantidade__gt=0)

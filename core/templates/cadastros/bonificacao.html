@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load bootstrap4 %}
+{% load widget_tweaks %}
+{% load crispy_forms_tags %}
+
+{% block title %}WManage Cadastro Bonificação{% endblock %}
+
+{% block content %}
+<section class="content-header">
+    <h4 class="mb-4 mt-4">
+        Lançar Bonificação
+        <small>Campos Obrigatórios ( * )</small>
+    </h4>  
+</section>
+<form method="post" class="mt-4" autocomplete="off">
+    {% csrf_token %}
+    <div class="form-row forms-container mb-3 rounded">
+        <div class="form-group col-md-3 mb-0">
+            {{form.ativo|as_crispy_field}}
+        </div>
+        <div class="form-group col-md-2 mb-0">
+            {{form.data|as_crispy_field}}
+        </div>
+        <div class="form-group col-md-2 mb-0">
+            {{ form.a_cada|attr:"placeholder:1"|as_crispy_field }}
+        </div>
+        <div class="form-group col-md-2 mb-0">
+            {{ form.recebo_bonus_de|attr:"placeholder:10"|as_crispy_field }}
+        </div>
+        <div class="form-group col-md-2 mb-0">
+            {{ form.custo_atribuido|attr:"placeholder:R$ 10,00"|as_crispy_field }}
+        </div>
+    </div>
+    <button class="btn btn-success mt-4 mb-3" type="submit">Cadastrar</button>
+</form>
+{% endblock %}
