@@ -4,7 +4,7 @@
 
 {% block content %}
 <section class="content-header">
-  <h4 class="h3 mt-4 font-weight-normal">
+  <h4 class="h3 mt-0 font-weight-normal">
     Carteira de Ações
   <small>Control panel</small>
   </h4>
@@ -35,13 +35,14 @@
             <tr>
               <th scope="col">Ativo</th>
               <th scope="col">Qtde.</th>
-              <th scope="col">V.Compra Total [R$]</th>
-              <th scope="col">Custo [R$]</th>
-              <th scope="col">V.Mercado Unit. [R$]</th>
-              <th scope="col">V.Mercado Total [R$]</th>
-              <th scope="col">Lucro [R$]</th>
+              <th scope="col">Preço Médio.</th>
+              <th scope="col">V.Compra Total</th>
+              <th scope="col">Custo</th>
+              <th scope="col">V.Mercado Unit.</th>
+              <th scope="col">V.Mercado Total</th>
+              <th scope="col">Lucro</th>
               <th scope="col">Variação Preço</th>
-              <th scope="col">Variação (%)</th>
+              <th scope="col">Variação</th>
             </tr>
           </thead>
           <tbody>
@@ -49,6 +50,7 @@
           <tr>    
               <th scope="row" class="text-primary"><a href="{% url 'temporal-chart' nota.ativo %}">{{nota.ativo}}</a></th>
               <td>{{nota.qt}}</td>
+              <td>{{nota.preco_medio}}</td>
               <td>{{nota.preco_f}}</td>
               <td>{{nota.custos}}</td>
               <td>{{nota.preco_m}}</td>

@@ -256,11 +256,12 @@ class WalletView(LoginRequiredMixin, TemplateView):
         ultima_atualizacao = []
         status_fechado_aberto = []
         porcentagem_lucro = 0.0
+        preco_medio = 0
         status_fechado_aberto = 'Aguardando o cadastro de ações'
         x = 0
         y = 0
         v = 0
-        result_compra = Nota.objects.values('ativo').annotate(qt=Sum('quantidade'), preco_f=Sum('total_compra'), custos=Sum('total_custo'), preco_m=Sum('preco'), v_mercado=Sum('preco'), lucro=Sum('preco'), variacao_mercado_1=Count('identificador'), variacao_mercado_2=Count('identificador')).filter(tipo__in=['C','B'], user=self.request.user)
+        result_compra = Nota.objects.values('ativo').annotate(qt=Sum('quantidade'), preco_f=Sum('total_compra'), custos=Sum('total_custo'), preco_m=Sum('preco'), preco_medio=Sum('preco'), v_mercado=Sum('preco'), lucro=Sum('preco'), variacao_mercado_1=Count('identificador'), variacao_mercado_2=Count('identificador')).filter(tipo__in=['C','B'], user=self.request.user)
         result_venda = Nota.objects.values('ativo').annotate(qt=Sum('quantidade'), preco_f=Sum('total_compra'), custos=Sum('total_custo')).filter(tipo='V', user=self.request.user)
             
         for venda in result_venda:
@@ -286,6 +287,7 @@ class WalletView(LoginRequiredMixin, TemplateView):
                 porcentagem_lucro = round((x/y)*100,2)
                 compra['lucro'] = locale.currency(compra['lucro'], grouping=True)
                 compra['preco_m'] = locale.currency(Decimal(preco_mercado.fechamento_ajustado.replace(",",".")), grouping=True)
+                compra['preco_medio'] = locale.currency(compra['preco_f'] / compra['qt'], grouping=True)
                 compra['preco_f'] = locale.currency(compra['preco_f'], grouping=True)
                 compra['custos'] = locale.currency(compra['custos'], grouping=True)
                 compra['variacao_1'] = preco_mercado.variacao_1
@@ -294,7 +296,8 @@ class WalletView(LoginRequiredMixin, TemplateView):
                 r_result.append(compra)                
                 total_lucro=locale.currency(x, grouping=True)
                 total_investido=locale.currency(y, grouping=True)
-                total_v_mercado = locale.currency(v, grouping=True)            
+                total_v_mercado = locale.currency(v, grouping=True)
+                
 
         pro = 0
         pro_result = []
