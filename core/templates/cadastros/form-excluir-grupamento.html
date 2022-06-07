@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}WManager Excluir{% endblock %}
+
+{% block content %}
+<h4 class="mt-4">Excluir e desfazer grupamento </h4>
+<form method="post"> 
+    <p>Atenção todos os grupamentos do ativo <b>{{ object }}</b> serão desfeitos de <b>{{ object.data }}</b> pra trás.</p>
+    <p>Ativos lançados após essa data não sofrerão nenhuma alteração.</p>
+    <p>
+        Deseja excluir e desfazer o grupamento para o ativo: <b>{{ object }}?</b>
+    </p>   
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button class="btn btn-danger" type="submit">Excluir</button>
+</form>
+{% endblock %}

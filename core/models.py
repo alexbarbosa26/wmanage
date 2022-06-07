@@ -113,4 +113,17 @@ class Bonificacao(models.Model):
 
     def __str__(self) -> str:
         return self.ativo.ativo
-    
+
+class Grupamento(models.Model):
+    ativo = models.ForeignKey(Ativo, on_delete=models.CASCADE)
+    data = models.DateField()
+    a_cada = models.IntegerField()
+    agrupa_se = models.IntegerField(verbose_name='Agrupa-se em')
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
+    data_instante = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        return super(Grupamento, self).save(*args, **kwargs)
+
+    def __str__(self) -> str:
+        return self.ativo.ativo
