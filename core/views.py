@@ -175,7 +175,9 @@ class NotaUpdate(LoginRequiredMixin,SuccessMessageMixin, UpdateView):
     success_message = "%(ativo)s atualizado com sucesso!"
 
     def form_valid(self, form):
-        Ativo.objects.filter(id=self.object.id, user=self.request.user).update(ativo=form.cleaned_data['ativo'])
+        Ativo.objects.filter(ativo=self.get_object(), user=self.request.user).update(ativo=form.cleaned_data['ativo'])
+        Nota.objects.filter(id=self.object.id, user=self.request.user).update(ativo=form.cleaned_data['ativo'])
+
 
         qtd_antigo = Nota.objects.values('quantidade','total_compra').filter(id=self.object.id, user=self.request.user)
         qtd_antigo = list(qtd_antigo)
