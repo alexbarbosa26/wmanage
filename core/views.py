@@ -175,6 +175,7 @@ class NotaUpdate(LoginRequiredMixin,SuccessMessageMixin, UpdateView):
     success_message = "%(ativo)s atualizado com sucesso!"
 
     def form_valid(self, form):
+        tipo_antes_atualizar = self.get_object(queryset=Nota.objects.values('tipo'))        
         Ativo.objects.filter(ativo=self.get_object(), user=self.request.user).update(ativo=form.cleaned_data['ativo'])
         Nota.objects.filter(id=self.object.id, user=self.request.user).update(ativo=form.cleaned_data['ativo'])
 
@@ -184,27 +185,30 @@ class NotaUpdate(LoginRequiredMixin,SuccessMessageMixin, UpdateView):
         
         ativo_reg = Ativo.objects.values().filter(ativo=form.cleaned_data['ativo'], user=self.request.user)
         ativo_reg = list(ativo_reg)
-
+        
         if ativo_reg[0]['quantidade'] <= 0:
             context ={
                 'message':'Seu saldo é 0 por favor lance uma nota de compra.'
             }
             return render(self.request, 'error.html', context)
 
-        elif not ativo_reg and form.cleaned_data['tipo'] == 'V' and form.cleaned_data['quantidade'] < 0:
-            context ={
-                'message':'Não foi possível atualizar sua ordem, por favor verifique a quantidade informada.'
-            }
-            return render(self.request, 'error.html', context)
+        elif form.cleaned_data['tipo'] == 'V':
+            qtd_ajustada = ativo_reg[0]['quantidade'] - qtd_antigo[0]['quantidade']
+            qtd_ajustada = qtd_ajustada - form.cleaned_data['quantidade']
+            preco_total_ajustado = ativo_reg[0]['preco_total'] - (form.cleaned_data['quantidade']*form.cleaned_data['preco'])
+            preco_total_ajustado = preco_total_ajustado - (form.cleaned_data['quantidade']*form.cleaned_data['preco'])
+            Ativo.objects.filter(ativo=form.cleaned_data['ativo'], user=self.request.user).update(quantidade=qtd_ajustada, preco_total=preco_total_ajustado)
+
+        elif tipo_antes_atualizar['tipo'] == 'V' and form.cleaned_data['tipo']=='C':
+            qtd_ajustada = ativo_reg[0]['quantidade'] + form.cleaned_data['quantidade']
+            qtd_ajustada = qtd_ajustada + form.cleaned_data['quantidade']
+            preco_total_ajustado = ativo_reg[0]['preco_total'] + (form.cleaned_data['quantidade']*form.cleaned_data['preco'])
+            preco_total_ajustado = preco_total_ajustado + (form.cleaned_data['quantidade']*form.cleaned_data['preco'])
+            Ativo.objects.filter(ativo=form.cleaned_data['ativo'], user=self.request.user).update(quantidade=qtd_ajustada, preco_total=preco_total_ajustado)
+
         else:
-            ativo_reg[0]['quantidade'] = ativo_reg[0]['quantidade'] - qtd_antigo[0]['quantidade']
-            ativo_reg[0]['preco_total'] = ativo_reg[0]['preco_total'] - qtd_antigo[0]['total_compra']
-            Ativo.objects.filter(ativo=form.cleaned_data['ativo'], user=self.request.user).update(quantidade=ativo_reg[0]['quantidade'], preco_total=ativo_reg[0]['preco_total'])
-
-            ativo_reg[0]['quantidade'] = ativo_reg[0]['quantidade'] + form.cleaned_data['quantidade']
-            ativo_reg[0]['preco_total'] = ativo_reg[0]['preco_total'] + (form.cleaned_data['quantidade']*form.cleaned_data['preco'])
-            Ativo.objects.filter(ativo=form.cleaned_data['ativo'], user=self.request.user).update(quantidade=ativo_reg[0]['quantidade'], preco_total=ativo_reg[0]['preco_total'])
-
+            pass
+            
         return super().form_valid(form)
 
 
