@@ -8,7 +8,7 @@
         <div class="row mb-2">
             <div class="col-sm-6">
                 <h4 class="h3 mt-0 font-weight-normal">
-                    Carteira de Ações
+                    Carteira de Ações <i class="ion ion-help-circled" data-toggle="tool-tip" title="Os valores da carteira são calculados baseado nas informações de compra e venda de ações."></i>
                 </h4>
             </div>
             <div class="col-sm-6">
@@ -27,7 +27,7 @@
         </div>
     </div>
 </section>
-{%  include 'status.html' %}
+{% include 'status.html' %}
 <section class="content">
     <div class="container-fluid">
         <div class="row">
@@ -37,7 +37,7 @@
                     <div class="card-body">
                         <table id="paginator" class="table table-bordered table-hover">
                             <thead class="thead-dark">
-                                <tr>                                    
+                                <tr>
                                     <th>Ativo</th>
                                     <th>Qtde.</th>
                                     <th>Preço Médio.</th>
@@ -53,7 +53,7 @@
                             </thead>
                             <tbody>
                                 {% for nota in result_c %}
-                                <tr>                                    
+                                <tr>
                                     <td>{{nota.ativo}}</td>
                                     <td>{{nota.qt}}</td>
                                     <td>{{nota.preco_medio}}</td>
@@ -82,7 +82,7 @@
                                     {% endif %}
                                     <th scope="row" class="text-primary">
                                         <a href="{% url 'temporal-chart' nota.ativo %}">
-                                        <i class="far fa-chart-bar"></i>
+                                            <i class="far fa-chart-bar"></i>
                                         </a>
                                     </th>
                                 </tr>
@@ -93,7 +93,7 @@
                                 {% endfor %}
                             </tbody>
                             <tfoot class="thead-dark">
-                                <tr>                                    
+                                <tr>
                                     <th>Ativo</th>
                                     <th>Qtde.</th>
                                     <th>Preço Médio.</th>
