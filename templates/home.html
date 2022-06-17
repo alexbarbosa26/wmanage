@@ -8,13 +8,16 @@
         <div class="row mb-2">
             <div class="col-sm-6">
                 <h4 class="h3 mt-0 font-weight-normal">
-                    Carteira de Ações <i class="ion ion-help-circled" data-toggle="tool-tip" title="Os valores da carteira são calculados baseado nas informações de compra e venda de ações."></i>
+                    Carteira de Ações
                 </h4>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     {% if status_fechado_aberto == 'Mercado fechado' %}
                     <li class="breadcrumb-item"><i class="fa fa-circle text-danger"></i> {{status_fechado_aberto}}&ensp;
+                    </li>
+                    {% elif status_fechado_aberto == 'Aguardando Atualizacao' %}
+                    <li><i class="fa fa-circle text-warning"></i> {{status_fechado_aberto}}&ensp;
                     </li>
                     {%else%}
                     <li><i class="fa fa-circle text-success"></i> {{status_fechado_aberto}}&ensp;</li>
@@ -35,6 +38,14 @@
                 <div class="card">
                     <!-- /.card-header -->
                     <div class="card-body">
+                        <!-- HTML to write -->
+                        <a href="#" data-data-animation="true" style="width: 250px;" data-html="true" data-toggle="tooltip"
+                            title="
+                    Indicador utilizado para relacionar os proventos pagos por uma companhia e o preço atual de suas ações.
+                    <small class=&quot;mt-2 fs-2 d-block&quot;>Observação:</small>
+                    <small class=&quot;text-main-secondary-light&quot;>
+                    <span class=&quot;fs-2 fw-900&quot;>O Dividend Yield foi calculado com base no valor bruto dos proventos com a DATA COM entre 16/06/2021 e 16/06/2022. Amortizações não são consideradas no cálculo.</span>
+                    </small>">Ajuda <i class="fa fa-question-circle"></i></a>
                         <table id="paginator" class="table table-bordered table-hover">
                             <thead class="thead-dark">
                                 <tr>

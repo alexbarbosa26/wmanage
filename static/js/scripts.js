@@ -8,5 +8,7 @@ $( document ).ready(function() {
     });
 
     jQuery('form').preventDoubleSubmit();
+
+    $('[data-toggle="tooltip"]').tooltip({boundary: 'window', delay:{"show":500, "hide":100}})
     
 });
