@@ -14,7 +14,7 @@
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     {% if status_fechado_aberto == 'Mercado fechado' %}
-                    <li class="breadcrumb-item"><i class="fa fa-circle text-danger"></i> {{status_fechado_aberto}}&ensp;
+                    <li><i class="fa fa-circle text-danger"></i> {{status_fechado_aberto}}&ensp;
                     </li>
                     {% elif status_fechado_aberto == 'Aguardando Atualizacao' %}
                     <li><i class="fa fa-circle text-warning"></i> {{status_fechado_aberto}}&ensp;
@@ -39,12 +39,12 @@
                     <!-- /.card-header -->
                     <div class="card-body">
                         <!-- HTML to write -->
-                        <a href="#" data-data-animation="true" style="width: 250px;" data-html="true" data-toggle="tooltip"
-                            title="
-                    Indicador utilizado para relacionar os proventos pagos por uma companhia e o preço atual de suas ações.
-                    <small class=&quot;mt-2 fs-2 d-block&quot;>Observação:</small>
-                    <small class=&quot;text-main-secondary-light&quot;>
-                    <span class=&quot;fs-2 fw-900&quot;>O Dividend Yield foi calculado com base no valor bruto dos proventos com a DATA COM entre 16/06/2021 e 16/06/2022. Amortizações não são consideradas no cálculo.</span>
+                        <a href="#" data-data-animation="true" style="width: 250px;" data-html="true"
+                            data-toggle="tooltip" title="
+                    A carteira de ações é calculada baseada nos valores de compra e venda que ssão lançados.
+                    <strong>Observação:</strong>
+                    <small>
+                    <span class=&quot;fs-2 fw-900&quot;>O lucro que é calculado, não é baseado no valor médio, ele de basea apenas na compra e venda que foi realizada.</span>
                     </small>">Ajuda <i class="fa fa-question-circle"></i></a>
                         <table id="paginator" class="table table-bordered table-hover">
                             <thead class="thead-dark">
@@ -74,17 +74,33 @@
                                     <td>{{nota.v_mercado}}</td>
                                     {% if nota.lucro > 'R$ 0,00' %}
                                     <td>
-                                        <h4><span class="badge badge-success lucro">{{nota.lucro}}</span></h4>
+                                        <span class="text-success">
+                                            <i class="fa fa-arrow-up"></i>
+                                            {{nota.lucro}}
+                                        </span>
                                     </td>
                                     {% else %}
                                     <td>
-                                        <h4><span class="badge badge-danger lucro">{{nota.lucro}}</span></h4>
+                                        <span class="text-danger lucro">
+                                            <i class="fa fa-arrow-down"></i>
+                                            {{nota.lucro}}
+                                        </span>
                                     </td>
                                     {% endif %}
                                     {% if nota.variacao_1 > '-0' %}
-                                    <td><span class='badge badge-danger lucro'>R$ {{nota.variacao_1}}</span></td>
+                                    <td>
+                                        <span class='text-danger lucro'>
+                                            <i class="fa fa-arrow-down"></i>
+                                            R$ {{nota.variacao_1}}
+                                        </span>
+                                    </td>
                                     {% else %}
-                                    <td><span class='badge badge-success lucro'>R$ {{nota.variacao_1}}</span></td>
+                                    <td>
+                                        <span class='text-success lucro'>
+                                            <i class="fa fa-arrow-up"></i>
+                                            R$ {{nota.variacao_1}}
+                                        </span>
+                                    </td>
                                     {% endif %}
                                     {% if nota.variacao_2 > '(-0)' %}
                                     <td><span class='text-danger'>{{nota.variacao_2}}</span></td>
