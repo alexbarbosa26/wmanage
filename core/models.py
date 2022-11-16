@@ -1,6 +1,20 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator
+from models_logging.admin import HistoryAdmin
+
+class ProfileImage(models.Model):
+      user = models.OneToOneField(User,on_delete=models.CASCADE,editable=False)
+      avatar = models.ImageField()
+
+      def user_avatar(self):
+        return self.profileimage.avatar
+
+# User.add_to_class('user_avatar', user_avatar)
+
+class LoggingAdminModel(HistoryAdmin):
+    history_latest_first = False
+    inline_models_history = '__all__' 
 
 # Create models Notas.
 class Nota(models.Model):

@@ -10,6 +10,7 @@ from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
 from django.views.generic import TemplateView
 from django.db.models import Count, Sum
+from django.db.models.functions import TruncMonth, TruncYear
 from bootstrap_datepicker_plus import DatePickerInput
 from braces.views import  GroupRequiredMixin
 import xlwt
@@ -117,7 +118,6 @@ class NotaList(LoginRequiredMixin, ListView):
         self.object_list = Nota.objects.filter(user=self.request.user).order_by('-data')
         return self.object_list
 
-
 # Delete
 class NotaDelete(GroupRequiredMixin, LoginRequiredMixin, DeleteView):
     login_url = reverse_lazy('account_login')
@@ -149,7 +149,6 @@ class NotaDelete(GroupRequiredMixin, LoginRequiredMixin, DeleteView):
             cleaned_data,
             ativo=self.object.ativo,
         )
-
 
 # Updates
 class NotaUpdate(LoginRequiredMixin,SuccessMessageMixin, UpdateView):
@@ -337,6 +336,7 @@ class WalletView(LoginRequiredMixin, TemplateView):
         }
         
         return context
+
 # Cadastrar proventos
 class ProventosCreate(LoginRequiredMixin, CreateView):
     model = Proventos
@@ -380,6 +380,7 @@ class ProventosUpdate(LoginRequiredMixin, UpdateView):
          options={'locale':'pt-br'}
         )
         return form
+
 # Listar proventos
 class ProventosList(LoginRequiredMixin,ListView):
     login_url = reverse_lazy('account_login')
@@ -486,30 +487,45 @@ class CarteiraChart(LoginRequiredMixin, TemplateView):
 
 # Grafico de proventos
 def Dashboard(request):
+    locale.setlocale(locale.LC_ALL, 'pt_BR')
     data_inicio = request.GET.get('data_inicio')
     data_fim = request.GET.get('data_fim')
-    total_proventos=0
+    total_proventos=0    
     
     if data_inicio or data_fim:
         proventos = Proventos.objects.select_related('user').filter(data__range=(data_inicio,data_fim), user=request.user).values('ativo').annotate(valor_total=Sum('valor')).order_by('-valor_total')        
+        proventos_mes = Proventos.objects.select_related('user').filter(data__range=(data_inicio,data_fim),user=request.user).annotate(mes=TruncMonth('data')).values('mes').annotate(valor_total=Sum('valor')).order_by('-valor_total')
         for p in proventos:
             total_proventos += p['valor_total']
     else:    
         proventos = Proventos.objects.select_related('user').filter(user=request.user).values('ativo').annotate(valor_total=Sum('valor')).order_by('-valor_total')
+        proventos_mes = Proventos.objects.select_related('user').filter(user=request.user).annotate(mes=TruncMonth('data')).values('mes').annotate(valor_total=Sum('valor')).order_by('-valor_total')
+        proventos_ano = Proventos.objects.select_related('user').filter(user=request.user).annotate(ano=TruncYear('data')).values('ano').annotate(valor_total=Sum('valor')).order_by('-valor_total')
         for p in proventos:
-            total_proventos += p['valor_total']
+            total_proventos += p['valor_total']        
 
     if not proventos:
             proventos = [{'ativo':'Nenhum','valor_total':0}]
+            proventos_mes = [{'ativo':'Nenhum','valor_total':0}]
 
     total_proventos = locale.currency(total_proventos, grouping=True)
+
+    fig_ano = px.bar(proventos_ano, x='ano', y='valor_total', text_auto='.2s', title='Soma de Proventos por Ano', labels={'ano':'Ano','valor_total':'Valor Total'})
+    fig_ano.update_traces(texttemplate='R$ %{y:,.2f}',textfont_size=12, textangle=0, textposition="outside", cliponaxis=False)
+    fig_ano.update_layout(yaxis_tickprefix = 'R$ ', yaxis_tickformat = ',.2f',uniformtext_minsize=8, uniformtext_mode='hide',title={'font_size':22,'xanchor':'center','x':0.5})
+    chart_ano = fig_ano.to_html()
+
+    fig_mes = px.bar(proventos_mes, x='mes', y='valor_total', text_auto='.2s', title='Soma de Proventos por Mês', labels={'mes':'Mês','valor_total':'Valor Total'})
+    fig_mes.update_traces(texttemplate='R$ %{y:,.2f}',textfont_size=12, textangle=0, textposition="outside", cliponaxis=False)
+    fig_mes.update_layout(yaxis_tickprefix = 'R$ ', yaxis_tickformat = ',.2f',uniformtext_minsize=8, uniformtext_mode='hide',title={'font_size':22,'xanchor':'center','x':0.5})
+    chart_mes = fig_mes.to_html()
 
     fig = px.bar(proventos,
         x = 'ativo',
         y = 'valor_total',
         text_auto='.2s',
-        title="Soma de proventos por ativo",
-        labels={'x':'Ativos','y':'Valor'},
+        title="Soma de Proventos por Ativo",
+        labels={'ativo':'Lista de Ativos','valor_total':'Valor Total'},
     )
 
     fig.update_traces(texttemplate='R$ %{y:,.2f}',textfont_size=12, textangle=0, textposition="outside", cliponaxis=False)
@@ -519,7 +535,7 @@ def Dashboard(request):
     if request.GET:
         form = DateForm(request.GET)
     
-    context = {'chart': chart, 'form': form, 'total_proventos':total_proventos}
+    context = {'chart': chart, 'chart_mes':chart_mes,'chart_ano':chart_ano, 'form': form, 'total_proventos':total_proventos}
     return render(request, 'dashboard/chart.html', context)    
 
 # Dashboard Temporal
@@ -568,7 +584,6 @@ class CotacaoList(LoginRequiredMixin, ListView):
         else:
             self.object_list = Cotacao.objects.all()
         return self.object_list
-
 
 class Export_xls:
 
@@ -681,6 +696,7 @@ class Dash_Carteira_X_Bolsa(LoginRequiredMixin, TemplateView):
         context = {'chart':chart, 'chart_PL':chart_PL, 'chart_IBOV_PL':chart_IBOV_PL, 'form':form}
         
         return context
+
 # Cadastrado de Desdobramento
 class DesdobramentoCreate(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     model = Desdobramento

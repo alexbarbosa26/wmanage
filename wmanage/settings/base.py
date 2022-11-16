@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'bootstrap_datepicker_plus',
     'widget_tweaks',
     'fontawesome-free',
+    'models_logging',
     # 2FA
     'django_otp',
     'django_otp.plugins.otp_static',
@@ -71,7 +72,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django_otp.middleware.OTPMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',    
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'models_logging.middleware.LoggingStackMiddleware', 
 ]
 
 ROOT_URLCONF = 'wmanage.urls'
@@ -192,18 +194,14 @@ EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = 'no-reply@wmanage.com'
 EMAIL_CONFIRMATION_PERIOD_DAYS = 7
 
-# LOGGING = {
-#     'version': 1,
-#     'disable_existing_loggers': False,
-#     'handlers': {
-#         'console': {
-#             'class': 'logging.StreamHandler',
-#         },
-#     },
-#     'loggers': {
-#         'django': {
-#             'handlers': ['console'],
-#              'level': os.getenv('DJANGO_LOG_LEVEL', 'DEBUG'),
-#         },
-#     },
+# ACCOUNT_FORMS = {
+#     'login': 'allauth.account.forms.LoginForm',
+#     #'signup': 'allauth.account.forms.SignupForm',
+#     'signup': 'core.forms.CustomUserCreationForm',
+#     'add_email': 'allauth.account.forms.AddEmailForm',
+#     'change_password': 'allauth.account.forms.ChangePasswordForm',
+#     'set_password': 'allauth.account.forms.SetPasswordForm',
+#     'reset_password': 'allauth.account.forms.ResetPasswordForm',
+#     'reset_password_from_key': 'allauth.account.forms.ResetPasswordKeyForm',
+#     'disconnect': 'allauth.socialaccount.forms.DisconnectForm',
 # }
