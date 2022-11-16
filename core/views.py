@@ -495,6 +495,7 @@ def Dashboard(request):
     if data_inicio or data_fim:
         proventos = Proventos.objects.select_related('user').filter(data__range=(data_inicio,data_fim), user=request.user).values('ativo').annotate(valor_total=Sum('valor')).order_by('-valor_total')        
         proventos_mes = Proventos.objects.select_related('user').filter(data__range=(data_inicio,data_fim),user=request.user).annotate(mes=TruncMonth('data')).values('mes').annotate(valor_total=Sum('valor')).order_by('-valor_total')
+        proventos_ano = Proventos.objects.select_related('user').filter(data__range=(data_inicio,data_fim),user=request.user).annotate(ano=TruncYear('data')).values('ano').annotate(valor_total=Sum('valor')).order_by('-valor_total')
         for p in proventos:
             total_proventos += p['valor_total']
     else:    
