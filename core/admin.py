@@ -1,9 +1,9 @@
 from django.contrib import admin
 from .models import Ativo, Bonificacao, Desdobramento, Grupamento, Nota, Proventos, Cotacao
-from django.contrib.auth import get_user_model
-from .models import ProfileImage
-from django.contrib.auth.admin import UserAdmin
-from django.contrib.auth.models import Group
+# from django.contrib.auth import get_user_model
+# from .models import ProfileImage
+# from django.contrib.auth.admin import UserAdmin
+# from django.contrib.auth.models import Group
 
 # Register your models here.
 # admin.site.register(Ativo)
@@ -27,20 +27,20 @@ class CotacaoAdmin(admin.ModelAdmin):
 
 
 
-User = get_user_model()
+# User = get_user_model()
 
 
-class ProfileInline(admin.StackedInline):
-    model = ProfileImage
-    max_num = 1
-    can_delete = False
+# class ProfileInline(admin.StackedInline):
+#     model = ProfileImage
+#     max_num = 1
+#     can_delete = False
 
-class MyUserAdmin(UserAdmin):
-    inlines = [ProfileInline]
+# class MyUserAdmin(UserAdmin):
+#     inlines = [ProfileInline]
 
-# unregister old user admin
-admin.site.unregister(User)
-# admin.site.unregister(Group)
+# # unregister old user admin
+# admin.site.unregister(User)
+# # admin.site.unregister(Group)
 
-# register new user admin that includes a UserProfile
-admin.site.register(User, MyUserAdmin)
+# # register new user admin that includes a UserProfile
+# admin.site.register(User, MyUserAdmin)
