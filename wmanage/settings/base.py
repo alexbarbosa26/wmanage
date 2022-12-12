@@ -53,7 +53,7 @@ INSTALLED_APPS = [
     'bootstrap4',
     'bootstrap_datepicker_plus',
     'widget_tweaks',
-    'fontawesome-free',
+    'fontawesomefree',
     'models_logging',
     # 2FA
     'django_otp',
@@ -184,6 +184,8 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 BOOTSTRAP4 = {
     'include_jquery': True,
 }
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 #gmail_send/settings.py
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
