@@ -1,6 +1,9 @@
 from django import template
 from django.contrib.auth.models import Group
 import requests
+from django.http import HttpRequest
+
+from wmanage.settings.base import STATIC_ROOT, STATIC_URL, STATICFILES_DIRS
 
 register = template.Library() 
 
@@ -34,10 +37,11 @@ def add_classes(value, arg):
 @register.filter
 def url_path(path, arg):
     try:
-        url = arg
+        url = arg+'static/img/acoes/'
         cod = path
         ext = '.png'
         url_final = url+cod+ext
+        print(url_final)
         request = requests.get(url_final)
         if request.status_code == 200:
             return 1
