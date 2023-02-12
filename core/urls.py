@@ -30,5 +30,9 @@ urlpatterns = [
     path('dashboard/temporal-chart/<str:ativo>', DashboardTemporal.as_view(), name='temporal-chart'),
     path('dashboard/carteira-vs-bolsa-chart/', Dash_Carteira_X_Bolsa.as_view(), name='carteira-vs-bolsa-chart'),
 
+    path('contact', views.contato, name='contact'),
+
     path('export/xls/', Export_xls.get_context_data, name='export-proventos-xls'),
+
+    path('dashboard2', views.Dashboard2, name='dashboard2')
 ]

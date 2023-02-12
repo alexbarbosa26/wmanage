@@ -2,6 +2,7 @@ from django import forms
 from core.models import Ativo, Bonificacao, Desdobramento, Grupamento
 from django.forms.widgets import Select
 from bootstrap_datepicker_plus import DatePickerInput
+from django.core.mail import EmailMessage
 
 class DateForm(forms.Form):
     data_inicio = forms.DateField(widget=forms.DateInput(attrs={'type':'date'}))
@@ -45,7 +46,32 @@ class GrupamentoForm(forms.ModelForm):
     
     ativo = forms.ModelChoiceField(queryset=None, widget=Select(attrs={'data-live-search': 'true', 'Class':'selectpicker border rounded', 'autofocus':''}))
     data = forms.DateField(widget=DatePickerInput(format='%d/%m/%Y',options={'locale':'pt-br'}, attrs={'placeholder':'DD/MM/AAAA'}))
-    
+
+class ContatoForm(forms.Form):
+    nome = forms.CharField(label="Nome", max_length=150)
+    email = forms.EmailField(label="E-mail", max_length=150)
+    assunto = forms.CharField(label="Assunto", max_length=250)
+    mensagem = forms.CharField(label="mensagem", widget=forms.Textarea())
+
+    def send_mail(self):
+        nome = self.cleaned_data['nome']
+        email = self.cleaned_data['email']
+        assunto = self.cleaned_data['assunto']
+        mensagem = self.cleaned_data['mensagem']
+
+        corpo = f"Nome:{nome}\nMensagem:{mensagem}"
+
+        mail = EmailMessage(
+            subject=assunto,
+            from_email='abarbosasilva7@gmail.com',
+            to=[email,],
+            body=corpo,
+            headers={
+                'Replay-To':'abarbosasilva7@gmail.com'
+            }
+        )
+        mail.send()
+
 
 # class CustomUserCreationForm(UserCreationForm):
 #     class Meta:

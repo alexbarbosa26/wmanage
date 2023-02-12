@@ -1,5 +1,5 @@
 from datetime import datetime
-from core.forms import BonificacaoForm, DateForm, DesdobramentoForm, GrupamentoForm
+from core.forms import BonificacaoForm, ContatoForm, DateForm, DesdobramentoForm, GrupamentoForm
 from .models import Ativo, Bonificacao, Desdobramento, Grupamento, Nota, Proventos, Cotacao
 from decimal import Decimal
 from django.shortcuts import render
@@ -14,7 +14,7 @@ from django.db.models.functions import TruncMonth, TruncYear
 from bootstrap_datepicker_plus import DatePickerInput
 from braces.views import  GroupRequiredMixin
 import xlwt
-from django.http import HttpResponse
+from django.http import HttpResponse,HttpResponseRedirect
 import locale
 import requests
 from bs4 import BeautifulSoup
@@ -22,6 +22,8 @@ import plotly.express as px
 import yfinance as yf
 import plotly.graph_objects as go
 import pandas as pd
+from django.http import JsonResponse
+from django.contrib import messages
 
 # Set Locale
 locale.setlocale(locale.LC_ALL, 'pt_BR')
@@ -586,6 +588,7 @@ class CotacaoList(LoginRequiredMixin, ListView):
             self.object_list = Cotacao.objects.all()
         return self.object_list
 
+# Exportar Proventos do usuario
 class Export_xls:
 
     def get_context_data(request):
@@ -761,6 +764,7 @@ class DesdobramentoList(LoginRequiredMixin, ListView):
         self.object_list = Desdobramento.objects.filter(user=self.request.user).order_by('-data')
         return self.object_list
 
+# Deletar desdobramento
 class DesdobramentoDelete(LoginRequiredMixin, DeleteView):
     login_url = reverse_lazy('account_login')
     model = Desdobramento
@@ -810,6 +814,7 @@ class DesdobramentoDelete(LoginRequiredMixin, DeleteView):
             ativo=self.object.ativo,
         )
 
+# Cadastro de bonificação
 class BonificacaoCreate(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     model = Bonificacao
     form_class= BonificacaoForm
@@ -987,6 +992,7 @@ class GrupamentoList(LoginRequiredMixin, ListView):
         self.object_list = Grupamento.objects.filter(user=self.request.user).order_by('-data')
         return self.object_list
 
+# Deletar Grupamento
 class GrupamentoDelete(LoginRequiredMixin, DeleteView):
     login_url = reverse_lazy('account_login')
     model = Grupamento
@@ -1035,6 +1041,73 @@ class GrupamentoDelete(LoginRequiredMixin, DeleteView):
             cleaned_data,
             ativo=self.object.ativo,
         )
+
+# Grafico de proventos
+def Dashboard2(request):
+    x = Proventos.objects.all().filter(user=request.user)
+
+    meses = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez']
+    data = []
+    labels = []
+    data_ano = []
+    labels_ano = []
+    cont = 0
+
+    mes = datetime.now().month + 1
+    ano = datetime.now().year
+
+    for i in range(12):
+        mes -= 1
+        if mes == 0:
+            mes=12
+            ano -=1
+        y = sum([i.valor for i in x if i.data.month == mes and i.data.year == ano])
+        labels.append(meses[mes-1])
+        data.append(y)
+        cont += 1
+    
+    for j in range(5):
+        if ano == 0:
+            ano=5
+        z = sum([j.valor for j in x if j.data.year == ano])
+        labels_ano.append(ano)
+        data_ano.append(z)
+        cont += 1
+                
+
+    data_json={'data':data[::-1], 'labels':labels[::-1]}
+    data_json2={'data':data_ano[::-1], 'labels':labels_ano[::-1]}
+
+    fig_mes = px.bar(x=labels_ano[:], y=data[::-1], text_auto='.2s', title='Soma de Proventos por Mês', labels={'x':'Mês','y':'Valor Total'})
+    fig_mes.update_traces(texttemplate='R$ %{y:,.2f}',textfont_size=12, textangle=0, textposition="outside", cliponaxis=False)
+    fig_mes.update_layout(yaxis_tickprefix = 'R$ ', yaxis_tickformat = ',.2f',uniformtext_minsize=8, uniformtext_mode='hide',title={'font_size':22,'xanchor':'center','x':0.5})
+    chart_mes = fig_mes.to_html()
+    context ={'chart_mes':chart_mes}
+    return JsonResponse(data_json2)
+    return render(request, 'dashboard/chart2.html', context)
+
+# função para enviar email com contato
+def contato(request):
+    # if this is a POST request we need to process the form data
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = ContatoForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            form.send_mail()
+            messages.success(request, "Mensagem enviada com sucesso.")
+            form = ContatoForm()
+            return HttpResponseRedirect('/contact')
+        else:
+            messages.error(request, "Não foi possivel enviar a mensagem, por favor tente mais tarde.")
+            return HttpResponseRedirect('/contact')
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = ContatoForm()
+
+    return render(request, 'contact.html', {'form': form})
+
 
 # Renderezação de erros
 def error_500(request):
