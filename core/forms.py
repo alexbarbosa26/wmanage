@@ -59,7 +59,7 @@ class ContatoForm(forms.Form):
         assunto = self.cleaned_data['assunto']
         mensagem = self.cleaned_data['mensagem']
 
-        corpo = f"Nome: {nome}\n E-mail: {email}\n{mensagem}"
+        corpo = f"Nome: {nome}\nE-mail: {email}\n{mensagem}"
 
         mail = EmailMessage(
             subject=assunto,

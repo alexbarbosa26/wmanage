@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load user_tags %}
 {% block title %}WManage{% endblock %}
 
 {% block content %}
@@ -49,6 +50,7 @@
                         <table id="paginator" class="table table-bordered table-hover">
                             <thead class="thead-dark">
                                 <tr>
+                                    <th></th>
                                     <th>Ativo</th>
                                     <th>Qtde.</th>
                                     <th>Preço Médio.</th>
@@ -65,7 +67,14 @@
                             <tbody>
                                 {% for nota in result_c %}
                                 <tr>
-                                    <td>{{nota.ativo}}</td>
+                                    <td>
+                                        {% if nota.ativo|slice:4|url_path:"https://xpmobilestatic.xpi.com.br/tickers/" %}
+                                        <img src="https://xpmobilestatic.xpi.com.br/tickers/{{nota.ativo|slice:4}}.png" alt="{{nota.ativo}}" width="30" height="30" style="border-radius: 4px; overflow: hidden; display: flex; background: rgb(239,239,239);">
+                                        {% else %}
+                                        <img src="https://xpmobilestatic.xpi.com.br/tickers/STOCKS_DEFAULT.png" alt="{{nota.ativo}}" width="32" height="32" style="border-radius: 4px; overflow: hidden; display: flex; background: rgb(239,239,239);">
+                                        {% endif %}
+                                    </td>
+                                    <td>{{nota.ativo|upper}}</td>
                                     <td>{{nota.qt}}</td>
                                     <td>{{nota.preco_medio}}</td>
                                     <td>{{nota.preco_f}}</td>
@@ -121,6 +130,7 @@
                             </tbody>
                             <tfoot class="thead-dark">
                                 <tr>
+                                    <th></th>
                                     <th>Ativo</th>
                                     <th>Qtde.</th>
                                     <th>Preço Médio.</th>

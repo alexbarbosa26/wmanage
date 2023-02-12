@@ -1,5 +1,6 @@
 from django import template
-from django.contrib.auth.models import Group 
+from django.contrib.auth.models import Group
+import requests
 
 register = template.Library() 
 
@@ -28,3 +29,19 @@ def add_classes(value, arg):
             classes.append(c)
     
     return value.as_widget(attrs={"class":" ".join(classes)})
+
+# Filtro para tratar a url das imagens das ações
+@register.filter
+def url_path(path, arg):
+    try:
+        url = arg
+        cod = path
+        ext = '.png'
+        url_final = url+cod+ext
+        request = requests.get(url_final)
+        if request.status_code == 200:
+            return 1
+        else:
+            return 0
+    except:
+        print('não acessou')
