@@ -77,8 +77,7 @@ class Proventos(models.Model):
     user = models.ForeignKey(User,  on_delete=models.PROTECT, verbose_name="Usuário")
     
     def save(self, *args, **kwargs):
-        super().save(*args,**kwargs)
-
+        return super(Proventos, self).save(*args, **kwargs)
     def __str__(self):
         return self.ativo
 

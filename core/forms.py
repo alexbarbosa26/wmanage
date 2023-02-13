@@ -1,5 +1,5 @@
 from django import forms
-from core.models import Ativo, Bonificacao, Desdobramento, Grupamento
+from core.models import Ativo, Bonificacao, Desdobramento, Grupamento, Proventos
 from django.forms.widgets import Select
 from bootstrap_datepicker_plus import DatePickerInput
 from django.core.mail import EmailMessage
@@ -42,6 +42,19 @@ class GrupamentoForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user')
         super(GrupamentoForm, self).__init__(*args, **kwargs)
+        self.fields['ativo'].queryset = Ativo.objects.filter(user=self.user, quantidade__gt=0)
+    
+    ativo = forms.ModelChoiceField(queryset=None, widget=Select(attrs={'data-live-search': 'true', 'Class':'selectpicker border rounded', 'autofocus':''}))
+    data = forms.DateField(widget=DatePickerInput(format='%d/%m/%Y',options={'locale':'pt-br'}, attrs={'placeholder':'DD/MM/AAAA'}))
+
+class ProventosForm(forms.ModelForm):
+    class Meta:
+        model = Proventos
+        exclude = ('user',)
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user')
+        super(ProventosForm, self).__init__(*args, **kwargs)
         self.fields['ativo'].queryset = Ativo.objects.filter(user=self.user, quantidade__gt=0)
     
     ativo = forms.ModelChoiceField(queryset=None, widget=Select(attrs={'data-live-search': 'true', 'Class':'selectpicker border rounded', 'autofocus':''}))

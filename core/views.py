@@ -1,5 +1,5 @@
 from datetime import datetime
-from core.forms import BonificacaoForm, ContatoForm, DateForm, DesdobramentoForm, GrupamentoForm
+from core.forms import BonificacaoForm, ContatoForm, DateForm, DesdobramentoForm, GrupamentoForm, ProventosForm
 from .models import Ativo, Bonificacao, Desdobramento, Grupamento, Nota, Proventos, Cotacao
 from decimal import Decimal
 from django.shortcuts import render
@@ -340,29 +340,27 @@ class WalletView(LoginRequiredMixin, TemplateView):
         return context
 
 # Cadastrar proventos
-class ProventosCreate(LoginRequiredMixin, CreateView):
+class ProventosCreate(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     model = Proventos
-    fields = ('ativo','tipo_provento','data','valor')
+    form_class = ProventosForm
     template_name = 'cadastros/form-proventos.html'
-    success_url = reverse_lazy('listar-proventos')
-    success_message = "%(ativo)s registrado com sucesso!"    
+    success_url = reverse_lazy('cadastrar-proventos')
+    success_message = "Provento do ativo %(ativo)s registrado com sucesso!"    
 
-    def get_success_message(self, cleaned_data):
-        return self.success_message % dict(
-            cleaned_data,
-            ativo=self.object.ativo,
-        )
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        self.object.user = self.request.user
+        self.object.save()
 
-    def get_form(self):
-        form = super().get_form()
-        form.instance.user = self.request.user
-        form.fields['data'].widget = DatePickerInput(format='%d/%m/%Y',
-         options={'locale':'pt-br'}
-        )
-        return form
+        return super().form_valid(form)
+
+    def get_form_kwargs(self, *args, **kwargs):
+        kwargs = super(ProventosCreate, self).get_form_kwargs(*args, **kwargs)        
+        kwargs['user'] = self.request.user
+        return kwargs
 
 # Atualizar proventod
-class ProventosUpdate(LoginRequiredMixin, UpdateView):
+class ProventosUpdate(LoginRequiredMixin,SuccessMessageMixin, UpdateView):
     model = Proventos
     fields = ('ativo','tipo_provento','data','valor')
     template_name = 'cadastros/form-proventos.html'
@@ -384,7 +382,7 @@ class ProventosUpdate(LoginRequiredMixin, UpdateView):
         return form
 
 # Listar proventos
-class ProventosList(LoginRequiredMixin,ListView):
+class ProventosList(LoginRequiredMixin,SuccessMessageMixin,ListView):
     login_url = reverse_lazy('account_login')
     model = Proventos
     template_name = 'listar/proventos.html'
@@ -400,11 +398,11 @@ class ProventosList(LoginRequiredMixin,ListView):
         return self.object_list
 
 # Delete proventos
-class ProventosDelete(LoginRequiredMixin, DeleteView):
+class ProventosDelete(LoginRequiredMixin,SuccessMessageMixin, DeleteView):
     login_url = reverse_lazy('account_login')
     model = Proventos
     template_name = 'cadastros/form-excluir.html'
-    success_url = reverse_lazy('listar-ordens')
+    success_url = reverse_lazy('listar-proventos')
     success_message = "%(ativo)s deletado com sucesso!"
 
     def get_success_message(self, cleaned_data):
