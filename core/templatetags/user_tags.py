@@ -43,9 +43,9 @@ def url_path(path, arg):
         url_final = url+cod+ext
         print(url_final)
         request = requests.get(url_final)
-        if request.status_code == 200:
+        if request.status_code == requests.codes.OK:
             return 1
-        elif request.status_code == 404:
+        else:
             return 0
     except:
         print('não acessou')
