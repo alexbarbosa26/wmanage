@@ -41,9 +41,9 @@ def url_path(path, arg):
         cod = path
         ext = '.png'
         url_final = url+cod+ext
-        print(url_final)
         request = requests.get(url_final)
-        if request.status_code == requests.codes.OK:
+        print(request.status_code)
+        if request.status_code == 200:
             return 1
         else:
             return 0
