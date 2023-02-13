@@ -67,14 +67,7 @@
                             <tbody>
                                 {% for nota in result_c %}
                                 <tr>
-                                    <td> 
-                                        {% if nota.ativo|slice:4|url_path:request.build_absolute_uri == 1 %}
-                                            <img src="{%static 'img/acoes/'%}{{nota.ativo|slice:4}}.png" alt="{{nota.ativo}}" width="30" height="30" style="border-radius: 4px; overflow: hidden; display: flex; background: rgb(239,239,239);">
-                                        {% else %}     
-                                            <img src="{%static 'img/acoes/'%}STOCKS_DEFAULT.png" alt="{{nota.ativo}}" width="30" height="30" style="border-radius: 4px; overflow: hidden; display: flex; background: rgb(239,239,239);">
-                                        {% endif %}                             
-                                        
-                                    </td>
+                                    <td><img src="{%static 'img/acoes/'%}{{nota.ativo|slice:4}}.png" alt="{{nota.ativo}}" width="30" height="30" style="border-radius: 4px; overflow: hidden; display: flex; background: rgb(239,239,239);"></td>
                                     <td>{{nota.ativo|upper}}</td>
                                     <td>{{nota.qt}}</td>
                                     <td>{{nota.preco_medio}}</td>
