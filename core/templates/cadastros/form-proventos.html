@@ -9,9 +9,9 @@
 <h4 class="mt-4">Cadastrar Proventos</h4>
 <form method="post"> 
     {% csrf_token %}
-    <div class="form-row mt-3">
-        <div class="form-group col-md-3 mb-0">
-            {{form.ativo|as_crispy_field}}
+    <div class="form-row mt-4">
+        <div class="form-group col-md-2 mb-0">
+            {{ form.ativo|as_crispy_field }}
         </div>
         <div class="form-group col-md-2 mb-0">
             {{ form.tipo_provento|as_crispy_field }}

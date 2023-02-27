@@ -121,7 +121,7 @@ class NotaList(LoginRequiredMixin, ListView):
         return self.object_list
 
 # Delete
-class NotaDelete(GroupRequiredMixin, LoginRequiredMixin, DeleteView):
+class NotaDelete(GroupRequiredMixin,SuccessMessageMixin, LoginRequiredMixin, DeleteView):
     login_url = reverse_lazy('account_login')
     group_required = u'Administrador'
     model = Nota
@@ -245,6 +245,7 @@ def b3_cotacao():
         dados.append(b3_porcentagem)
     
         return dados
+
 # Classe para mostrar os calculos da tela Home.html
 class WalletView(LoginRequiredMixin, TemplateView):
     login_url = reverse_lazy('account_login')  
@@ -252,6 +253,7 @@ class WalletView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        # Formato local de moeda agrupado
         v_zero = locale.currency(0, grouping=True)
         r_result = []
         total_lucro = []
@@ -268,9 +270,13 @@ class WalletView(LoginRequiredMixin, TemplateView):
         x = 0
         y = 0
         v = 0
+        # Buscando a relação de compras usuario
         result_compra = Nota.objects.values('ativo').annotate(qt=Sum('quantidade'), preco_f=Sum('total_compra'), custos=Sum('total_custo'), preco_m=Sum('preco'), preco_medio=Sum('preco'), v_mercado=Sum('preco'), lucro=Sum('preco'), variacao_mercado_1=Count('identificador'), variacao_mercado_2=Count('identificador')).filter(tipo__in=['C','B'], user=self.request.user)
+        
+        # Buscando a relação de vendas do usuario
         result_venda = Nota.objects.values('ativo').annotate(qt=Sum('quantidade'), preco_f=Sum('total_compra'), custos=Sum('total_custo')).filter(tipo='V', user=self.request.user)
-            
+        
+        # Varrendo a lista de vendas e compras e realizando o calculo sobre as quantidades e valores pagos e vendidos    
         for venda in result_venda:
             for compra in result_compra:
                 if compra['ativo'] == venda['ativo']:                
@@ -280,48 +286,65 @@ class WalletView(LoginRequiredMixin, TemplateView):
 
         for compra in result_compra:
             if compra['qt'] != 0:
+                # Retornando a cotação do ativo no mercado
                 preco_mercado = Cotacao.objects.filter(ativo=compra['ativo']).last()
+                # Retornando o status do antivo no mercado
                 status_fechado_aberto = Cotacao.objects.filter(ativo=compra['ativo']).last()
                 status_fechado_aberto = status_fechado_aberto.status_fechado_aberto
+                # coletando a ultima atualização realizada
                 ultima_atualizacao = preco_mercado.data_instante
+                # Caculando o valor de mercado 
                 compra['v_mercado'] = locale.currency(Decimal(preco_mercado.fechamento_ajustado.replace(",",".")) * compra['qt'], grouping=True)
+                # Calculando o lucro 
                 compra['lucro'] = (Decimal(preco_mercado.fechamento_ajustado.replace(",","."))*compra['qt'])-compra['preco_f']-compra['custos']-compra['custos']*(Decimal(preco_mercado.fechamento_ajustado.replace(",","."))*compra['qt'])/compra['preco_f']
-                
+                # Calculando o preço di fechamento ajustado * a quantidade de compras que o cliente possui
                 v = (Decimal(preco_mercado.fechamento_ajustado.replace(",",".")) * compra['qt']) + v
+                # Enquanto tiver lucro ou não, ele irá ser somado na variavel x
                 x = compra['lucro'] + x
+                # Calculo de preço de fechamento, mais custos na compra do ativo, mais a soma disso tudo de novo atribuido a variavel y
                 y = compra['preco_f'] + compra['custos'] + y
-
+                # calculando o percentual do lucro
                 porcentagem_lucro = round((x/y)*100,2)
+                # convertendo o valor do lucro em moeda Real Brasil e agrupando as casas decimais
                 compra['lucro'] = locale.currency(compra['lucro'], grouping=True)
+                # convertendo o valor do preço de mercado em moeda Real Brasil e agrupando as casas decimais
                 compra['preco_m'] = locale.currency(Decimal(preco_mercado.fechamento_ajustado.replace(",",".")), grouping=True)
+                # convertendo o valor do preço de mercado em moeda Real Brasil e agrupando as casas decimais
                 compra['preco_medio'] = locale.currency(compra['preco_f'] / compra['qt'], grouping=True)
+                # convertendo o valor do preço de fechamento em moeda Real Brasil e agrupando as casas decimais
                 compra['preco_f'] = locale.currency(compra['preco_f'], grouping=True)
+                # convertendo o valor dos custos em moeda Real Brasil e agrupando as casas decimais
                 compra['custos'] = locale.currency(compra['custos'], grouping=True)
+                # obtendo o valor da variação de mercado em duas frente de variaveis
                 compra['variacao_1'] = preco_mercado.variacao_1
                 compra['variacao_2'] = preco_mercado.variacao_2                
 
+                # Atribuindo os valores da compra via append dentro da variavel r_result
                 r_result.append(compra)                
+                # convertendo o valor total do lucro em moeda Real Brasil e agrupando as casas decimais
                 total_lucro=locale.currency(x, grouping=True)
+                # convertendo o valor total investido em moeda Real Brasil e agrupando as casas decimais
                 total_investido=locale.currency(y, grouping=True)
+                # convertendo o valor total de mercado moeda Real Brasil e agrupando as casas decimais
                 total_v_mercado = locale.currency(v, grouping=True)
-                
-
+               
         pro = 0
         pro_result = []
         pro_result = 0
+        # Obtendo os valores de proventos do usuario para poder somar todo o ganho
         proventos = Proventos.objects.filter(user=self.request.user)
         for i in proventos:
             pro = i.valor + pro
-
+        # convertendo a soma dos proventos em moeda Real Brasil e agrupando as casas decimais
         pro_result = locale.currency(pro, grouping=True)
-
+        # convertendo o valor total de mercado extra em moeda Real Brasil e agrupando as casas decimais
         total_v_mercado_extra = locale.currency(v + pro, grouping=True)
         # Tratando erro em caso de erro do certificado digital
         try:
             b3 = b3_cotacao()
         except requests.exceptions.SSLError:
             b3 = ['IBOV','N/A','N/A']
-            
+        # Atribuindo todo o resultado acima e consolida tudo em context
         context = {
             'result_c' : r_result,
             'total_lucro' : total_lucro,
@@ -359,30 +382,29 @@ class ProventosCreate(LoginRequiredMixin, SuccessMessageMixin, CreateView):
         kwargs['user'] = self.request.user
         return kwargs
 
-# Atualizar proventod
-class ProventosUpdate(LoginRequiredMixin,SuccessMessageMixin, UpdateView):
+# Atualizar proventos
+class ProventosUpdate(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     model = Proventos
-    fields = ('ativo','tipo_provento','data','valor')
+    # fields = ('ativo','tipo_provento','data','valor')
+    form_class = ProventosForm
     template_name = 'cadastros/form-proventos.html'
     success_url = reverse_lazy('listar-proventos')
-    success_message = "Proventos do %(ativo)s atualizado com sucesso!"    
+    success_message = "Proventos do %(ativo)s atualizado com sucesso!"  
 
-    def get_success_message(self, cleaned_data):
-        return self.success_message % dict(
-            cleaned_data,
-            ativo=self.object.ativo,
-        )
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        self.object.user = self.request.user
+        self.object.save()
 
-    def get_form(self):
-        form = super().get_form()
-        form.instance.user = self.request.user
-        form.fields['data'].widget = DatePickerInput(format='%d/%m/%Y',
-         options={'locale':'pt-br'}
-        )
-        return form
+        return super().form_valid(form)
+
+    def get_form_kwargs(self, *args, **kwargs):
+        kwargs = super(ProventosUpdate, self).get_form_kwargs(*args, **kwargs)        
+        kwargs['user'] = self.request.user
+        return kwargs
 
 # Listar proventos
-class ProventosList(LoginRequiredMixin,SuccessMessageMixin,ListView):
+class ProventosList(LoginRequiredMixin, SuccessMessageMixin, ListView):
     login_url = reverse_lazy('account_login')
     model = Proventos
     template_name = 'listar/proventos.html'
@@ -479,9 +501,7 @@ class CarteiraChart(LoginRequiredMixin, TemplateView):
             'chart' : chart,
             'valor_acumulado':valor_acumulado,
             'form':form
-        }
-
-        
+        }        
         
         return context
 
@@ -490,7 +510,7 @@ def Dashboard(request):
     locale.setlocale(locale.LC_ALL, 'pt_BR')
     data_inicio = request.GET.get('data_inicio')
     data_fim = request.GET.get('data_fim')
-    total_proventos=0    
+    total_proventos=0   
     
     if data_inicio or data_fim:
         proventos = Proventos.objects.select_related('user').filter(data__range=(data_inicio,data_fim), user=request.user).values('ativo').annotate(valor_total=Sum('valor')).order_by('-valor_total')        
