@@ -217,3 +217,10 @@ body{
 .bg-info, .bg-info > a {
   color: #fff !important;
 }
+
+.user-panel img {
+  /* height: auto; */
+  width: 2.5rem;
+  display: flex;
+  height: 2.5rem;
+}

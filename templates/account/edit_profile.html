@@ -5,17 +5,18 @@
 
 {% block content %}
 <h2>Editar Perfil</h2>
+<style>
+
+</style>
 
 <div class="col-md-4" style="margin: 0 auto; width: 50%;">
   <div class="card card-primary card-outline">
     <div class="card-body box-profile">
-      <div class="text-center">
+      <div class="perfil-img">
         {% if not user.profile.image %}
-        <img class="profile-user-img img-fluid img-circle" src="{% static 'img/default-user.png' %}"
-          alt="User profile picture">
+        <img src="{% static 'img/default-user.png' %}" alt="User profile picture">
         {% else %}
-        <img class="profile-user-img img-fluid img-circle" src="/media/{{user.profile.image}}"
-          alt="User profile picture">
+        <img src="/media/{{user.profile.image}}" alt="User profile picture">
         {% endif %}
       </div>
       <h3 class="profile-username text-center">{{user.first_name}} {{user.last_name}}</h3>
