@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import BonificacaoCreate, BonificacaoDelete, BonificacaoList, CotacaoList, Dash_Carteira_X_Bolsa, DashboardTemporal, DesdobramentoCreate, DesdobramentoDelete, DesdobramentoList, GrupamentoCreate, GrupamentoDelete, GrupamentoList, NotaChartView, NotaCreate, NotaList, NotaUpdate, NotaDelete, ProventosCreate, ProventosList, ProventosUpdate, ProventosDelete, CarteiraChart, Export_xls
+from .views import BonificacaoCreate, BonificacaoDelete, BonificacaoList, CotacaoList, Dash_Carteira_X_Bolsa, DashboardTemporal, DesdobramentoCreate, DesdobramentoDelete, DesdobramentoList, GrupamentoCreate, GrupamentoDelete, GrupamentoList, NotaCreate, NotaList, NotaUpdate, NotaDelete, ProventosCreate, ProventosList, ProventosUpdate, ProventosDelete, CarteiraChart, Export_xls
 from . import views
 
 urlpatterns = [
@@ -35,7 +35,4 @@ urlpatterns = [
 
     path('export/xls/', Export_xls.get_context_data, name='export-proventos-xls'),
 
-    path('dashboard2', views.Dashboard2, name='dashboard2'),
-
-    path('nota-chart/', NotaChartView.as_view(), name='nota_chart'),
 ]

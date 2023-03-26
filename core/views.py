@@ -1063,49 +1063,6 @@ class GrupamentoDelete(LoginRequiredMixin, DeleteView):
             ativo=self.object.ativo,
         )
 
-# Grafico de proventos
-def Dashboard2(request):
-    x = Proventos.objects.all().filter(user=request.user)
-
-    meses = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez']
-    data = []
-    labels = []
-    data_ano = []
-    labels_ano = []
-    cont = 0
-
-    mes = datetime.now().month + 1
-    ano = datetime.now().year
-
-    for i in range(12):
-        mes -= 1
-        if mes == 0:
-            mes=12
-            ano -=1
-        y = sum([i.valor for i in x if i.data.month == mes and i.data.year == ano])
-        labels.append(meses[mes-1])
-        data.append(y)
-        cont += 1
-    
-    for j in range(5):
-        if ano == 0:
-            ano=5
-        z = sum([j.valor for j in x if j.data.year == ano])
-        labels_ano.append(ano)
-        data_ano.append(z)
-        cont += 1
-                
-
-    data_json={'data':data[::-1], 'labels':labels[::-1]}
-    data_json2={'data':data_ano[::-1], 'labels':labels_ano[::-1]}
-
-    fig_mes = px.bar(x=labels_ano[:], y=data[::-1], text_auto='.2s', title='Soma de Proventos por Mês', labels={'x':'Mês','y':'Valor Total'})
-    fig_mes.update_traces(texttemplate='R$ %{y:,.2f}',textfont_size=12, textangle=0, textposition="outside", cliponaxis=False)
-    fig_mes.update_layout(yaxis_tickprefix = 'R$ ', yaxis_tickformat = ',.2f',uniformtext_minsize=8, uniformtext_mode='hide',title={'font_size':22,'xanchor':'center','x':0.5})
-    chart_mes = fig_mes.to_html()
-    context ={'chart_mes':chart_mes}
-    return JsonResponse(data_json2)
-    return render(request, 'dashboard/chart2.html', context)
 
 # função para enviar email com contato
 def contato(request):
@@ -1151,34 +1108,6 @@ def edit_profile(request):
             return redirect('edit_profile')
 
     return render(request, 'account/edit_profile.html', {'user_form': user_form, 'profile_form': profile_form})
-
-class NotaChartView(TemplateView):
-    template_name = 'grafico.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        notas = Nota.objects.filter(user=self.request.user)
-        total_compra = notas.aggregate(Sum('total_compra'))['total_compra__sum']
-        total_custo = notas.aggregate(Sum('total_custo'))['total_custo__sum']
-        lucro = total_compra - total_custo
-        context['lucro'] = lucro
-        return context
-
-    def get(self, request, *args, **kwargs):
-        data = {
-            'labels': ['Total Compra', 'Total Custo', 'Lucro'],
-            'datasets': [{
-                'label': 'Valores',
-                'backgroundColor': ['#007bff', '#dc3545', '#28a745'],
-                'data': [
-                    Nota.objects.aggregate(Sum('total_compra'))['total_compra__sum'],
-                    Nota.objects.aggregate(Sum('total_custo'))['total_custo__sum'],
-                    self.get_context_data()['lucro'],
-                ]
-            }]
-        }
-        return JsonResponse(data)
-    
 
 # Renderezação de erros
 def error_500(request):
