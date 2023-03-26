@@ -23,6 +23,8 @@ from django_otp.admin import OTPAdminSite
 from django.contrib.auth.models import User
 from django_otp.plugins.otp_totp.models import TOTPDevice
 from django_otp.plugins.otp_totp.admin import TOTPDeviceAdmin
+from django.conf.urls.static import static
+from django.conf import settings
 
 class OTPAdmin(OTPAdminSite):
     pass
@@ -78,6 +80,7 @@ urlpatterns = [
              template_name='password-reset/password_reset_complete.html'
          ),
          name='password_reset_complete'),
-]
+]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
 handler500='core.views.error_500'
 handler404='core.views.error_404'

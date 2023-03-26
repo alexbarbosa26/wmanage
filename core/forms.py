@@ -1,8 +1,19 @@
 from django import forms
-from core.models import Ativo, Bonificacao, Desdobramento, Grupamento, Proventos
+from core.models import Ativo, Bonificacao, Desdobramento, Grupamento, Proventos, Profile
 from django.forms.widgets import Select
 from bootstrap_datepicker_plus import DatePickerInput
 from django.core.mail import EmailMessage
+from django.contrib.auth.models import User
+
+class UserForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ('first_name', 'last_name', 'email')
+
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = ('image',)
 
 class DateForm(forms.Form):
     data_inicio = forms.DateField(widget=forms.DateInput(attrs={'type':'date'}))

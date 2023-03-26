@@ -3,14 +3,12 @@ from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator
 from models_logging.admin import HistoryAdmin
 
-# class ProfileImage(models.Model):
-#       user = models.OneToOneField(User,on_delete=models.CASCADE,editable=False)
-#       avatar = models.ImageField()
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='img/profile_images/', blank=True)
 
-#       def user_avatar(self):
-#         return self.profileimage.avatar
-
-# User.add_to_class('user_avatar', user_avatar)
+    def __str__(self):
+        return self.user.username
 
 class LoggingAdminModel(HistoryAdmin):
     history_latest_first = False

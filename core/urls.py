@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import BonificacaoCreate, BonificacaoDelete, BonificacaoList, CotacaoList, Dash_Carteira_X_Bolsa, DashboardTemporal, DesdobramentoCreate, DesdobramentoDelete, DesdobramentoList, GrupamentoCreate, GrupamentoDelete, GrupamentoList, NotaCreate, NotaList, NotaUpdate, NotaDelete, ProventosCreate, ProventosList, ProventosUpdate, ProventosDelete, CarteiraChart, Export_xls
+from .views import BonificacaoCreate, BonificacaoDelete, BonificacaoList, CotacaoList, Dash_Carteira_X_Bolsa, DashboardTemporal, DesdobramentoCreate, DesdobramentoDelete, DesdobramentoList, GrupamentoCreate, GrupamentoDelete, GrupamentoList, NotaChartView, NotaCreate, NotaList, NotaUpdate, NotaDelete, ProventosCreate, ProventosList, ProventosUpdate, ProventosDelete, CarteiraChart, Export_xls
 from . import views
 
 urlpatterns = [
@@ -18,6 +18,7 @@ urlpatterns = [
 
     path('editar/ativo/<int:pk>/', NotaUpdate.as_view(), name='editar-nota'),
     path('editar/proventos/<int:pk>/', ProventosUpdate.as_view(), name='editar-provento'),
+    path('edit-profile/', views.edit_profile, name='edit_profile'),
 
     path('excluir/nota/<int:pk>/', NotaDelete.as_view(), name='excluir-nota'),
     path('excluir/provento/<int:pk>/', ProventosDelete.as_view(), name='excluir-provento'),
@@ -34,5 +35,7 @@ urlpatterns = [
 
     path('export/xls/', Export_xls.get_context_data, name='export-proventos-xls'),
 
-    path('dashboard2', views.Dashboard2, name='dashboard2')
+    path('dashboard2', views.Dashboard2, name='dashboard2'),
+
+    path('nota-chart/', NotaChartView.as_view(), name='nota_chart'),
 ]

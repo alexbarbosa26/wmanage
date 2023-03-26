@@ -1,8 +1,8 @@
 from datetime import datetime
-from core.forms import BonificacaoForm, ContatoForm, DateForm, DesdobramentoForm, GrupamentoForm, ProventosForm
-from .models import Ativo, Bonificacao, Desdobramento, Grupamento, Nota, Proventos, Cotacao
+from core.forms import BonificacaoForm, ContatoForm, DateForm, DesdobramentoForm, GrupamentoForm, ProventosForm, ProfileForm, UserForm
+from .models import Ativo, Bonificacao, Desdobramento, Grupamento, Nota, Profile, Proventos, Cotacao
 from decimal import Decimal
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
@@ -14,6 +14,8 @@ from django.db.models.functions import TruncMonth, TruncYear
 from bootstrap_datepicker_plus import DatePickerInput
 from braces.views import  GroupRequiredMixin
 import xlwt
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django.http import HttpResponse,HttpResponseRedirect
 import locale
 import requests
@@ -24,6 +26,7 @@ import plotly.graph_objects as go
 import pandas as pd
 from django.http import JsonResponse
 from django.contrib import messages
+
 
 # Set Locale
 locale.setlocale(locale.LC_ALL, 'pt_BR')
@@ -1126,6 +1129,56 @@ def contato(request):
 
     return render(request, 'contact.html', {'form': form})
 
+@login_required
+def edit_profile(request):
+    try:
+        profile = request.user.profile
+    except Profile.DoesNotExist:
+        profile = Profile(user=request.user)
+        profile.save()
+
+    user_form = UserForm(instance=request.user)
+    profile_form = ProfileForm(instance=profile)
+
+    if request.method == 'POST':
+        user_form = UserForm(request.POST, instance=request.user)
+        profile_form = ProfileForm(request.POST, request.FILES, instance=profile)
+
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
+            messages.success(request, 'Your profile was successfully updated!')
+            return redirect('edit_profile')
+
+    return render(request, 'account/edit_profile.html', {'user_form': user_form, 'profile_form': profile_form})
+
+class NotaChartView(TemplateView):
+    template_name = 'grafico.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        notas = Nota.objects.filter(user=self.request.user)
+        total_compra = notas.aggregate(Sum('total_compra'))['total_compra__sum']
+        total_custo = notas.aggregate(Sum('total_custo'))['total_custo__sum']
+        lucro = total_compra - total_custo
+        context['lucro'] = lucro
+        return context
+
+    def get(self, request, *args, **kwargs):
+        data = {
+            'labels': ['Total Compra', 'Total Custo', 'Lucro'],
+            'datasets': [{
+                'label': 'Valores',
+                'backgroundColor': ['#007bff', '#dc3545', '#28a745'],
+                'data': [
+                    Nota.objects.aggregate(Sum('total_compra'))['total_compra__sum'],
+                    Nota.objects.aggregate(Sum('total_custo'))['total_custo__sum'],
+                    self.get_context_data()['lucro'],
+                ]
+            }]
+        }
+        return JsonResponse(data)
+    
 
 # Renderezação de erros
 def error_500(request):
