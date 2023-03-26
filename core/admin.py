@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Ativo, Bonificacao, Desdobramento, Grupamento, Nota, Proventos, Cotacao
+from .models import Ativo, Bonificacao, Desdobramento, Grupamento, Nota, Profile, Proventos, Cotacao
 # from django.contrib.auth import get_user_model
 # from .models import ProfileImage
 # from django.contrib.auth.admin import UserAdmin
@@ -13,6 +13,7 @@ admin.site.register(Proventos)
 admin.site.register(Desdobramento)
 admin.site.register(Bonificacao)
 admin.site.register(Grupamento)
+admin.site.register(Profile)
 
 @admin.register(Ativo)
 class AtivoAdmin(admin.ModelAdmin):

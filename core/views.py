@@ -1104,7 +1104,7 @@ def edit_profile(request):
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile_form.save()
-            messages.success(request, 'Your profile was successfully updated!')
+            messages.success(request, 'Seu perfil foi atualizado com sucesso!')
             return redirect('edit_profile')
 
     return render(request, 'account/edit_profile.html', {'user_form': user_form, 'profile_form': profile_form})
