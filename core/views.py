@@ -1550,7 +1550,7 @@ def grafico_proventos(request):
     # Renderiza o template e passa as variáveis para a página
     return render(request, 'proventos/grafico_proventos.html', {'div1': div1, 'div2': div2, 'div3': div3})
 
-
+# relatorio de custo, lucro bruto, liquido e receitas
 def relatorio(request):
     if request.method == 'POST':
         ano_base = request.POST.get('ano_base')
@@ -1571,7 +1571,7 @@ def relatorio(request):
             'total_custo__sum'] or 0
 
         # Calcula a receita total das notas de venda
-        venda_total = notas_venda.aggregate(Sum('preco'))['preco__sum'] or 0
+        venda_total = notas_venda.aggregate(Sum('total_compra'))['total_compra__sum'] or 0
 
         # Calcula o lucro líquido
         lucro_bruto = venda_total - custo_total
@@ -1589,7 +1589,8 @@ def relatorio(request):
                    'venda_total': venda_total,
                    'lucro_liquido': lucro_liquido,
                    'lucro_bruto': lucro_bruto,
-                   'years': years}
+                   'years': years,
+                   'ano_base': ano_base}
         return render(request, 'relatorio_ir.html', context)
 
     # Cria uma lista de anos para preencher o campo de seleção no formulário
@@ -1598,7 +1599,7 @@ def relatorio(request):
     # Renderiza o formulário com a lista de anos
     return render(request, 'relatorio_ir_form.html', {'years': years})
 
-
+# Gerando grafico de compra e venda de ações 
 class SalesChartJSONView(BaseLineChartView):
     def get_labels(self):
         anos = []
@@ -1616,26 +1617,14 @@ class SalesChartJSONView(BaseLineChartView):
         data_vendas = []
         data_compras = []
         for ano in anos:
-            notas_venda = Nota.objects.filter(
-                user=self.request.user, data__year=ano, tipo='V').aggregate(Sum('preco'))
-            venda_total = notas_venda['preco__sum'] or 0
-            notas_compra = Nota.objects.filter(
-                user=self.request.user, data__year=ano, tipo='C').aggregate(Sum('total_custo'))
-            compra_total = notas_compra['total_custo__sum'] or 0
+            notas_venda = Nota.objects.filter(user=self.request.user, data__year=ano, tipo='V').aggregate(Sum('total_compra'))
+            venda_total = notas_venda['total_compra__sum'] or 0
+            notas_compra = Nota.objects.filter(user=self.request.user, data__year=ano, tipo='C').aggregate(Sum('total_compra'))
+            compra_total = notas_compra['total_compra__sum'] or 0
             data_vendas.append(venda_total)
             data_compras.append(compra_total)
         return [data_vendas, data_compras]
-    
-    def get_tooltip(self, context):
-        ano = self.get_labels()[context['x']]
-        compra = context['raw_data'][0][context['index']]
-        venda = context['raw_data'][1][context['index']]
-        tooltip = [
-            {'label': 'Ano', 'value': ano},
-            {'label': 'Compra', 'value': f'R$ {compra:,.2f}'},
-            {'label': 'Venda', 'value': f'R$ {venda:,.2f}'},
-        ]
-        return tooltip
+
 
 # Renderezação de erros
 def error_500(request):

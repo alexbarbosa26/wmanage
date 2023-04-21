@@ -1,7 +1,6 @@
 from apscheduler.schedulers.background import BackgroundScheduler
 from . import yahoo_api
 import logging
-from pytz import timezone
 
 logger = logging.getLogger(__name__)
 

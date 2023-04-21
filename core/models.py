@@ -33,7 +33,7 @@ class Nota(models.Model):
     IRRF_Final = models.DecimalField(blank=True, default=0.00, max_digits=10,decimal_places=2, verbose_name='IRRF Final')
     Lucro_Day_Trade = models.DecimalField(blank=True, default=0.00, max_digits=10,decimal_places=2, verbose_name='Lucro Day Trade')
     IRRF_Day_Trade = models.DecimalField(blank=True, default=0.00, max_digits=10,decimal_places=2, verbose_name='IRRF Day Trade')
-    total_custo = models.DecimalField(default=0, blank=True, max_digits=10, decimal_places=2, verbose_name='Total Compra')
+    total_custo = models.DecimalField(default=0, blank=True, max_digits=10, decimal_places=2, verbose_name='Total Custo')
     corretora = models.CharField(blank=True, max_length=250)
     data_instante = models.DateTimeField(auto_now=True)
     user = models.ForeignKey(User, on_delete=models.PROTECT, verbose_name="usuário")
