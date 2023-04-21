@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Relatório de Imposto de Renda</h1>
+    <!-- relatorio_ir_form.html -->
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="ano_base">Ano base:</label>
+            <select name="ano_base" class="form-control">
+                {% for year in years %}
+                <option value="{{ year }}">{{ year }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Gerar relatório</button>
+    </form>
+
+</div>
+{% endblock %}

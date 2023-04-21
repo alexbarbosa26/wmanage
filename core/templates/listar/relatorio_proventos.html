@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container-fluid">
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <h4 class="mb-4">Proventos</h4>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">Ativo</th>
+                            <th scope="col">Tipo Provento</th>
+                            <th scope="col">Data</th>
+                            <th scope="col">Valor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for provento in proventos %}
+                            <tr>
+                                <td>{{ provento.ativo }}</td>
+                                <td>{{ provento.get_tipo_provento_display }}</td>
+                                <td>{{ provento.data }}</td>
+                                <td>{{ provento.valor }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <h4 class="mb-4">Notas de Operações</h4>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">Ativo</th>
+                            <th scope="col">Quantidade</th>
+                            <th scope="col">Preço</th>
+                            <th scope="col">Data</th>
+                            <th scope="col">Tipo</th>
+                            <th scope="col">Total Compra</th>
+                            <th scope="col">Identificador</th>
+                            <th scope="col">Corretagem</th>
+                            <th scope="col">Emolumentos</th>
+                            <th scope="col">Taxa Líquida CBLC</th>
+                            <th scope="col">IRRF Final</th>
+                            <th scope="col">Lucro Day Trade</th>
+                            <th scope="col">IRRF Day Trade</th>
+                            <th scope="col">Total Custo</th>
+                            <th scope="col">Corretora</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for nota in notas %}
+                            <tr>
+                                <td>{{ nota.ativo }}</td>
+                                <td>{{ nota.quantidade }}</td>
+                                <td>{{ nota.preco }}</td>
+                                <td>{{ nota.data }}</td>
+                                <td>{{ nota.get_tipo_display }}</td>
+                                <td>{{ nota.total_compra }}</td>
+                                <td>{{ nota.identificador }}</td>
+                                <td>{{ nota.corretagem }}</td>
+                                <td>{{ nota.emolumentos }}</td>
+                                <td>{{ nota.tx_liquida_CBLC }}</td>
+                                <td>{{ nota.IRRF_Final }}</td>
+                                <td>{{ nota.Lucro_Day_Trade }}</td>
+                                <td>{{ nota.IRRF_Day_Trade }}</td>
+                                <td>{{ nota.total_custo }}</td>
+                                <td>{{ nota.corretora }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

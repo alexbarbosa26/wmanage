@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+
+{% block content %}
+<form method="get">
+    <label for="ativos">Selecione os ativos:</label>
+    <select name="ativos" id="ativos" multiple>
+        {% for ativo in ativos %}
+        <option value="{{ ativo }}">{{ ativo }}</option>
+        {% endfor %}
+    </select>
+    <button type="submit">Filtrar</button>
+</form>
+
+{{ graph_div|safe }}
+{% endblock %}

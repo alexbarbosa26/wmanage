@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import BonificacaoCreate, BonificacaoDelete, BonificacaoList, CotacaoList, Dash_Carteira_X_Bolsa, DashboardTemporal, DesdobramentoCreate, DesdobramentoDelete, DesdobramentoList, GrupamentoCreate, GrupamentoDelete, GrupamentoList, NotaCreate, NotaList, NotaUpdate, NotaDelete, ProventosCreate, ProventosList, ProventosUpdate, ProventosDelete, CarteiraChart, Export_xls
+from .views import BonificacaoCreate, BonificacaoDelete, BonificacaoList, CotacaoList, Dash_Carteira_X_Bolsa, DashboardTemporal, DesdobramentoCreate, DesdobramentoDelete, DesdobramentoList, GrupamentoCreate, GrupamentoDelete, GrupamentoList, NotaCreate, NotaList, NotaUpdate, NotaDelete, ProventosCreate, ProventosList, ProventosUpdate, ProventosDelete, CarteiraChart, Export_xls, SalesChartJSONView
 from . import views
 
 urlpatterns = [
@@ -30,9 +30,16 @@ urlpatterns = [
     path('dashboard/proventos-chart/', views.Dashboard, name='proventos-chart'),
     path('dashboard/temporal-chart/<str:ativo>', DashboardTemporal.as_view(), name='temporal-chart'),
     path('dashboard/carteira-vs-bolsa-chart/', Dash_Carteira_X_Bolsa.as_view(), name='carteira-vs-bolsa-chart'),
+    
+    path('nota-chart/', views.nota_chart, name='nota_chart'),
+    path('nota-chart-2/', views.lucro_prejuizo_chart, name='nota_chart_2'),
+    path('calculadora/', views.calculadora, name='calculadora'),
+    path('nota-chart-3/', views.grafico_proventos, name='nota_chart_3'),
 
     path('contact', views.contato, name='contact'),
 
     path('export/xls/', Export_xls.get_context_data, name='export-proventos-xls'),
+    path('relatorio/', views.relatorio, name='relatorio'),
+    path('sales_chart_json/', SalesChartJSONView.as_view(), name='sales_chart_json'),
 
 ]

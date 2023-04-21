@@ -5,6 +5,10 @@ from bootstrap_datepicker_plus import DatePickerInput
 from django.core.mail import EmailMessage
 from django.contrib.auth.models import User
 
+class CalculadoraForm(forms.Form):
+    ticker = forms.CharField(max_length=10)
+    acoes = forms.IntegerField()
+
 class UserForm(forms.ModelForm):
     class Meta:
         model = User

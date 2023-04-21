@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'css/Chart.min.css' %}">
+<script src="{% static 'js/Chart.min.js' %}"></script>
+
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row mb-2">
+        <div class="col-sm-6">
+            <h1>Relatório de Imposto de Renda</h1>
+        </div>
+        <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item"><a href="{% url 'pages:home' %}" >Home</a></li>
+                <li class="breadcrumb-item active"><a href="{% url 'relatorio' %}" >Gerar Relatório</a></li>
+            </ol>
+        </div>
+    </div>
+    <div class="row mt-5">
+        <div class="col-md-12">
+            <canvas id="salesChart" height="50"></canvas>
+        </div>
+    </div>
+    <div class="row mt-5">
+        <div class="col-md-6">
+            <h2>Receitas</h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Descrição</th>
+                        <th>Valor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Proventos</td>
+                        <td>R$ {{ proventos|floatformat:2 }}</td>
+                    </tr>
+                    <tr>
+                        <td>Total de Vendas</td>
+                        <td>R$ {{ venda_total|floatformat:2 }}</td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td><strong>Total Receitas</strong></td>
+                        <td><strong>R$ {{ proventos|add:venda_total|floatformat:2 }}</strong></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        <div class="col-md-6">
+            <h2>Custos</h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Descrição</th>
+                        <th>Valor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Compras</td>
+                        <td>R$ {{ custo_total|floatformat:2 }}</td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td><strong>Total Custos</strong></td>
+                        <td><strong>R$ {{ custo_total|floatformat:2 }}</strong></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+    <div class="row mt-5">
+        <div class="col-md-6">
+            <h2>Lucro Líquido</h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Descrição</th>
+                        <th>Valor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Lucro Líquido</td>
+                        <td>R$ {{ lucro_liquido|floatformat:2 }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-6">
+            <h2>Lucro Bruto</h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Descrição</th>
+                        <th>Valor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Lucro Bruto</td>
+                        <td>R$ {{ lucro_bruto|floatformat:2 }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Obtém o canvas para desenhar o gráfico
+    var canvas = document.getElementById('salesChart').getContext('2d');
+
+    // Obtém os dados do gráfico através da API do Django
+    var apiUrl = '{% url "sales_chart_json" %}';
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            // Configuração do gráfico
+            var chartOptions = {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                },
+                legend: {
+                    display: true,
+                    labels: {
+                        fontColor: '#333'
+                    }
+                },
+                responsive: true,
+                title: {
+                    display: true,
+                    text: 'Vendas e Compras por Ano'
+                },
+                tooltips: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                hover: {
+                    mode: 'nearest',
+                    intersect: true
+                },
+                scales: {
+                    xAxes: [{
+                        display: true,
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Ano'
+                        }
+                    }],
+                    yAxes: [{
+                        display: true,
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Valor'
+                        }
+                    }]
+                }
+            };
+
+            // Criação do gráfico
+            var salesChart = new Chart(canvas, {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'Vendas',
+                        data: data.datasets[0].data,
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        fill: false
+                    },
+                    {
+                        label: 'Compras',
+                        data: data.datasets[1].data,
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        fill: false
+                    }
+                    ]
+                },
+                options: chartOptions,
+            });
+        });
+</script>
+{% endblock %}

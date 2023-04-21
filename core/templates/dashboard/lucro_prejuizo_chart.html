@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>Gráfico de Lucro/Prejuízo Acumulado</h1>
+  <form method="get" action="{% url 'nota_chart_2' %}">
+    {% csrf_token %}
+    <label for="ativo">Selecione o(s) ativo(s):</label>
+    <select name="ativo" id="ativo" multiple>
+      {% for ativo in ativos %}
+        <option value="{{ ativo }}">{{ ativo }}</option>
+      {% endfor %}
+    </select>
+    <br>
+    <button type="submit">Gerar gráfico</button>
+  </form>
+  <br>
+  {% if graph_html %}
+    <div>{{ graph_html|safe }}</div>
+  {% endif %}
+{% endblock %}
