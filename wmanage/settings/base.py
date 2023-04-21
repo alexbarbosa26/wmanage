@@ -55,7 +55,6 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'fontawesomefree',
     'models_logging',
-    'chartjs',
     # 2FA
     'django_otp',
     'django_otp.plugins.otp_static',
