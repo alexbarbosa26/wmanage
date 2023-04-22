@@ -1290,6 +1290,12 @@ def save_to_s3(file, bucket_name, key_name):
 
 
 from django.conf import settings
+
+def generate_unique_filename(filename):
+    extension = filename.split('.')[-1]
+    new_filename = f"{uuid.uuid4().hex}.{extension}"
+    return new_filename
+
 @login_required
 def edit_profile(request):
     try:
@@ -1309,18 +1315,23 @@ def edit_profile(request):
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
 
-            # Gera um novo nome de arquivo exclusivo com a extensão original
-            file = request.FILES['image']
-            file_extension = file.name.split('.')[-1]
-            file_name = str(uuid.uuid4()) + '.' + file_extension
-
-            # Salva a imagem no Amazon S3 com o novo nome de arquivo
             s3 = boto3.client('s3')
-            s3.upload_fileobj(file, settings.AWS_STORAGE_BUCKET_NAME, file_name)
-
-            # Salve o nome do arquivo no perfil do usuário
+            if 'image' in request.FILES:
+                file = request.FILES['image']
+                if profile.image:
+                    # Delete the old file
+                    s3.delete_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=profile.image.name)
+                # Save the new file
+                file_name = generate_unique_filename(file.name)
+                s3.upload_fileobj(file, settings.AWS_STORAGE_BUCKET_NAME, file_name)
+                profile.image = file_name
+            else:
+                # Delete the old file
+                if profile.image:
+                    s3.delete_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=profile.image.name)
+                profile.image = None
+            
             profile = profile_form.save(commit=False)
-            profile.image = file_name
             profile.save()
 
             messages.success(request, 'Seu perfil foi atualizado com sucesso!')
