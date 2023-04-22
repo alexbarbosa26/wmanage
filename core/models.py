@@ -10,7 +10,7 @@ class Profile(models.Model):
 
     def image_url(self):
         if self.image:
-            return f'https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/{self.image}'
+            return f'https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.sa-east-1.amazonaws.com/{self.image}'
         return None
 
     def __str__(self):
