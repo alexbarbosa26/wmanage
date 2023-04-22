@@ -26,3 +26,5 @@ pandas==1.4.2
 yfinance==0.1.70
 Pillow==9.4.0
 django-chartjs==2.3.0
+django-storages==1.13.2
+boto3==1.26.118

@@ -142,13 +142,9 @@ USE_TZ = True
 
 SITE_ID = 1
 
-# LOGIN_REDIRECT_URL = '/'
 USERNAME_FIELD = 'email'
 LOGIN_URL = 'two_factor:login'
 LOGIN_REDIRECT_URL = 'two_factor:profile'
-# TWO_FACTOR_PATCH_ADMIN = True
-# TWO_FACTOR_CALL_GATEWAY = 'two_factor.gateways.fake.fake'
-# TWO_FACTOR_SMS_GATEWAY = 'two_factor.gateways.fake.Fake'
 ACCOUNT_SESSION_REMEMBER = True
 ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = True
 ACCOUNT_USERNAME_REQUIRED = True
@@ -194,16 +190,16 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = 'no-reply@wmanage.com'
-EMAIL_CONFIRMATION_PERIOD_DAYS = 7
+EMAIL_CONFIRMATION_PERIOD_DAYS = 3
 
-# ACCOUNT_FORMS = {
-#     'login': 'allauth.account.forms.LoginForm',
-#     #'signup': 'allauth.account.forms.SignupForm',
-#     'signup': 'core.forms.CustomUserCreationForm',
-#     'add_email': 'allauth.account.forms.AddEmailForm',
-#     'change_password': 'allauth.account.forms.ChangePasswordForm',
-#     'set_password': 'allauth.account.forms.SetPasswordForm',
-#     'reset_password': 'allauth.account.forms.ResetPasswordForm',
-#     'reset_password_from_key': 'allauth.account.forms.ResetPasswordKeyForm',
-#     'disconnect': 'allauth.socialaccount.forms.DisconnectForm',
-# }
+AWS_ACCESS_KEY_ID = 'AKIA6MOWIQ3MRAIMI7OT'
+AWS_SECRET_ACCESS_KEY = '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'
+AWS_S3_REGION_NAME = 'sa-east-1'
+AWS_S3_SIGNATURE_NAME = 's3v4'
+AWS_STORAGE_BUCKET_NAME = 'wmanage'
+AWS_S3_FILE_OVERWRITE = False
+AWS_DEFAULT_ACL = None
+AWS_S3_VERITY = False
+AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'

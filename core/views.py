@@ -1,5 +1,6 @@
 from datetime import datetime
 from core.forms import BonificacaoForm, CalculadoraForm, ContatoForm, DateForm, DesdobramentoForm, GrupamentoForm, ProventosForm, ProfileForm, UserForm
+from wmanage.settings.base import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_STORAGE_BUCKET_NAME
 from .models import Ativo, Bonificacao, Desdobramento, Grupamento, Nota, Profile, Proventos, Cotacao
 from decimal import Decimal
 from django.shortcuts import render, redirect
@@ -26,8 +27,10 @@ import plotly.graph_objects as go
 import pandas as pd
 from django.contrib import messages
 from plotly.offline import plot
-from django.http import JsonResponse
 from chartjs.views.lines import BaseLineChartView
+import boto3
+from botocore.exceptions import NoCredentialsError
+import uuid
 
 # Set Locale
 locale.setlocale(locale.LC_ALL, 'pt_BR')
@@ -1273,7 +1276,21 @@ def contato(request):
 
     return render(request, 'contact.html', {'form': form})
 
+def save_to_s3(file, bucket_name, key_name):
+    s3 = boto3.client('s3')
+    try:
+        s3.upload_fileobj(file.file, bucket_name, key_name)
+        print("Upload realizado com sucesso!")
+        return True
+    except FileNotFoundError as e:
+        print("Arquivo não encontrado.", e)
+        return False
+    except NoCredentialsError as e:
+        print("Credenciais inválidas.", e)
+        return False
 
+
+from django.conf import settings
 @login_required
 def edit_profile(request):
     try:
@@ -1292,7 +1309,18 @@ def edit_profile(request):
 
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
-            profile_form.save()
+
+            # Salve a imagem no Amazon S3
+            file = request.FILES['image']
+            file_name = file.name
+            s3 = boto3.client('s3')
+            s3.upload_fileobj(file, settings.AWS_STORAGE_BUCKET_NAME, file_name)
+
+            # Salve o nome do arquivo no perfil do usuário
+            profile = profile_form.save(commit=False)
+            profile.image = file_name
+            profile.save()
+
             messages.success(request, 'Seu perfil foi atualizado com sucesso!')
             return redirect('edit_profile')
 
