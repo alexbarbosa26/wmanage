@@ -1309,9 +1309,12 @@ def edit_profile(request):
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
 
-            # Salve a imagem no Amazon S3
+            # Gera um novo nome de arquivo exclusivo com a extensão original
             file = request.FILES['image']
-            file_name = file.name
+            file_extension = file.name.split('.')[-1]
+            file_name = str(uuid.uuid4()) + '.' + file_extension
+
+            # Salva a imagem no Amazon S3 com o novo nome de arquivo
             s3 = boto3.client('s3')
             s3.upload_fileobj(file, settings.AWS_STORAGE_BUCKET_NAME, file_name)
 
