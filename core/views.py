@@ -1,6 +1,5 @@
 from datetime import datetime
 from core.forms import BonificacaoForm, CalculadoraForm, ContatoForm, DateForm, DesdobramentoForm, GrupamentoForm, ProventosForm, ProfileForm, UserForm
-from wmanage.settings.base import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_STORAGE_BUCKET_NAME
 from .models import Ativo, Bonificacao, Desdobramento, Grupamento, Nota, Profile, Proventos, Cotacao
 from decimal import Decimal
 from django.shortcuts import render, redirect
