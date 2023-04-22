@@ -16,7 +16,7 @@
         {% if not user.profile.image %}
         <img src="{% static 'img/default-user.png' %}" alt="User profile picture">
         {% else %}
-        <img src="/media/{{user.profile.image}}" alt="User profile picture">
+        <img src="{{user.profile.image_url}}" alt="User profile picture">
         {% endif %}
       </div>
       <h3 class="profile-username text-center">{{user.first_name}} {{user.last_name}}</h3>

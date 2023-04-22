@@ -115,7 +115,7 @@
             {% if not user.profile.image %}
               <img src="{% static 'img/default-user.png' %}" class="img-circle elevation-2" alt="User Image">
             {% else %}
-              <img src="/media/{{user.profile.image }}" class="img-circle elevation-2" alt="User Image">
+              <img src="{{user.profile.image_url }}" class="img-circle elevation-2" alt="User Image">
             {% endif %}
 
           </div>

@@ -2,10 +2,16 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator
 from models_logging.admin import HistoryAdmin
+from django.conf import settings
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    image = models.ImageField(upload_to='img/profile_images/', blank=True)
+    image = models.ImageField(upload_to='profile_images', null=True, blank=True)
+
+    def image_url(self):
+        if self.image:
+            return f'https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/{self.image}'
+        return None
 
     def __str__(self):
         return self.user.username
