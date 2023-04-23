@@ -35,6 +35,7 @@ urlpatterns = [
     path('nota-chart-2/', views.lucro_prejuizo_chart, name='nota_chart_2'),
     path('calculadora/', views.calculadora, name='calculadora'),
     path('nota-chart-3/', views.grafico_proventos, name='nota_chart_3'),
+    path('comparar-acoes/', views.compare, name='comparar_ativos'),
 
     path('contact', views.contato, name='contact'),
 

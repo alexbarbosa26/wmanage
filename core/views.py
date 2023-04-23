@@ -1667,6 +1667,43 @@ class SalesChartJSONView(BaseLineChartView):
         return [data_vendas, data_compras]
 
 
+def compare(request):
+    if request.method == 'POST':
+        stock1 = request.POST.get('stock1')
+        stock2 = request.POST.get('stock2')
+
+        ticker1 = yf.Ticker(stock1)
+        ticker2 = yf.Ticker(stock2)
+
+        stock_data1 = ticker1.info
+        stock_data2 = ticker2.info
+
+        indicators = {
+            'P_L': 'trailingPE',
+            'DY': 'dividendYield',
+            'P_VPA': 'priceToBook',
+            'EV_EBITDA': 'enterpriseToEbitda',
+            'P_A': 'priceToSalesTrailing12Months',
+            'ROE': 'returnOnEquity',
+            'Divida_Liquida_Patrimonio_Liquido': 'debtToEquity',
+            'Margem_Bruta': 'grossMargins',
+            'Margem_Liquida': 'profitMargins',
+        }
+
+        data = {}
+
+        for indicator, value in indicators.items():
+            data[indicator] = {
+                stock1: stock_data1.get(value),
+                stock2: stock_data2.get(value),
+            }
+        print(data)
+
+        return render(request, 'listar/compare.html', {'data': data})
+    
+    return render(request, 'listar/compare.html')
+
+
 # Renderezação de erros
 def error_500(request):
     return render(request, '500.html')

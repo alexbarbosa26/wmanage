@@ -5,6 +5,12 @@ from bootstrap_datepicker_plus import DatePickerInput
 from django.core.mail import EmailMessage
 from django.contrib.auth.models import User
 
+class CompararAcoesForm(forms.Form):
+    acao1 = forms.CharField(label='Ação 1', max_length=10)
+    acao2 = forms.CharField(label='Ação 2', max_length=10)
+    start_date = forms.DateField(label='Data Inicial', widget=forms.widgets.DateInput(attrs={'type': 'date'}))
+    end_date = forms.DateField(label='Data Final', widget=forms.widgets.DateInput(attrs={'type': 'date'}))
+
 class CalculadoraForm(forms.Form):
     ticker = forms.CharField(max_length=10)
     acoes = forms.IntegerField()
