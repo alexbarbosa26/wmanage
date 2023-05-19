@@ -31,6 +31,11 @@ import boto3
 from botocore.exceptions import NoCredentialsError
 import uuid
 
+from reportlab.lib.pagesizes import landscape, letter
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+
 # Set Locale
 locale.setlocale(locale.LC_ALL, 'pt_BR')
 
@@ -142,10 +147,109 @@ class NotaList(LoginRequiredMixin, ListView):
     model = Nota
     template_name = 'listar/ordens.html'
 
-    def get_queryset(self):
-        self.object_list = Nota.objects.filter(
-            user=self.request.user).order_by('-data')
-        return self.object_list
+    # def get_queryset(self):
+    #     self.object_list = Nota.objects.filter(
+    #         user=self.request.user).order_by('-data')
+    #     return self.object_list
+
+    def get(self, request):
+        notas = Nota.objects.filter(user=request.user).order_by('-data')
+        export_type = request.GET.get('export_type', None)
+
+        notas_data = []
+
+        for nota in notas:
+            notas_data.append([
+                nota.ativo,
+                nota.quantidade,
+                nota.preco,
+                nota.data.strftime("%d/%m/%Y"),
+                nota.tipo,
+                nota.total_compra,
+                nota.identificador,
+                nota.corretagem,
+                nota.emolumentos,
+                nota.tx_liquida_CBLC,
+                nota.IRRF_Final,
+                nota.Lucro_Day_Trade,
+                nota.IRRF_Day_Trade,
+                nota.total_custo,
+                nota.corretora,
+                nota.data_instante.strftime("%d/%m/%Y %H:%M:%S")
+            ])
+
+        if export_type == 'excel':
+            df = pd.DataFrame(notas_data)
+            df = df.rename(columns={
+                0: 'ativo',
+                1: 'quantidade',
+                2: 'preco',
+                3: 'data',
+                4: 'tipo',
+                5: 'total_compra',
+                6: 'identificador',
+                7: 'corretagem',
+                8: 'emolumentos',
+                9: 'tx_liquida_CBLC',
+                10: 'IRRF_Final',
+                11: 'Lucro_Day_Trade',
+                12: 'IRRF_Day_Trade',
+                13: 'total_custo',
+                14: 'corretora',
+                15: 'data_instante',
+            })
+            response = HttpResponse(content_type='application/ms-excel')
+            response['Content-Disposition'] = 'attachment; filename="notas.xlsx"'
+            df.to_excel(response, index=False)
+
+            return response
+        
+        elif export_type == 'pdf':
+            doc = SimpleDocTemplate("notas.pdf", pagesize=landscape(letter))
+            elements = []
+
+            style = getSampleStyleSheet()
+            style.add(ParagraphStyle(name='TextColor', textColor=colors.black))
+
+            table_style = TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                ('TEXTCOLOR', (0, 0), (-1, 0), style['TextColor']),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica'),
+                ('FONTSIZE', (0, 0), (-1, 0), 10),
+                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                ('BACKGROUND', (0, 1), (-1, -1), colors.lightgrey),
+                ('TEXTCOLOR', (0, 1), (-1, -1), style['TextColor']),
+                ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+                ('FONTSIZE', (0, 1), (-1, -1), 8),
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
+                ('BOX', (0, 0), (-1, -1), 0.25, colors.black)
+            ])
+            from reportlab.lib.units import inch
+            from reportlab.lib.units import cm
+
+            # Define a altura das células da tabela em polegadas
+            CELL_HEIGHT = 0.25 * inch
+            notas_table = Table([
+                ['Ativo', 'Quantidade', 'Preço', 'Data', 'Tipo', 'Total Compra', 'Identificador',
+                    'Corretagem', 'Emolumentos', 'Taxa Líquida CBLC', 'IRRF Final', 'Lucro Day Trade',
+                    'IRRF Day Trade', 'Total Custo', 'Corretora', 'Data/Hora'],
+                *notas_data
+            ], colWidths=[2*cm] + [1.2*cm]*6 + [1.8*cm] + [1.5*cm]*4 + [2*cm]*3 + [1.5*cm]*2 + [2.5*cm])
+            
+            notas_table.setStyle(table_style)
+            elements.append(notas_table)
+
+            doc.build(elements)
+            with open("notas.pdf", 'rb') as file:
+                response = HttpResponse(file.read(), content_type='application/pdf')
+                response['Content-Disposition'] = 'attachment; filename="notas.pdf"'
+                return response
+
+        else:
+            context = {'object_list': notas}
+            return render(request, 'listar/ordens.html', context)
 
 # Delete
 
@@ -1341,146 +1445,6 @@ def edit_profile(request):
 
 
 @login_required
-def nota_chart(request):
-    notas = Nota.objects.all().filter(user=request.user)
-    df = pd.DataFrame(list(notas.values()))
-
-    fig = px.bar(df, x='ativo', y='quantidade', color='tipo',
-                 labels={'ativo': 'Ativo', 'quantidade': 'Quantidade', 'tipo': 'Tipo'})
-
-    return render(request, 'dashboard/nota_chart.html', context={'fig': fig.to_html()})
-
-
-@login_required
-def nota_chart_2(request):
-    # Obtendo a lista de ativos para exibir no filtro de seleção
-    ativos = Nota.objects.values_list(
-        'ativo', flat=True).distinct().order_by('ativo')
-    # Obtendo os ativos selecionados no filtro
-    ativos_selecionados = request.GET.getlist('ativos')
-    # Filtrando as notas pelos ativos selecionados
-    if ativos_selecionados:
-        notas = Nota.objects.filter(
-            ativo__in=ativos_selecionados, user=request.user)
-    else:
-        notas = Nota.objects.all().filter(user=request.user)
-
-    # Agrupando notas por ativo e tipo de operação (compra ou venda)
-    data = []
-    for ativo in notas.values_list('ativo', flat=True).distinct():
-        notas_ativo = notas.filter(ativo=ativo)
-        for tipo in notas.values_list('tipo', flat=True).distinct():
-            notas_tipo = notas_ativo.filter(tipo=tipo)
-            notas_tipo_mes = pd.DataFrame(
-                notas_tipo.values('data').annotate(count=Count('id')))
-            notas_tipo_mes['tipo'] = tipo
-            notas_tipo_mes['ativo'] = ativo
-            data.append(notas_tipo_mes)
-
-    # Criando o DataFrame com as informações de todas as notas
-    notas_df = pd.concat(data)
-
-    # Criando o gráfico
-    fig = go.Figure()
-    for ativo in notas_df['ativo'].unique():
-        for tipo in notas_df['tipo'].unique():
-            notas_ativo_tipo = notas_df[(notas_df['ativo'] == ativo) & (
-                notas_df['tipo'] == tipo)]
-            fig.add_trace(
-                go.Bar(
-                    name=f'{ativo} - {tipo}',
-                    x=notas_ativo_tipo['data'],
-                    y=notas_ativo_tipo['count']
-                )
-            )
-
-    # Configurando o layout do gráfico
-    fig.update_layout(
-        barmode='stack',
-        title='Quantidade de notas por ativo e tipo de operação',
-        xaxis_title='Mês',
-        yaxis_title='Quantidade de notas',
-    )
-
-    # Convertendo o gráfico para HTML e exibindo na página
-    graph_div = fig.to_html(
-        full_html=False, default_height=500, default_width=700)
-    return render(request, 'dashboard/nota_chart_2.html', {'graph_div': graph_div, 'ativos': ativos, 'ativos_selecionados': ativos_selecionados})
-
-
-@login_required
-def lucro_prejuizo_chart(request):
-    ativos = request.GET.getlist('ativo')
-    if ativos:
-        notas = Nota.objects.filter(ativo__in=ativos).order_by('data')
-    else:
-        notas = Nota.objects.all().filter(user=request.user).order_by('data')
-
-    # Cálculo do lucro/prejuízo acumulado
-    lucro_prejuizo_acumulado = []
-    total = 0
-    for nota in notas:
-        if nota.tipo == 'C':
-            total -= nota.total_custo
-        else:
-            total += nota.quantidade * nota.preco
-        lucro_prejuizo_acumulado.append(total)
-
-    # Obtenção dos nomes dos ativos para exibir no eixo x
-    nomes_ativos = list(set(notas.values_list('ativo', flat=True)))
-
-    # Criação do gráfico de barras
-    fig = go.Figure(
-        go.Bar(
-            x=nomes_ativos,
-            y=lucro_prejuizo_acumulado,
-            marker_color='green' if lucro_prejuizo_acumulado[-1] >= 0 else 'red'
-        )
-    )
-
-    # Configurando o layout do gráfico
-    fig.update_layout(
-        title='Lucro/Prejuízo acumulado por data',
-        xaxis_title='Data',
-        yaxis_title='Lucro/Prejuízo acumulado (R$)',
-    )
-
-    # Convertendo o gráfico para HTML e exibindo na página
-    graph_html = fig.to_html(
-        full_html=False, default_height=500, default_width=700)
-    return render(request, 'dashboard/lucro_prejuizo_chart.html', {'graph_html': graph_html, 'ativos': Nota.objects.values_list('ativo', flat=True).distinct()})
-
-
-def calculadora(request):
-    # data = yf.download('PETR4.SA', start='2016-01-01',end='2022-12-31', interval='1mo')
-    data = yf.download('TAEE11.SA', period="5y", actions=True)
-    data = data.reset_index()
-
-    anos = []
-    dividendos = []
-    for i in range(len(data)):
-        ano = data['Date'][i].year
-        if ano not in anos and data['Dividends'][i] > 0:
-            anos.append(ano)
-            dividendos.append(data['Dividends'][i])
-
-    acoes = 100  # Quantidade de ações que você possui
-    previsao_dividendos = []
-    for i in range(len(dividendos)):
-        previsao_dividendos.append((dividendos[i] * acoes * 12))
-
-    fig = go.Figure()
-    fig.add_trace(go.Bar(x=anos, y=dividendos, name='Histórico de Dividendos'))
-    fig.add_trace(go.Bar(x=anos, y=previsao_dividendos,
-                  name='Previsão de Dividendos'))
-
-    fig.update_layout(title='Previsão de Dividendos',
-                      xaxis_title='Ano', yaxis_title='Dividendos')
-
-    return render(request, 'calculadora.html', {'plot_dividendos': fig.to_html()})
-
-
-@login_required
 def grafico_proventos(request):
     # Define o locale como o Brasil para exibir os valores em reais
     locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
@@ -1592,6 +1556,7 @@ def grafico_proventos(request):
     return render(request, 'proventos/grafico_proventos.html', {'div1': div1, 'div2': div2, 'div3': div3})
 
 # relatorio de custo, lucro bruto, liquido e receitas
+@login_required
 def relatorio(request):
     if request.method == 'POST':
         ano_base = request.POST.get('ano_base')

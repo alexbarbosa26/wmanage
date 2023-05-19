@@ -14,6 +14,15 @@
   </svg>
    Registar Ativo
 </a>
+<form action="{% url 'listar-ordens' %}" method="get">
+  <label for="export_type">Exportar para:</label>
+  <select name="export_type" id="export_type">
+    <option value="">Selecione</option>
+    <option value="excel">Excel</option>
+    <option value="pdf">PDF</option>
+  </select>
+  <button type="submit">Exportar</button>
+</form>
 <div class="container-fluid">
   <div class="row">
     <div class="col-12">

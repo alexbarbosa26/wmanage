@@ -73,6 +73,7 @@ class Proventos(models.Model):
     TIPO_PROVENTOS = (
         ('D','DIVIDENDOS'),
         ('J','JUROS COMPOSTO'),
+        ('R','RENDIMENTOS'),
     )
     ativo = models.CharField(max_length=250)
     tipo_provento = models.CharField(max_length=250, choices=TIPO_PROVENTOS)

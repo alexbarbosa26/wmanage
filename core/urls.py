@@ -29,12 +29,9 @@ urlpatterns = [
     path('dashboard/carteira-chart/', CarteiraChart.as_view(), name='carteira-chart'),
     path('dashboard/proventos-chart/', views.Dashboard, name='proventos-chart'),
     path('dashboard/temporal-chart/<str:ativo>', DashboardTemporal.as_view(), name='temporal-chart'),
-    path('dashboard/carteira-vs-bolsa-chart/', Dash_Carteira_X_Bolsa.as_view(), name='carteira-vs-bolsa-chart'),
-    
-    path('nota-chart/', views.nota_chart, name='nota_chart'),
-    path('nota-chart-2/', views.lucro_prejuizo_chart, name='nota_chart_2'),
-    path('calculadora/', views.calculadora, name='calculadora'),
-    path('nota-chart-3/', views.grafico_proventos, name='nota_chart_3'),
+    path('dashboard/carteira-vs-bolsa-chart/', Dash_Carteira_X_Bolsa.as_view(), name='carteira-vs-bolsa-chart'),    
+    path('dashboard/proventos-chart-2/', views.grafico_proventos, name='proventos-chart-2'),
+
     path('comparar-acoes/', views.compare, name='comparar_ativos'),
 
     path('contact', views.contato, name='contact'),
