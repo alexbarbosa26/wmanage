@@ -57,8 +57,6 @@ INSTALLED_APPS = [
     'fontawesomefree',
     'models_logging',
     'django_plotly_dash.apps.DjangoPlotlyDashConfig',
-    'dal',
-    'dal_select2',
     # 2FA
     'django_otp',
     'django_otp.plugins.otp_static',

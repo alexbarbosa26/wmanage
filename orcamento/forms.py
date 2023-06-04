@@ -1,6 +1,5 @@
 from django import forms
 from .models import Categoria, Subcategoria, Lancamento
-from dal import autocomplete
 
 class CategoriaForm(forms.ModelForm):
     class Meta:
