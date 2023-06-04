@@ -224,3 +224,11 @@ body{
   display: flex;
   height: 2.5rem;
 }
+
+.receita {
+  background-color: #C8E6C9; /* Verde claro */
+}
+
+.despesa {
+  background-color: #FFCDD2; /* Vermelho claro */
+}

@@ -45,22 +45,28 @@ INSTALLED_APPS = [
     'core.apps.CoreConfig',
     'pages',
     'csvs',
+    'orcamento',
     # bibliotecas
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
-    "crispy_forms",
+    'crispy_forms',
     'bootstrap4',
     'bootstrap_datepicker_plus',
     'widget_tweaks',
     'fontawesomefree',
     'models_logging',
+    'django_plotly_dash.apps.DjangoPlotlyDashConfig',
+    'dal',
+    'dal_select2',
     # 2FA
     'django_otp',
     'django_otp.plugins.otp_static',
     'django_otp.plugins.otp_totp',
     'two_factor',
 ]
+
+X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',    
@@ -73,7 +79,7 @@ MIDDLEWARE = [
     'django_otp.middleware.OTPMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'models_logging.middleware.LoggingStackMiddleware', 
+    'models_logging.middleware.LoggingStackMiddleware',
 ]
 
 ROOT_URLCONF = 'wmanage.urls'
