@@ -34,28 +34,27 @@
                             </thead>
                             <tbody>
                                 {% for lancamento in lancamentos %}
-                                <tr class="{% if lancamento.categoria.tipo == '1' %}receita{% elif lancamento.categoria.tipo == '2' %}despesa{% endif %}">
+                                <tr
+                                    class="{% if lancamento.categoria.tipo == '1' %}receita{% elif lancamento.categoria.tipo == '2' %}despesa{% endif %}">
                                     <td>{{ lancamento.descricao }}</td>
                                     <td>{{ lancamento.categoria.nome }}</td>
                                     <td>{{ lancamento.subcategoria.nome }}</td>
                                     <td>{{ lancamento.valor|format_currency }}</td>
                                     <td>{{ lancamento.data }}</td>
                                     <td>
-                                        <a href="{% url 'orcamento:editar_lancamento' lancamento.id %}" class="btn btn-primary btn-sm"><i class="fa-solid fa-pencil"></i></a>
+                                        <a href="{% url 'orcamento:editar_lancamento' lancamento.id %}"
+                                            class="btn btn-primary btn-sm"><i class="fa-solid fa-pencil"></i></a>
                                     </td>
                                     <td>
-                                        <form action="{% url 'orcamento:excluir_lancamento' lancamento.id %}" method="post" class="d-inline">
+                                        <form action="{% url 'orcamento:excluir_lancamento' lancamento.id %}"
+                                            method="post" class="d-inline">
                                             {% csrf_token %}
-                                            <button type="submit" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i></button>
+                                            <button type="submit" class="btn btn-danger btn-sm"><i
+                                                    class="fa-solid fa-trash"></i></button>
                                         </form>
                                     </td>
                                 </tr>
                                 {% endfor %}
-                                <!-- linhas de receitas e despesas -->
-                                <tr class="total-row">
-                                    <td colspan="3">Total</td>
-                                    <td class="total-column">{{ total_receitas|format_currency }}</td>
-                                </tr>
                             </tbody>
                         </table>
                     </div>
