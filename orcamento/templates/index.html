@@ -5,7 +5,44 @@
 
 
 {% block content %}
-<h1>Orçamento Doméstico</h1>
+<h1 class="mb-4">Orçamento Doméstico</h1>
+<div class="row">
+    <div class="col-12 col-sm-6 col-md-3">
+        <div class="info-box">
+            <span class="info-box-icon bg-info"><i class="fa fa-hand-holding-usd"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Total receita</span>
+                <span class="info-box-number">{{total_receitas|format_currency}}</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6 col-md-3">
+        <div class="info-box">
+            <span class="info-box-icon bg-primary"><i class="fa fa-shopping-bag"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Total despesa</span>
+                <span class="info-box-number">{{total_despesas|format_currency}}</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6 col-md-3">
+        <div class="info-box">
+            {% if total_saldo < 0 %}
+            <span class="info-box-icon bg-danger"> 
+                <i class="fa fa-thumbs-down"></i>
+            </span>
+            {% else %}
+            <span class="info-box-icon bg-success"> 
+                <i class="fa fa-thumbs-up"></i>
+            </span>
+            {% endif %} 
+            <div class="info-box-content">
+                <span class="info-box-text">Saldo</span>
+                <span class="info-box-number">{{total_saldo|format_currency}}</span>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="mt-3 mb-3">
     <button class="btn btn-primary" data-toggle="modal" data-target="#categoriaModal">+ Categoria</button>
     <button class="btn btn-primary" data-toggle="modal" data-target="#subcategoriaModal">+ Subcategoria</button>

@@ -15,10 +15,12 @@ def index(request):
 
     total_receitas = lancamentos.filter(categoria__tipo='1').aggregate(total=Sum('valor'))['total']
     total_despesas = lancamentos.filter(categoria__tipo='2').aggregate(total=Sum('valor'))['total']
-    if not total_receitas or not total_despesas:
+    if not total_receitas:
         total_receitas = Decimal(0.00)
+    if not total_despesas:
         total_despesas = Decimal(0.00)
-    total_receitas = total_receitas - total_despesas
+
+    total_saldo = total_receitas - total_despesas
     
     context = {
         'lancamentos': lancamentos,
@@ -27,6 +29,7 @@ def index(request):
         'lancamento_form': lancamento_form,
         'total_receitas': total_receitas or Decimal(0.00),
         'total_despesas': total_despesas or Decimal(0.00),
+        'total_saldo':total_saldo,
     }
     return render(request, 'index.html', context)
 
@@ -76,7 +79,6 @@ def lancamento_modal(request):
 
 def get_subcategorias(request):
     categoria_id = request.GET.get('categoria_id')
-    print(categoria_id)
     subcategorias = Subcategoria.objects.filter(categoria_id=categoria_id)
     data = [{'id': subcategoria.id, 'nome': subcategoria.nome} for subcategoria in subcategorias]
     return JsonResponse(data, safe=False)

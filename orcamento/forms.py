@@ -14,9 +14,11 @@ class SubcategoriaForm(forms.ModelForm):
 
 
 class LancamentoForm(forms.ModelForm):
+    data = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}))
     class Meta:
         model = Lancamento
         fields = ['descricao', 'categoria', 'subcategoria', 'valor', 'data']
+
 
         # widgets = {
         #     'subcategoria': autocomplete.ModelSelect2(url='orcamento:subcategoria-autocomplete')
