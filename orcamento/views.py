@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib import messages
@@ -14,16 +15,18 @@ def index(request):
 
     total_receitas = lancamentos.filter(categoria__tipo='1').aggregate(total=Sum('valor'))['total']
     total_despesas = lancamentos.filter(categoria__tipo='2').aggregate(total=Sum('valor'))['total']
+    if not total_receitas or not total_despesas:
+        total_receitas = Decimal(0.00)
+        total_despesas = Decimal(0.00)
     total_receitas = total_receitas - total_despesas
-    if total_receitas < 0:
-        total_receitas = 0,00
+    
     context = {
         'lancamentos': lancamentos,
         'categoria_form': categoria_form,
         'subcategoria_form': subcategoria_form,
         'lancamento_form': lancamento_form,
-        'total_receitas': total_receitas or 0,
-        'total_despesas': total_despesas or 0,
+        'total_receitas': total_receitas or Decimal(0.00),
+        'total_despesas': total_despesas or Decimal(0.00),
     }
     return render(request, 'index.html', context)
 
