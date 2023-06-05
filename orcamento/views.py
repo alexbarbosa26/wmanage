@@ -5,7 +5,15 @@ from django.contrib import messages
 from .forms import CategoriaForm, SubcategoriaForm, LancamentoForm
 from .models import Categoria, Subcategoria, Lancamento
 from django.db.models import Sum
+from datetime import date, timedelta
+from dateutil.relativedelta import relativedelta
+from datetime import datetime
 
+def get_last_util_day(date_obj):
+    last_day = date_obj.replace(day=1) + relativedelta(months=1) - relativedelta(days=25)
+    while last_day.weekday() >= 5:
+        last_day -= relativedelta(days=1)
+    return last_day
 
 def index(request):
     lancamentos = Lancamento.objects.all()
@@ -13,14 +21,29 @@ def index(request):
     subcategoria_form = SubcategoriaForm()
     lancamento_form = LancamentoForm()
 
+    # Filtro por data
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    # Filtro por data
+    data_inicial = date.today().replace(day=1) + timedelta(days=4)
+    data_final = get_last_util_day(data_inicial + relativedelta(months=1))
+    lancamentos = lancamentos.filter(data__range=[data_inicial, data_final])
+
+    if start_date and end_date:
+        data_inicial = datetime.strptime(start_date, "%Y-%m-%d").date()
+        data_final = datetime.strptime(end_date, "%Y-%m-%d").date()
+        lancamentos = lancamentos.filter(data__range=[data_inicial, data_final])
+
     total_receitas = lancamentos.filter(categoria__tipo='1').aggregate(total=Sum('valor'))['total']
     total_despesas = lancamentos.filter(categoria__tipo='2').aggregate(total=Sum('valor'))['total']
+
     if not total_receitas:
         total_receitas = Decimal(0.00)
     if not total_despesas:
         total_despesas = Decimal(0.00)
 
-    total_saldo = total_receitas - total_despesas
+    total_saldo = total_receitas - total_despesas    
     
     context = {
         'lancamentos': lancamentos,
@@ -30,6 +53,8 @@ def index(request):
         'total_receitas': total_receitas or Decimal(0.00),
         'total_despesas': total_despesas or Decimal(0.00),
         'total_saldo':total_saldo,
+        'data_inicial':data_inicial,
+        'data_final':data_final,
     }
     return render(request, 'index.html', context)
 

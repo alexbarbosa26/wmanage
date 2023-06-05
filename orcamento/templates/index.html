@@ -3,9 +3,11 @@
 {% load static %}
 {% load custom_filters %}
 
-
 {% block content %}
 <h1 class="mb-4">Orçamento Doméstico</h1>
+<div class="row">
+    <p>Período de {{data_inicial}} até {{data_final}}</p>
+</div>
 <div class="row">
     <div class="col-12 col-sm-6 col-md-3">
         <div class="info-box">
@@ -27,26 +29,45 @@
     </div>
     <div class="col-12 col-sm-6 col-md-3">
         <div class="info-box">
-            {% if total_saldo < 0 %}
-            <span class="info-box-icon bg-danger"> 
+            {% if total_saldo < 0 %} <span class="info-box-icon bg-danger">
                 <i class="fa fa-thumbs-down"></i>
-            </span>
-            {% else %}
-            <span class="info-box-icon bg-success"> 
-                <i class="fa fa-thumbs-up"></i>
-            </span>
-            {% endif %} 
-            <div class="info-box-content">
-                <span class="info-box-text">Saldo</span>
-                <span class="info-box-number">{{total_saldo|format_currency}}</span>
-            </div>
+                </span>
+                {% else %}
+                <span class="info-box-icon bg-success">
+                    <i class="fa fa-thumbs-up"></i>
+                </span>
+                {% endif %}
+                <div class="info-box-content">
+                    <span class="info-box-text">Saldo</span>
+                    <span class="info-box-number">{{total_saldo|format_currency}}</span>
+                </div>
         </div>
     </div>
 </div>
+
+
 <div class="mt-3 mb-3">
-    <button class="btn btn-primary" data-toggle="modal" data-target="#categoriaModal">+ Categoria</button>
-    <button class="btn btn-primary" data-toggle="modal" data-target="#subcategoriaModal">+ Subcategoria</button>
-    <button class="btn btn-primary" data-toggle="modal" data-target="#lancamentoModal">+ Lançamento</button>
+    <form method="GET" action="{% url 'orcamento:index' %}">
+        <div class="form-row mt-1">
+            <div class="form-group col-md-2 mb-0">
+                <label for="start_date">Data inicial:</label>
+                <input type="date" class="form-control" id="start_date" name="start_date">
+            </div>
+            <div class="form-group col-md-2 mb-0">
+
+                <label for="end_date">Data final:</label>
+                <input type="date" class="form-control" id="end_date" name="end_date">
+            </div>
+            <div class="form-group col-md-1 mb-0">
+                <label></label>
+                <input type="submit" class="btn btn-info form-control mt-2 mb-3" value="Filtrar">
+            </div>
+        </div>
+    </form>
+    <button class="btn btn-primary" data-toggle="modal" data-target="#categoriaModal">Categoria</button>
+    <button class="btn btn-primary" data-toggle="modal" data-target="#subcategoriaModal">Subcategoria</button>
+    <button class="btn btn-primary" data-toggle="modal" data-target="#lancamentoModal">Lançamento</button>
+    
 </div>
 
 <section class="content">
@@ -66,7 +87,6 @@
                                     <th>Valor</th>
                                     <th>Data</th>
                                     <th></th>
-                                    <th></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -78,10 +98,6 @@
                                     <td>{{ lancamento.subcategoria.nome }}</td>
                                     <td>{{ lancamento.valor|format_currency }}</td>
                                     <td>{{ lancamento.data }}</td>
-                                    <td>
-                                        <a href="{% url 'orcamento:editar_lancamento' lancamento.id %}"
-                                            class="btn btn-primary btn-sm"><i class="fa-solid fa-pencil"></i></a>
-                                    </td>
                                     <td>
                                         <form action="{% url 'orcamento:excluir_lancamento' lancamento.id %}"
                                             method="post" class="d-inline">
