@@ -3,10 +3,8 @@ from dash.dependencies import Input, Output, State
 import dash_bootstrap_components as dbc
 from dash_bootstrap_templates import ThemeChangerAIO
 from datetime import date, timedelta
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.middleware import get_user
 
-from gestao_orcamento.models import Categoria
+from orcamento.models import Categoria
 
 
 # ========= Layout ========= #

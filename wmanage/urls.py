@@ -26,7 +26,8 @@ urlpatterns = [
     path('', include('pages.urls', namespace="pages")),
     path('', include('core.urls')),
     path('', include('csvs.urls')),
-    path('orcamento/domestico/', include(('orcamento.urls', app_name), namespace='orcamento')),
+    path('orcamento/', include(('orcamento.urls', app_name), namespace='orcamento')),
+    path('django_plotly_dash/', include('django_plotly_dash.urls')),
     path('', include(tf_urls)),
 
     path('admin/', admin.site.urls),    

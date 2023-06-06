@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import include, path
 from . import views
 
 urlpatterns = [
@@ -9,4 +9,6 @@ urlpatterns = [
     path('subcategorias/', views.get_subcategorias, name='get_subcategorias'),
     path('lancamento/editar/<int:pk>/', views.editar_lancamento, name='editar_lancamento'),
     path('lancamento/excluir/<int:pk>/', views.excluir_lancamento, name='excluir_lancamento'),
+    path('dashboard/', views.dashboard_view, name='dashboard'),   
+    path('django_plotly_dash/', include('django_plotly_dash.urls')), 
 ]
