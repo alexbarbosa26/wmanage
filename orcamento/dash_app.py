@@ -4,6 +4,7 @@ from django_plotly_dash import DjangoDash
 from dash.dependencies import Input, Output
 from .components import sidebar, dashboards, extratos
 from .components.sidebar import register_callback_sidebar
+from .components.dashboards import register_callback_dashboard
 
 app = DjangoDash('SimpleExample', external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.FONT_AWESOME, '/static/style/styles.css'])
 
@@ -19,7 +20,7 @@ app.layout = dbc.Container(children=[
             content
         ],md=10)
     ])
-], fluid=True,)
+], fluid=True, className="dbc")
 
 # =========  Callbacks  =========== #
 @app.callback(Output('page-content','children'), [Input('url', 'pathname')])
@@ -33,3 +34,4 @@ def page_render(pathname):
     return dashboards.layout
 
 register_callback_sidebar(app)
+register_callback_dashboard(app)

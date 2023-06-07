@@ -13,6 +13,8 @@ from django_plotly_dash import DjangoDash
 import plotly.graph_objs as go
 from dash import html, dcc
 from dash.dependencies import Input, Output
+from .dash_app import app
+from .dash_app2 import app
 
 def get_last_util_day(date_obj):
     last_day = date_obj.replace(day=1) + relativedelta(months=1) - relativedelta(days=25)
@@ -138,56 +140,59 @@ def excluir_lancamento(request, pk):
     return render(request, 'excluir_lancamento.html', {'lancamento': lancamento})
 
 
+# def dashboard_view(request):
+#     # Crie uma instância do DjangoDash
+#     app = DjangoDash('Simple')
+
+#     # Defina o layout da aplicação Dash
+#     app.layout = html.Div(children=[
+#         html.H1('Relação de Modelos'),
+#         dcc.Graph(id='graph'),
+#     ])
+
+#     # Crie uma função de callback para atualizar o gráfico
+#     @app.callback(
+#         Output('graph', 'figure'),
+#         [Input('graph', 'id')]
+#     )
+#     def update_graph(input_value):
+#         # Obtenha os dados para o gráfico a partir do seu modelo
+#         categorias = Categoria.objects.filter(lancamento__isnull=False).distinct()
+#         receitas = []
+#         despesas = []
+
+#         for categoria in categorias:
+#             lancamentos = Lancamento.objects.filter(categoria=categoria)
+#             total = sum(lancamento.valor for lancamento in lancamentos)
+
+#             if categoria.tipo == '1':
+#                 receitas.append(total)
+#             elif categoria.tipo == '2':
+#                 despesas.append(total)
+
+#         # Crie o gráfico de barras
+#         trace1 = go.Bar(
+#             x=[categoria.nome for categoria in categorias if categoria.tipo == '1'],
+#             y=receitas,
+#             name='Receitas'
+#         )
+#         trace2 = go.Bar(
+#             x=[categoria.nome for categoria in categorias if categoria.tipo == '2'],
+#             y=despesas,
+#             name='Despesas'
+#         )
+
+#         data = [trace1, trace2]
+#         layout = go.Layout(
+#             barmode='group',
+#             title='Relação de Receitas e Despesas por Categoria'
+#         )
+
+#         fig = go.Figure(data=data, layout=layout)
+
+#         return fig
+
+#     return render(request, 'dashboard.html')
+
 def dashboard_view(request):
-    # Crie uma instância do DjangoDash
-    app = DjangoDash('Simple')
-
-    # Defina o layout da aplicação Dash
-    app.layout = html.Div(children=[
-        html.H1('Relação de Modelos'),
-        dcc.Graph(id='graph'),
-    ])
-
-    # Crie uma função de callback para atualizar o gráfico
-    @app.callback(
-        Output('graph', 'figure'),
-        [Input('graph', 'id')]
-    )
-    def update_graph(input_value):
-        # Obtenha os dados para o gráfico a partir do seu modelo
-        categorias = Categoria.objects.filter(lancamento__isnull=False).distinct()
-        receitas = []
-        despesas = []
-
-        for categoria in categorias:
-            lancamentos = Lancamento.objects.filter(categoria=categoria)
-            total = sum(lancamento.valor for lancamento in lancamentos)
-
-            if categoria.tipo == '1':
-                receitas.append(total)
-            elif categoria.tipo == '2':
-                despesas.append(total)
-
-        # Crie o gráfico de barras
-        trace1 = go.Bar(
-            x=[categoria.nome for categoria in categorias if categoria.tipo == '1'],
-            y=receitas,
-            name='Receitas'
-        )
-        trace2 = go.Bar(
-            x=[categoria.nome for categoria in categorias if categoria.tipo == '2'],
-            y=despesas,
-            name='Despesas'
-        )
-
-        data = [trace1, trace2]
-        layout = go.Layout(
-            barmode='group',
-            title='Relação de Receitas e Despesas por Categoria'
-        )
-
-        fig = go.Figure(data=data, layout=layout)
-
-        return fig
-
     return render(request, 'dashboard.html')
