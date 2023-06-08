@@ -2,7 +2,9 @@ from dash import dcc, html
 import dash_bootstrap_components as dbc
 from django_plotly_dash import DjangoDash
 from dash.dependencies import Input, Output
-from .components import sidebar, dashboards, extratos
+
+from orcamento.models import Lancamento
+from .components import sidebar, dashboards
 from .components.sidebar import register_callback_sidebar
 from .components.dashboards import register_callback_dashboard
 
@@ -28,7 +30,7 @@ def page_render(pathname):
     if pathname=='/dashboard/':
         return dashboards.layout
     
-    if pathname=='/extrato/':
+    if pathname=='/extratos/':
         return extratos.layout
     
     return dashboards.layout
