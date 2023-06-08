@@ -5,6 +5,9 @@ from dash_bootstrap_templates import ThemeSwitchAIO
 from datetime import datetime, timedelta
 from orcamento.models import Categoria
 
+card_style_light = {"height": "100vh", "margin": "0px", "padding": "10px"}
+card_style_dark = {'padding-left': '10px', 'padding-top': '10px', "backgroundColor": "rgb(48 48 48)", "color": "#FFFFFF"}
+
 # ========= Layout ========= #
 layout = dbc.Card([
     html.H2('MBManage', className='text-primary'),
@@ -92,3 +95,14 @@ def register_callback_sidebar(app):
             opt_receita = [{"label": i, "value": i}
                            for i in Categoria.objects.filter(tipo='1')]
             return f"A categoria {categoria} foi salva!"
+
+    @app.callback(
+        Output("sidebar_completa", "style"),
+        Input(ThemeSwitchAIO.ids.switch("theme"), "value"),
+    )
+    def update_card_style_theme(toggle):
+        if toggle:
+            return
+        else:
+            return card_style_dark
+
