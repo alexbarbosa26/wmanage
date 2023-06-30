@@ -380,18 +380,16 @@ class NotaUpdate(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
 
 def b3_cotacao():
     dados = []
-    url = 'https://br.finance.yahoo.com/quote/^BVSP'
+    url = 'https://br.financas.yahoo.com/quote/%5EBVSP'
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36 Edg/91.0.864.64'}
     # pegando cotação no yahoo
     response = requests.get(url, headers=headers)
     soup = BeautifulSoup(response.text, 'lxml')
 
-    b3_nome = soup.find_all('h3', {'class': 'Maw(160px)'})[0].find('a').text
-    b3_indice = soup.find_all('h3', {'class': 'Maw(160px)'})[
-        0].find('fin-streamer').text
-    b3_porcentagem = soup.find_all('h3', {'class': 'Maw(160px)'})[
-        0].find('div').text
+    b3_nome = soup.find_all('h1', {'class': 'D(ib) Fz(18px)'})[0].text
+    b3_indice = soup.find_all('div', {'class': 'D(ib) Mend(20px)'})[0].find('fin-streamer').text
+    b3_porcentagem = soup.find_all('fin-streamer', {'class':'Fw(500) Pstart(8px) Fz(24px)'})[0].text
 
     dados.append(b3_nome)
     dados.append(b3_indice)
