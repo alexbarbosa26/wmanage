@@ -24,13 +24,15 @@ def get_yahoo_cotacao():
         fuso_horario = timezone('America/Sao_Paulo')
         if compra['qt'] != 0:
             url = 'https://br.financas.yahoo.com/quote/'+compra['ativo']+'.SA'
-            headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36 Edg/91.0.864.64'}
-            #pegando cotação no yahoo            
-            response = requests.get(url, headers=headers)
-            soup = BeautifulSoup(response.text, 'lxml')
-            # preco_mercado = soup.find_all('div', {'class':'D(ib) Mend(20px)'})[0].find('span').text
-            preco_mercado = soup.find_all('div', {'class':'D(ib) Mend(20px)'})[0].find('fin-streamer').text
+            headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0'}
+            
             try:
+                #pegando cotação no yahoo            
+                response = requests.get(url, headers=headers)
+                soup = BeautifulSoup(response.text, 'lxml')
+                # preco_mercado = soup.find_all('div', {'class':'D(ib) Mend(20px)'})[0].find('span').text
+                preco_mercado = soup.find_all('div', {'class':'D(ib) Mend(20px)'})[0].find('fin-streamer').text
+                
                 variacao_mercado = []
                 variacao_mercado.append(soup.find_all('fin-streamer', {'class':'Fw(500) Pstart(8px) Fz(24px)'})[0].text)
                 variacao_mercado.append(soup.find_all('fin-streamer', {'class':'Fw(500) Pstart(8px) Fz(24px)'})[1].text)

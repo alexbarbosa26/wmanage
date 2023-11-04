@@ -1,6 +1,7 @@
 from apscheduler.schedulers.background import BackgroundScheduler
 from . import yahoo_api
 import logging
+from django.contrib.auth.models import User
 
 logger = logging.getLogger(__name__)
 
@@ -14,5 +15,6 @@ def start():
             scheduler.start()
         except KeyboardInterrupt:
             logger.info("Stopping scheduler...")
+            scheduler.remove_job('yahoo_api')
             scheduler.shutdown()
             logger.info("Scheduler shut down successfully!")    
