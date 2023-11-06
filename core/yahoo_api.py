@@ -39,9 +39,7 @@ def get_yahoo_cotacao():
                 variacao_mercado.append(soup.find_all('fin-streamer', {'class':'Fw(500) Pstart(8px) Fz(24px)'})[1].text)
             except IndexError:
                 # variacao_mercado = soup.find_all('span', {'class':'Trsdu(0.3s) Fw(500) Pstart(10px) Fz(24px) C($negativeColor)'})[0].text
-                variacao_mercado = []
-                variacao_mercado.append(soup.find_all('fin-streamer', {'class':'Fw(500) Pstart(8px) Fz(24px)'})[0].text)
-                variacao_mercado.append(soup.find_all('fin-streamer', {'class':'Fw(500) Pstart(8px) Fz(24px)'})[1].text)
+                variacao_mercado = ['0', '(0)']
             mercado_aberto_fechado = soup.find('span', {'data-id':'mk-msg'}).text
             # variacao_mercado = variacao_mercado.split(' ')
 
