@@ -23,6 +23,7 @@ def get_yahoo_cotacao():
         data_e_hora_atuais = datetime.now()
         fuso_horario = timezone('America/Sao_Paulo')
         if compra['qt'] != 0:
+            print(compra)
             url = 'https://br.financas.yahoo.com/quote/'+compra['ativo']+'.SA'
             headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0'}
             
