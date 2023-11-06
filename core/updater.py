@@ -1,7 +1,6 @@
 from apscheduler.schedulers.background import BackgroundScheduler
 from . import yahoo_api
 import logging
-from django.contrib.auth.models import User
 
 logger = logging.getLogger(__name__)
 
