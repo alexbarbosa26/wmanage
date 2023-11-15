@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from core.forms import BonificacaoForm, CalculadoraForm, ContatoForm, DateForm, DesdobramentoForm, GrupamentoForm, ProventosForm, ProfileForm, UserForm
 from .models import Ativo, Bonificacao, Desdobramento, Grupamento, Nota, Profile, Proventos, Cotacao
 from decimal import Decimal
@@ -1444,10 +1444,20 @@ def edit_profile(request):
 
 @login_required
 def grafico_proventos(request):
-    # Define o locale como o Brasil para exibir os valores em reais
+    # Obtém a data atual
+    data_atual = datetime.now()
+    # Definido o locale como o Brasil para exibir os valores em reais
     locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
+    # Calcula a data há 5 anos atrás
+    data_5_anos_atras = data_atual - timedelta(days=365 * 5)
+    data_inicio = request.GET.get('data_inicio')
+    data_fim = request.GET.get('data_fim')
 
-    data = Proventos.objects.all().filter(user=request.user)
+    if data_inicio or data_fim:
+        data = Proventos.objects.all().filter(data__range=(data_inicio, data_fim), user=request.user)
+    else:
+        data = Proventos.objects.all().filter(data__gte=data_5_anos_atras, user=request.user)
+    
     data_dict = {}
     for d in data:
         if d.ativo not in data_dict:
@@ -1494,8 +1504,7 @@ def grafico_proventos(request):
         total = data.filter(data__year=a.year).aggregate(
             Sum('valor'))['valor__sum'] or 0
         total_reais = locale.currency(total, grouping=True, symbol="R$")
-        data3.append(go.Bar(x=[a.year], y=[total], text=[
-                     total_reais], textposition='auto'))
+        data3.append(go.Bar(x=[a.year], y=[total], text=[total_reais], textposition='auto'))
 
     # Primeiro grafico
     layout1 = go.Layout(barmode='stack')
@@ -1516,33 +1525,21 @@ def grafico_proventos(request):
     fig2.update_layout(
         xaxis_title='Mês',
         yaxis_title='Valor total em reais',
-        annotations=[dict(
-            x=meses.index('Dezembro'),
-            y=data2[meses.index('Dezembro')]['y'][0],
-            name=meses.index('Dezembro'),
-            text=f'Total: {total2_reais}',
-            showarrow=True,
-            arrowhead=1
-        )]
+        # annotations=[dict(
+        #     x=meses.index('Dezembro'),
+        #     y=data2[meses.index('Dezembro')]['y'][0],
+        #     name=meses.index('Dezembro'),
+        #     text=f'Total: {total2_reais}',
+        #     showarrow=True,
+        #     arrowhead=1
+        # )]
     )
     fig2.update_traces(showlegend=False)
 
     # Terceiro grafico
     layout3 = go.Layout(title='Total de proventos por ano')
     fig3 = go.Figure(data=data3, layout=layout3)
-    total3 = sum([d['y'][0] for d in data3])
-    total3_reais = locale.currency(total3, grouping=True, symbol="R$")
-    # fig3.update_layout(
-    #     xaxis_title='Ano',
-    #     yaxis_title='Valor total em reais',
-    #     annotations=[dict(
-    #         x=anos.count() - 1,
-    #         y=data3[-1]['y'][0],
-    #         text=f'Total: {total3_reais}',
-    #         showarrow=True,
-    #         arrowhead=1
-    #     )]
-    # )
+   
     fig3.update_traces(showlegend=False)
 
     # Converte os gráficos para HTML
@@ -1550,8 +1547,14 @@ def grafico_proventos(request):
     div2 = plot(fig2, output_type='div')
     div3 = plot(fig3, output_type='div')
 
+    form = DateForm()
+    if request.GET:
+        form = DateForm(request.GET)
+    
+    context={'form':form,'div1': div1, 'div2': div2, 'div3': div3}
+
     # Renderiza o template e passa as variáveis para a página
-    return render(request, 'proventos/grafico_proventos.html', {'div1': div1, 'div2': div2, 'div3': div3})
+    return render(request, 'proventos/grafico_proventos.html', context)
 
 # relatorio de custo, lucro bruto, liquido e receitas
 @login_required
