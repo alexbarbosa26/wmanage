@@ -21,18 +21,31 @@
     </div>
 </form>
 <div class="row">
-    <div class="col">
-        {{ div1|safe }}
-    </div>
+    <section class="col">
+        <div class="card">
+            <div class="card-header border-0">
+                {{ div1|safe }}
+            </div>            
+        </div>
+
+        <div class="card">
+            <div class="card-header border-0">
+                {{ div2|safe }}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header border-0">
+                {{ div3|safe }}
+            </div>
+        </div>
+
+    </section>
 </div>
-<div class="row mb-3">
-    <div class="col">
-        {{ div2|safe }}
-    </div>
+<!-- <div class="row">
+    
 </div>
 <div class="row">
-    <div class="col">
-        {{ div3|safe }}
-    </div>
-</div>
+    
+</div> -->
 {% endblock %}
