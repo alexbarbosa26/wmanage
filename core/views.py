@@ -1546,33 +1546,37 @@ def grafico_proventos(request):
    
     fig3.update_traces(showlegend=False)
 
+    # Quarto grafico
+    layout4 = go.Layout(title='Variação percentual de proventos por ano')
+    fig4 = go.Figure(layout=layout4)
     # Adicionar as linhas de variação percentual
-    fig3.add_trace(go.Scatter(
+    fig4.add_trace(go.Scatter(
         x=ano[1:],
         y=variacao_percentual[1:],
         mode='markers+lines+text',
         name='Variação Percentual',
         yaxis='y2',
-        line=dict(color='red'),
-        marker=dict(color='red', size=10),
+        line=dict(color='blue'),
+        marker=dict(color='blue', size=10),
         hoverinfo='none',  # Desabilita a exibição de informações ao passar o mouse
-        line_shape='spline'  # Forma da linha
+        line_shape='spline',  # Forma da linha
+        textposition='bottom right'
     ))
 
     # Adicionar anotações de texto simulando background
     for i, valor in enumerate(variacao_percentual[1:]):
-        fig3.add_annotation(
+        fig4.add_annotation(
             x=ano[i + 1],
             y=valor,
             text=f"{valor:.2f}%",
             font=dict(color='white', size=12, family='Arial'),
-            showarrow=False,
+            showarrow=True,
             xshift=0,
             yshift=5,
-            bordercolor='red',
+            bordercolor='blue',
             borderwidth=1,
             borderpad=4,
-            bgcolor='red',
+            bgcolor='blue',
             opacity=0.8
         )
 
@@ -1580,12 +1584,13 @@ def grafico_proventos(request):
     div1 = plot(fig1, output_type='div')
     div2 = plot(fig2, output_type='div')
     div3 = plot(fig3, output_type='div')
+    div4 = plot(fig4, output_type='div')
 
     form = DateForm()
     if request.GET:
         form = DateForm(request.GET)
     
-    context={'form':form,'div1': div1, 'div2': div2, 'div3': div3}
+    context={'form':form,'div1': div1, 'div2': div2, 'div3': div3, 'div4':div4}
 
     # Renderiza o template e passa as variáveis para a página
     return render(request, 'proventos/grafico_proventos.html', context)
