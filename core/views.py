@@ -1487,27 +1487,28 @@ def grafico_proventos(request):
 
     # Gráfico de total por mês do ano
     data2 = []
-    linha_variacao = []
     meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
              'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro']
     for m in meses:
         total = data.filter(data__month=meses.index(m) + 1).aggregate(Sum('valor'))['valor__sum'] or 0
         total_reais = locale.currency(total, grouping=True, symbol="R$")
         data2.append(go.Bar(x=[m], y=[total], text=[total_reais], textposition='auto'))
-        linha_variacao.append(total)
-
-    # Calcular a variação percentual entre os meses
-    variacao_percentual = [(linha_variacao[i] - linha_variacao[i-1]) / linha_variacao[i-1] * 100 if i > 0 else 0 for i in range(len(linha_variacao))]
-
+    
     # Gráfico de total por ano
     data3 = []
+    linha_variacao = []
+    ano = []
     anos = data.dates('data', 'year')
 
     for a in anos:
-        total = data.filter(data__year=a.year).aggregate(
-            Sum('valor'))['valor__sum'] or 0
+        total = data.filter(data__year=a.year).aggregate(Sum('valor'))['valor__sum'] or 0
         total_reais = locale.currency(total, grouping=True, symbol="R$")
         data3.append(go.Bar(x=[a.year], y=[total], text=[total_reais], textposition='auto'))
+        linha_variacao.append(total)
+        ano.append(a.year)
+
+    # Calcular a variação percentual entre os meses
+    variacao_percentual = [(linha_variacao[i] - linha_variacao[i-1]) / linha_variacao[i-1] * 100 if i > 0 else 0 for i in range(len(linha_variacao))]
 
     # Primeiro grafico
     layout1 = go.Layout(barmode='stack')
@@ -1538,25 +1539,30 @@ def grafico_proventos(request):
         # )]
     )
     fig2.update_traces(showlegend=False)
+    
+    # Terceiro grafico
+    layout3 = go.Layout(title='Total de proventos por ano')
+    fig3 = go.Figure(data=data3, layout=layout3)
+   
+    fig3.update_traces(showlegend=False)
+
     # Adicionar as linhas de variação percentual
-    fig2.add_trace(go.Scatter(
-        x=meses[1:],
+    fig3.add_trace(go.Scatter(
+        x=ano[1:],
         y=variacao_percentual[1:],
         mode='markers+lines+text',
         name='Variação Percentual',
         yaxis='y2',
         line=dict(color='red'),
-        # text=variacao_percentual[1:],  # Rótulos de dados nas linhas
-        # textposition='bottom center',  # Posição do rótulo na linha
-        # texttemplate='%{text:.2f}%',  # Formato do rótulo
         marker=dict(color='red', size=10),
         hoverinfo='none',  # Desabilita a exibição de informações ao passar o mouse
         line_shape='spline'  # Forma da linha
     ))
+
     # Adicionar anotações de texto simulando background
     for i, valor in enumerate(variacao_percentual[1:]):
-        fig2.add_annotation(
-            x=meses[i + 1],
+        fig3.add_annotation(
+            x=ano[i + 1],
             y=valor,
             text=f"{valor:.2f}%",
             font=dict(color='white', size=12, family='Arial'),
@@ -1569,12 +1575,6 @@ def grafico_proventos(request):
             bgcolor='red',
             opacity=0.8
         )
-
-    # Terceiro grafico
-    layout3 = go.Layout(title='Total de proventos por ano')
-    fig3 = go.Figure(data=data3, layout=layout3)
-   
-    fig3.update_traces(showlegend=False)
 
     # Converte os gráficos para HTML
     div1 = plot(fig1, output_type='div')
