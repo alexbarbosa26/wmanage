@@ -1580,6 +1580,21 @@ def grafico_proventos(request):
             opacity=0.8
         )
 
+    # Layout do gráfico
+    fig4.update_layout(
+        yaxis=dict(title='Valores'),
+        yaxis2=dict(
+            title='Variação Percentual',
+            overlaying='y',
+            showgrid=True,
+        ),
+        xaxis=dict(
+            tickmode='linear',
+            tick0=1,
+            dtick=1,
+            title='Anos'
+        )
+    )
     # Converte os gráficos para HTML
     div1 = plot(fig1, output_type='div')
     div2 = plot(fig2, output_type='div')
