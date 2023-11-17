@@ -31,6 +31,7 @@ urlpatterns = [
     path('dashboard/temporal-chart/<str:ativo>', DashboardTemporal.as_view(), name='temporal-chart'),
     path('dashboard/carteira-vs-bolsa-chart/', Dash_Carteira_X_Bolsa.as_view(), name='carteira-vs-bolsa-chart'),    
     path('dashboard/proventos-chart-2/', views.grafico_proventos, name='proventos-chart-2'),
+    path('dashboard/mapa-dividendos/', views.MapaDividendos, name='mapa-dividendos'),
 
     path('comparar-acoes/', views.compare, name='comparar_ativos'),
 

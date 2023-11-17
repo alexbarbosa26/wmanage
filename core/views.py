@@ -30,7 +30,7 @@ from chartjs.views.lines import BaseLineChartView
 import boto3
 from botocore.exceptions import NoCredentialsError
 import uuid
-
+import fundamentus
 from reportlab.lib.pagesizes import landscape, letter
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
@@ -1723,6 +1723,29 @@ def compare(request):
     
     return render(request, 'listar/compare.html')
 
+def MapaDividendos(request):
+    # Obtenha os dados do Fundamentus
+    df = fundamentus.get_resultado()
+
+    # Filtre os dados
+    filtro = df[(df.dy > 0.04) & (df.pl > 0) & (df.pl <= 15) & (df.evebitda > 0) & (df.evebitda <= 10) & (df.mrgliq > 0.10) & (df.roe > 0.10) & (df.c5y > 0)]
+    filtro.sort_values('dy', ascending=False, inplace=True)
+    dy = filtro.dy * 100
+    # Converter os valores de porcentagem para string
+    dy_labels = [f"{val:.0f}%" for val in dy]
+    dy_y = [f"{val:.0f}" for val in dy]
+    # Crie o gráfico usando Plotly
+    fig = go.Figure(data=[go.Bar(x=filtro.index, y=filtro.dy, text=dy_labels, textposition='auto')])
+    fig.update_layout(
+        title='Boas ações pagadoras de dividendos',
+        xaxis=dict(title='Ações'),
+        yaxis=dict(title='Dividendos (%)', tickformat='.0%'),
+        bargap=0.3,  # Espaçamento entre as barras
+        bargroupgap=0.1  # Espaçamento entre os grupos de barras
+    )
+    fig = plot(fig, output_type='div')
+    context = {'fig':fig}
+    return render(request, 'dashboard/MapaDividendos.html', context)
 
 # Renderezação de erros
 def error_500(request):
