@@ -1461,29 +1461,33 @@ def grafico_proventos(request):
     data_dict = {}
     for d in data:
         if d.ativo not in data_dict:
-            data_dict[d.ativo] = {'D': 0, 'J': 0}
+            data_dict[d.ativo] = {'D': 0, 'J': 0, 'R': 0}
         if d.tipo_provento == 'D':
             data_dict[d.ativo]['D'] += d.valor
         elif d.tipo_provento == 'J':
             data_dict[d.ativo]['J'] += d.valor
+        elif d.tipo_provento == 'R':
+            data_dict[d.ativo]['R'] += d.valor
 
     x = []
     y1 = []
     y2 = []
+    y3 = []
     for key, value in data_dict.items():
         x.append(key)
         y1.append(value['D'])
         y2.append(value['J'])
+        y3.append(value['R'])
 
     # Formata os valores em reais
     y1_reais = [locale.currency(v, grouping=True, symbol="R$") for v in y1]
     y2_reais = [locale.currency(v, grouping=True, symbol="R$") for v in y2]
+    y3_reais = [locale.currency(v, grouping=True, symbol="R$") for v in y3]
 
-    trace1 = go.Bar(x=x, y=y1, name='Dividendos',
-                    text=y1_reais, textposition='auto')
-    trace2 = go.Bar(x=x, y=y2, name='Juros Compostos',
-                    text=y2_reais, textposition='auto')
-    data1 = [trace1, trace2]
+    trace1 = go.Bar(x=x, y=y1, name='Dividendos', text=y1_reais, textposition='auto')
+    trace2 = go.Bar(x=x, y=y2, name='Juros Compostos', text=y2_reais, textposition='auto')
+    trace3 = go.Bar(x=x, y=y3, name='Rendimentos', text=y3_reais, textposition='auto')
+    data1 = [trace1, trace2, trace3]
 
     # Gráfico de total por mês do ano
     data2 = []
@@ -1746,6 +1750,34 @@ def MapaDividendos(request):
     fig = plot(fig, output_type='div')
     context = {'fig':fig}
     return render(request, 'dashboard/MapaDividendos.html', context)
+
+from django.shortcuts import render
+import quantstats as qs
+import matplotlib.pyplot as plt
+import io
+import urllib, base64
+
+def mostrar_grafico(request):
+    acao = qs.utils.download_returns('TAEE11.SA')
+    qs.extend_pandas()
+
+    # Gerar o gráfico
+    plt.figure(figsize=(8, 6))
+    acao.plot_monthly_heatmap()
+    
+    # Salvar a imagem em um buffer
+    buffer = io.BytesIO()
+    plt.savefig(buffer, format='png')
+    buffer.seek(0)
+    
+    # Codificar a imagem em base64
+    image_png = buffer.getvalue()
+    buffer.close()
+    graphic = base64.b64encode(image_png).decode('utf-8')
+
+    return render(request, 'dashboard/teste.html', {'graphic': graphic})
+
+
 
 # Renderezação de erros
 def error_500(request):

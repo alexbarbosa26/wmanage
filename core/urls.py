@@ -41,4 +41,6 @@ urlpatterns = [
     path('relatorio/', views.relatorio, name='relatorio'),
     path('sales_chart_json/', SalesChartJSONView.as_view(), name='sales_chart_json'),
 
+    path('mostrar-grafico/', views.mostrar_grafico, name='mostrar_grafico'),
+
 ]
