@@ -36,3 +36,4 @@ django-plotly-dash==2.2.1
 dash-bootstrap-templates==1.0.8
 fundamentus==0.2.0
 QuantStats==0.0.62
+ipython==8.17.2
