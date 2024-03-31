@@ -1517,7 +1517,7 @@ def grafico_proventos(request):
     # Primeiro grafico
     layout1 = go.Layout(barmode='stack')
     fig1 = go.Figure(data=data1, layout=layout1)
-    total1 = sum(y1) + sum(y2)
+    total1 = sum(y1) + sum(y2) + sum(y3)
     total1_reais = locale.currency(total1, grouping=True, symbol="R$")
     fig1.update_layout(
         title=f'Total de proventos por ativo {total1_reais}',
