@@ -1,3 +1,4 @@
+import dash
 from dash import dcc, html
 import dash_bootstrap_components as dbc
 from django_plotly_dash import DjangoDash
@@ -13,6 +14,7 @@ app = DjangoDash('SimpleExample', external_stylesheets=[dbc.themes.BOOTSTRAP, db
 content = html.Div(id="page-content")
 
 app.layout = dbc.Container(children=[
+    html.Div(id="output-one"),
     dbc.Row([
         dbc.Col([
             dcc.Location(id='url'),
@@ -24,7 +26,6 @@ app.layout = dbc.Container(children=[
     ])
 ], fluid=True, className="dbc")
 
-# =========  Callbacks  =========== #
 @app.callback(Output('page-content','children'), [Input('url', 'pathname')])
 def page_render(pathname):
     if pathname=='/dashboard/':
@@ -37,3 +38,7 @@ def page_render(pathname):
 
 register_callback_sidebar(app)
 register_callback_dashboard(app)
+
+
+
+

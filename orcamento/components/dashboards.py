@@ -1,7 +1,8 @@
 import calendar
 import locale
+import dash
 from dash import html, dcc
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 import dash_bootstrap_components as dbc
 import plotly.express as px
 import plotly.graph_objs as go
@@ -9,6 +10,7 @@ from dash_bootstrap_templates import ThemeSwitchAIO
 from django.db.models import Q
 
 from orcamento.models import Categoria, Lancamento, Subcategoria
+# user_id = HttpRequest.COOKIES['user_id']
 
 card_icon = {
     'color': 'white',
@@ -85,8 +87,6 @@ layout = dbc.Col([
 ])
 
 # =========  Callbacks  =========== #
-
-
 def register_callback_dashboard(app):
     @app.callback(
         Output("chart1", "figure"),
@@ -96,7 +96,9 @@ def register_callback_dashboard(app):
             Input('dropdown-subcategoria', 'value'),
         ],
     )
-    def update_graph1_theme(toggle, categoria_select, subcategoria_select):
+    def update_graph1_theme(toggle, categoria_select, subcategoria_select, **kwargs):
+        request = kwargs.get('request')  # Obtenha o objeto request dos kwargs
+        user_id = request.user.id if request else None  # Acesse o usuário se o request estiver disponível
         template = "bootstrap" if toggle else "darkly"
         # Obtenha os dados para o gráfico a partir do seu modelo
         if categoria_select or subcategoria_select:
@@ -109,7 +111,7 @@ def register_callback_dashboard(app):
         despesas = []
 
         for categoria in categorias:
-            lancamentos = Lancamento.objects.filter(categoria=categoria)
+            lancamentos = Lancamento.objects.filter(categoria=categoria, user=user_id)
             total = sum(lancamento.valor for lancamento in lancamentos)
 
             if categoria.tipo == '1':
@@ -153,25 +155,27 @@ def register_callback_dashboard(app):
             Input('dropdown-subcategoria', 'value'),
         ],
     )
-    def update_graph2_theme(toggle, categoria_select, subcategoria_select):
+    def update_graph2_theme(toggle, categoria_select, subcategoria_select, **kwargs):
+        request = kwargs.get('request')  # Obtenha o objeto request dos kwargs
+        user_id = request.user.id if request else None  # Acesse o usuário se o request estiver disponível
         template = "bootstrap" if toggle else "darkly"
 
         # Obtenha os dados para o gráfico a partir do seu modelo
         if categoria_select:
             subcategorias = Subcategoria.objects.filter( Q(categoria__in=categoria_select),
-            lancamento__isnull=False).distinct()
+            lancamento__isnull=False, lancamento__user=user_id).distinct()
         
         if subcategoria_select:
             subcategorias = Subcategoria.objects.filter(Q(id__in=subcategoria_select),
-            lancamento__isnull=False).distinct()
+            lancamento__isnull=False, lancamento__user=user_id).distinct()
 
         else:
             subcategorias = Subcategoria.objects.filter(
-                lancamento__isnull=False).distinct()
+                lancamento__isnull=False, lancamento__user=user_id).distinct()
         despesas = []
 
         for subcategoria in subcategorias:
-            lancamentos = Lancamento.objects.filter(subcategoria=subcategoria)
+            lancamentos = Lancamento.objects.filter(subcategoria=subcategoria, user=user_id)
             total = sum(lancamento.valor for lancamento in lancamentos)
 
             if subcategoria.categoria.tipo == '2':
@@ -207,16 +211,18 @@ def register_callback_dashboard(app):
             Input('dropdown-subcategoria', 'value'),
         ],
     )
-    def update_graph3_theme(toggle, categoria_select, subcategoria_select):
+    def update_graph3_theme(toggle, categoria_select, subcategoria_select, **kwargs):
+        request = kwargs.get('request')  # Obtenha o objeto request dos kwargs
+        user_id = request.user.id if request else None  # Acesse o usuário se o request estiver disponível
         template = "bootstrap" if toggle else "darkly"
 
         # Obtenha os dados para o gráfico a partir do seu modelo
         if categoria_select or subcategoria_select:
             lancamentos = Lancamento.objects.filter(Q(categoria__id__in=categoria_select) | Q(categoria__subcategoria__id__in=subcategoria_select),
-            categoria__tipo='2') 
+            categoria__tipo='2', user=user_id) 
         else:
             lancamentos = Lancamento.objects.filter(
-                categoria__tipo='2')  # Filtrar apenas as despesas
+                categoria__tipo='2', user=user_id)  # Filtrar apenas as despesas
         # Dicionário para armazenar os gastos por mês
         gastos_por_mes = {month: 0 for month in range(1, 13)}
 
@@ -251,29 +257,31 @@ def register_callback_dashboard(app):
         fig = go.Figure(data=data, layout=layout)
         return fig
 
-    def calculate_total_receitas():
+    def calculate_total_receitas(user_id):
         receitas = Lancamento.objects.filter(
-            categoria__tipo='1')  # Filtrar apenas as receitas
+            categoria__tipo='1', user=user_id)  # Filtrar apenas as receitas
         total_receitas = sum(lancamento.valor for lancamento in receitas)
         return total_receitas
 
-    def calculate_total_despesas():
+    def calculate_total_despesas(user_id):
         despesas = Lancamento.objects.filter(
-            categoria__tipo='2')  # Filtrar apenas as despesas
+            categoria__tipo='2', user=user_id)  # Filtrar apenas as despesas
         total_despesas = sum(lancamento.valor for lancamento in despesas)
         return total_despesas
 
-    def calculate_total_saldo():
-        total_saldo = calculate_total_receitas() - calculate_total_despesas()
+    def calculate_total_saldo(user_id):
+        total_saldo = calculate_total_receitas(user_id) - calculate_total_despesas(user_id)
         return total_saldo
 
     @app.callback(
         Output("p-saldo-dahsboard", "children"),
         Input(ThemeSwitchAIO.ids.switch("theme"), "value"),
     )
-    def update_receita_theme(toggle):
+    def update_receita_theme(toggle, **kwargs):
+        request = kwargs.get('request')  # Obtenha o objeto request dos kwargs
+        user_id = request.user.id if request else None  # Acesse o usuário se o request estiver disponível
         template = "bootstrap" if toggle else "darkly"
-        total_saldo = calculate_total_saldo()
+        total_saldo = calculate_total_saldo(user_id)
         saldo_formatted = locale.currency(total_saldo, grouping=True)
         return saldo_formatted
 
@@ -281,9 +289,11 @@ def register_callback_dashboard(app):
         Output("p-receita-dahsboard", "children"),
         Input(ThemeSwitchAIO.ids.switch("theme"), "value"),
     )
-    def update_despesa_theme(toggle):
+    def update_despesa_theme(toggle, **kwargs):
+        request = kwargs.get('request')  # Obtenha o objeto request dos kwargs
+        user_id = request.user.id if request else None  # Acesse o usuário se o request estiver disponível
         template = "bootstrap" if toggle else "darkly"
-        total_receitas = calculate_total_receitas()
+        total_receitas = calculate_total_receitas(user_id)
         saldo_formatted = locale.currency(total_receitas, grouping=True)
         return saldo_formatted
 
@@ -291,9 +301,11 @@ def register_callback_dashboard(app):
         Output("p-despesa-dahsboard", "children"),
         Input(ThemeSwitchAIO.ids.switch("theme"), "value"),
     )
-    def update_saldo_theme(toggle):
+    def update_saldo_theme(toggle, **kwargs):
+        request = kwargs.get('request')  # Obtenha o objeto request dos kwargs
+        user_id = request.user.id if request else None  # Acesse o usuário se o request estiver disponível
         template = "bootstrap" if toggle else "darkly"
-        total_despesas = calculate_total_despesas()
+        total_despesas = calculate_total_despesas(user_id)
         saldo_formatted = locale.currency(total_despesas, grouping=True)
         return saldo_formatted
 

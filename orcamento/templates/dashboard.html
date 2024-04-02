@@ -1,8 +1,26 @@
 {% extends 'base.html' %}
 {% load plotly_dash %}
 {% block title %}Dashboard Orçamento Doméstico{% endblock %}
-{% block content %}
 
-{% plotly_app_bootstrap name="SimpleExample" aspect="1by1" %}
+
+{% block content %}
+<div id="user-id" style="display: none;">{{ user_id }}</div>
+<!-- Adicione o script para recuperar o user_id do cookie e atualizar o layout do gráfico -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var user_id = document.cookie.replace(/(?:(?:^|.*;\s*)user_id\s*=\s*([^;]*).*$)|^.*$/, "$1");
+
+        // Define o ID do usuário no layout do gráfico
+        var layout = {
+            user_id: user_id
+        };
+
+        // Atualiza o layout do gráfico
+        Plotly.relayout('chart1', layout);
+    });
+</script>
+{% plotly_app name="SimpleExample" ratio="75" %}
+<!-- {% plotly_app_bootstrap name="SimpleExample" aspect="1by1" %} -->
+
 
 {% endblock %}

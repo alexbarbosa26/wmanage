@@ -15,6 +15,9 @@ from dash import html, dcc
 from dash.dependencies import Input, Output
 from .dash_app import app
 from .dash_app2 import app
+from django.contrib.auth.decorators import login_required
+from django_plotly_dash.models import DashApp
+import os
 
 def get_last_util_day(date_obj):
     last_day = date_obj.replace(day=1) + relativedelta(months=1) - relativedelta(days=25)
@@ -193,6 +196,8 @@ def excluir_lancamento(request, pk):
 #         return fig
 
 #     return render(request, 'dashboard.html')
-
+@login_required
 def dashboard_view(request):
-    return render(request, 'dashboard.html')
+    response = render(request, 'dashboard.html')
+    response.set_cookie('user_id', request.user.id)
+    return response
