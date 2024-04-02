@@ -7,7 +7,8 @@
 {% block content %}
 <h1 class="mb-4">Orçamento Doméstico</h1>
 <div class="row">
-    <p>Período de {{data_inicial}} até {{data_final}}</p>
+    <p>Você está visualizando o período de {{ data_inicial|date:"j" }} de {{ data_inicial|date:"F" }} de {{ data_inicial|date:"Y" }} até {{ data_final|date:"j" }} de {{ data_final|date:"F" }} de {{ data_final|date:"Y" }}</p>
+
 </div>
 <div class="row">
     <div class="col-12 col-sm-6 col-md-3">
