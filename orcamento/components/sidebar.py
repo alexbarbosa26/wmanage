@@ -7,6 +7,11 @@ from orcamento.models import Categoria, Subcategoria
 
 card_style_light = {"height": "100vh", "margin": "0px",'margin-top': '10px', "padding": "10px"}
 card_style_dark = {'padding-left': '10px', 'padding-top': '10px', "backgroundColor": "rgb(48 48 48)", "color": "#FFFFFF"}
+start_day_month=datetime.today().replace(day=1)
+start_day_month=start_day_month.strftime("%Y-%m-%d")
+next_month = datetime.today().replace(day=28) + timedelta(days=4)
+end_date_month = next_month - timedelta(days=next_month.day)
+end_date_month = end_date_month.strftime("%Y-%m-%d")
 
 # ========= Layout ========= #
 layout = dbc.Card([
@@ -46,11 +51,11 @@ layout = dbc.Card([
                 id='date-picker-config',
                 month_format='Do MMM, YY',
                 end_date_placeholder_text='Data...',
-                start_date=datetime(2023, 1, 1),
-                end_date=datetime.today() + timedelta(days=31),
+                start_date=start_day_month,
+                end_date=end_date_month,
                 updatemode='singledate',
                 style={'z-index': '100'},
-                display_format='DD/MM/YYYY'
+                display_format='DD/MM/YYYY',
             ),
         ]),
     ]),

@@ -68,7 +68,7 @@
     <button class="btn btn-primary" data-toggle="modal" data-target="#categoriaModal">Categoria</button>
     <button class="btn btn-primary" data-toggle="modal" data-target="#subcategoriaModal">Subcategoria</button>
     <button class="btn btn-primary" data-toggle="modal" data-target="#lancamentoModal">Lançamento</button>
-    
+
 </div>
 
 <section class="content">
@@ -88,6 +88,7 @@
                                     <th>Valor</th>
                                     <th>Data</th>
                                     <th></th>
+                                    <th></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -106,6 +107,11 @@
                                             <button type="submit" class="btn btn-danger btn-sm"><i
                                                     class="fa-solid fa-trash"></i></button>
                                         </form>
+                                    </td>
+                                    <td>
+                                        <button class="editar-lancamento-btn btn btn-info btn-sm"
+                                            data-id="{{ lancamento.id }}"><i class="fa-solid fa-pencil"></i></button>
+
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -188,4 +194,93 @@
         </div>
     </div>
 </div>
+
+<!-- Modal de Edição de Lançamento -->
+<div class="modal fade" id="editarlancamentoModal" tabindex="-1" role="dialog"
+    aria-labelledby="editarlancamentoModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editarlancamentoModalLabel">Editar Lançamento</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="editarLancamentoForm" method="POST" action="">
+                    {% csrf_token %}
+                    <div id="div_id_descricao" class="form-group"> <label for="id_descricao_editar"
+                            class=" requiredField">
+                            Descricao<span class="asteriskField">*</span> </label>
+                        <div class=""> <input type="text" name="descricao" maxlength="100"
+                                class="textinput textInput form-control" required="" id="id_descricao_editar"> </div>
+                    </div>
+                    <div id="div_id_valor" class="form-group"> <label for="id_valor_editar" class=" requiredField">
+                            Valor<span class="asteriskField">*</span> </label>
+                        <div class=""> <input type="number" name="valor" step="0.01" class="numberinput form-control"
+                                required="" id="id_valor_editar"> </div>
+                    </div>
+                    <div id="div_id_data" class="form-group"> <label for="id_data_editar" class=" requiredField">
+                            Data<span class="asteriskField">*</span> </label>
+                        <div class=""> <input type="date" name="data" class="dateinput form-control" required=""
+                                id="id_data_editar"> </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                <button type="button" class="btn btn-primary" id="salvarEditarBtn">Salvar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('.editar-lancamento-btn').click(function () {
+            var id = $(this).data('id');
+            $.ajax({
+                url: '/orcamento/lancamento/editar/' + id + '/',
+                method: 'GET',
+                success: function (data) {
+                    console.log(data)
+                    // Preencher os campos do formulário com os dados do lançamento
+                    $('#id_descricao_editar').val(data.descricao);
+                    $('#id_valor_editar').val(data.valor);
+                    $('#id_data_editar').val(data.data);
+                    // Preencha os demais campos conforme necessário
+                    // Abrir a modal de edição
+                    $('#editarlancamentoModal').modal('show');
+                    // Adicionar o ID do lançamento ao formulário
+                    $('#editarLancamentoForm').attr('action', '/orcamento/lancamento/editar/' + id + '/');
+                }
+            });
+        });
+
+        $('#salvarEditarBtn').click(function () {
+            var form = $('#editarLancamentoForm');            
+            console.log(form)
+            $.ajax({
+                url: form.attr('action'),
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': $('input[name=csrfmiddlewaretoken]').val()
+                },
+                data: form.serialize(),
+                success: function (response) {
+                    $('#editarlancamentoModal').modal('hide');
+                    if (response.success) {
+                        window.location.href = response.redirect_url;
+                    }
+                    // Atualizar a lista de lançamentos ou fazer qualquer outra ação necessária
+                },
+                error: function (xhr, status, error) {
+                    console.error(xhr.responseText);
+                }
+            });
+        });
+    });
+
+</script>
+
 {% endblock %}

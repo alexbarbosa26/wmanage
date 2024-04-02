@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    <form method="POST" action="{% url 'orcamento:lancamento_modal' %}">
+        {% csrf_token %}
+        {{ lancamento_form|crispy }}
+        <button type="submit" class="btn btn-primary">Salvar</button>
+    </form>
+{% endblock %}

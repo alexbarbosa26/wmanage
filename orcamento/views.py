@@ -2,6 +2,7 @@ from decimal import Decimal
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib import messages
+from django.urls import reverse
 from .forms import CategoriaForm, SubcategoriaForm, LancamentoForm
 from .models import Categoria, Subcategoria, Lancamento
 from django.db.models import Sum
@@ -26,7 +27,7 @@ def get_last_util_day(date_obj):
     return last_day
 
 def index(request):
-    lancamentos = Lancamento.objects.all()
+    lancamentos = Lancamento.objects.all().filter(user=request.user.id)
     categoria_form = CategoriaForm()
     subcategoria_form = SubcategoriaForm()
     lancamento_form = LancamentoForm()
@@ -36,17 +37,21 @@ def index(request):
     end_date = request.GET.get('end_date')
 
     # Filtro por data
-    data_inicial = date.today().replace(day=1) + timedelta(days=4)
-    data_final = get_last_util_day(data_inicial + relativedelta(months=1))
+    data_inicial = date.today().replace(day=1)
+    next_month = datetime.today().replace(day=28) + timedelta(days=4)
+    end_date_month = next_month - timedelta(days=next_month.day)
+    data_final = end_date_month
     lancamentos = lancamentos.filter(data__range=[data_inicial, data_final])
 
     if start_date and end_date:
         data_inicial = datetime.strptime(start_date, "%Y-%m-%d").date()
         data_final = datetime.strptime(end_date, "%Y-%m-%d").date()
         lancamentos = lancamentos.filter(data__range=[data_inicial, data_final])
+        total_receitas = lancamentos.filter(data__range=[data_inicial, data_final],categoria__tipo='1', user=request.user.id).aggregate(total=Sum('valor'))['total']
+        total_despesas = lancamentos.filter(data__range=[data_inicial, data_final], categoria__tipo='2', user=request.user.id).aggregate(total=Sum('valor'))['total']
 
-    total_receitas = lancamentos.filter(categoria__tipo='1').aggregate(total=Sum('valor'))['total']
-    total_despesas = lancamentos.filter(categoria__tipo='2').aggregate(total=Sum('valor'))['total']
+    total_receitas = lancamentos.filter(data__range=[data_inicial, data_final],categoria__tipo='1', user=request.user.id).aggregate(total=Sum('valor'))['total']
+    total_despesas = lancamentos.filter(data__range=[data_inicial, data_final], categoria__tipo='2', user=request.user.id).aggregate(total=Sum('valor'))['total']
 
     if not total_receitas:
         total_receitas = Decimal(0.00)
@@ -118,19 +123,34 @@ def get_subcategorias(request):
     data = [{'id': subcategoria.id, 'nome': subcategoria.nome} for subcategoria in subcategorias]
     return JsonResponse(data, safe=False)
 
+
 def editar_lancamento(request, pk):
     lancamento = get_object_or_404(Lancamento, pk=pk)
     if request.method == 'POST':
-        form = LancamentoForm(request.POST, instance=lancamento)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Lançamento atualizado com sucesso')
-            return redirect('orcamento:index')
-        else:
-            messages.error(request, 'Erro ao atualizar')
+        descricao = request.POST.get('descricao')
+        valor = request.POST.get('valor')
+        data = request.POST.get('data')
+        print(descricao)
+        lancamento.descricao = descricao
+        lancamento.valor = valor
+        lancamento.data = data
+        lancamento.save()
+        
+        messages.success(request, 'Lançamento atualizado com sucesso')
+        return JsonResponse({'success': True, 'redirect_url': reverse('orcamento:index')})
+
+    elif request.is_ajax():
+        data = {
+            'descricao': lancamento.descricao,
+            'valor': lancamento.valor,
+            'data': lancamento.data,
+            # Adicione os demais campos conforme necessário
+        }
+        return JsonResponse(data)
     else:
         form = LancamentoForm(instance=lancamento)
     return render(request, 'editar_lancamento.html', {'form': form, 'lancamento': lancamento})
+
 
 def excluir_lancamento(request, pk):
     lancamento = get_object_or_404(Lancamento, pk=pk)
@@ -142,60 +162,6 @@ def excluir_lancamento(request, pk):
         messages.error(request, 'Erro ao excluir')
     return render(request, 'excluir_lancamento.html', {'lancamento': lancamento})
 
-
-# def dashboard_view(request):
-#     # Crie uma instância do DjangoDash
-#     app = DjangoDash('Simple')
-
-#     # Defina o layout da aplicação Dash
-#     app.layout = html.Div(children=[
-#         html.H1('Relação de Modelos'),
-#         dcc.Graph(id='graph'),
-#     ])
-
-#     # Crie uma função de callback para atualizar o gráfico
-#     @app.callback(
-#         Output('graph', 'figure'),
-#         [Input('graph', 'id')]
-#     )
-#     def update_graph(input_value):
-#         # Obtenha os dados para o gráfico a partir do seu modelo
-#         categorias = Categoria.objects.filter(lancamento__isnull=False).distinct()
-#         receitas = []
-#         despesas = []
-
-#         for categoria in categorias:
-#             lancamentos = Lancamento.objects.filter(categoria=categoria)
-#             total = sum(lancamento.valor for lancamento in lancamentos)
-
-#             if categoria.tipo == '1':
-#                 receitas.append(total)
-#             elif categoria.tipo == '2':
-#                 despesas.append(total)
-
-#         # Crie o gráfico de barras
-#         trace1 = go.Bar(
-#             x=[categoria.nome for categoria in categorias if categoria.tipo == '1'],
-#             y=receitas,
-#             name='Receitas'
-#         )
-#         trace2 = go.Bar(
-#             x=[categoria.nome for categoria in categorias if categoria.tipo == '2'],
-#             y=despesas,
-#             name='Despesas'
-#         )
-
-#         data = [trace1, trace2]
-#         layout = go.Layout(
-#             barmode='group',
-#             title='Relação de Receitas e Despesas por Categoria'
-#         )
-
-#         fig = go.Figure(data=data, layout=layout)
-
-#         return fig
-
-#     return render(request, 'dashboard.html')
 @login_required
 def dashboard_view(request):
     response = render(request, 'dashboard.html')
