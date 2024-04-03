@@ -1417,22 +1417,35 @@ def edit_profile(request):
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
 
-            s3 = boto3.client('s3')
+            s3 = boto3.client('s3',
+                aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+                aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+            )
+
             if 'image' in request.FILES:
                 file = request.FILES['image']
                 if profile.image:
                     # Delete the old file
-                    s3.delete_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=profile.image.name)
+                    try:
+                        s3.delete_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=profile.image.name)
+                    except NoCredentialsError:
+                        messages.error(request, 'Erro ao excluir a imagem antiga. Credenciais inválidas.')
                 # Save the new file
                 file_name = generate_unique_filename(file.name)
-                s3.upload_fileobj(file, settings.AWS_STORAGE_BUCKET_NAME, file_name)
-                profile.image = file_name
+                try:
+                    s3.upload_fileobj(file, settings.AWS_STORAGE_BUCKET_NAME, file_name)
+                    profile.image = file_name
+                except NoCredentialsError:
+                    messages.error(request, 'Erro ao fazer upload da nova imagem. Credenciais inválidas.')
             else:
                 # Delete the old file
                 if profile.image:
-                    s3.delete_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=profile.image.name)
-                profile.image = None
-            
+                    try:
+                        s3.delete_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=profile.image.name)
+                        profile.image = None
+                    except NoCredentialsError:
+                        messages.error(request, 'Erro ao excluir a imagem antiga. Credenciais inválidas.')
+
             profile = profile_form.save(commit=False)
             profile.save()
 
@@ -1440,7 +1453,6 @@ def edit_profile(request):
             return redirect('edit_profile')
 
     return render(request, 'account/edit_profile.html', {'user_form': user_form, 'profile_form': profile_form})
-
 
 @login_required
 def grafico_proventos(request):
